@@ -9,7 +9,16 @@ export const redis =
     // degrades to the fallbacks in cached()/rateLimit() instead of hanging.
     maxRetriesPerRequest: 2,
     connectTimeout: 2000,
+    // Connect on first command, so importing this module (e.g. during
+    // `next build`) never opens a socket.
+    lazyConnect: true,
   });
+
+// Without a listener ioredis logs every reconnect failure as unhandled;
+// callers already fall back when a command fails.
+redis.on("error", (err) => {
+  if (process.env.NODE_ENV !== "test") console.warn("[redis]", err.message);
+});
 
 if (process.env.NODE_ENV !== "production") globalForRedis.redis = redis;
 

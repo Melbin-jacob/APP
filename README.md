@@ -11,7 +11,14 @@ and AWS SES or SMTP.
 The schema, component tree, full API spec and security mapping are in
 **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
-## Quick start
+## Try it
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Melbin-jacob/APP?ref=claude/optimistic-ride-oiy31m)
+
+Or run `docker compose up --build` and open http://localhost:3000. The test inbox is at http://localhost:8025.
+**[TESTING.md](TESTING.md)** has the demo accounts and a walkthrough of every feature.
+
+## Manual setup
 
 ```bash
 # Prerequisites: Node 20+, PostgreSQL 16 with PostGIS, Redis 7
@@ -22,7 +29,7 @@ npm run db:seed                 # categories, 16 demo traders, banners, super-ad
 npm run dev
 ```
 
-Seeded logins (dev only): `admin@homeservices.local` and `trader0@homeservices.local`, both with password `ChangeMe-123456`.
+Seeded logins (dev only): `admin@`, `trader0@` and `customer@homeservices.local`, all with password `ChangeMe-123456`.
 
 With `EMAIL_TRANSPORT=console`, emails such as review requests and magic links are printed to the
 server log instead of being sent. This setting is refused when `NODE_ENV=production`.

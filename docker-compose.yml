@@ -1,0 +1,49 @@
+# Full local stack: app + PostGIS + Redis + Mailpit (test inbox).
+#   docker compose up --build
+#   App:   http://localhost:3000
+#   Inbox: http://localhost:8025   (every email the app sends lands here)
+services:
+  app:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_started }
+      mailpit: { condition: service_started }
+    ports: ["3000:3000"]
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/homeservices?schema=public
+      REDIS_URL: redis://redis:6379
+      APP_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: local-test-secret-change-me-0123456789abcdef
+      REVIEW_TOKEN_PEPPER: local-test-pepper-change-me-0123456789abcdef
+      REVIEW_TOKEN_TTL_DAYS: "14"
+      CRON_SECRET: local-test-cron-secret-change-me-0123456789
+      EMAIL_TRANSPORT: smtp
+      SMTP_URL: smtp://mailpit:1025
+      EMAIL_FROM: HomeServices Direct <no-reply@homeservices.test>
+      SEED_DEMO_DATA: "true"
+
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: homeservices
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d homeservices"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports: ["8025:8025", "1025:1025"]
+
+volumes:
+  pgdata:

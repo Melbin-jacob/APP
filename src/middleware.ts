@@ -7,7 +7,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_ROLES = new Set(["ADMIN", "SUPER_ADMIN"]);
 
-function csp(nonce: string) {
+function csp(nonce: string, https: boolean) {
   const dev = process.env.NODE_ENV !== "production";
   return [
     `default-src 'self'`,
@@ -21,7 +21,8 @@ function csp(nonce: string) {
     `form-action 'self'`,
     `base-uri 'self'`,
     `object-src 'none'`,
-    ...(dev ? [] : ["upgrade-insecure-requests"]),
+    // Only behind TLS: on plain-http localhost it would rewrite assets to https and break them.
+    ...(https && !dev ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 }
 
@@ -42,11 +43,12 @@ export async function middleware(req: NextRequest) {
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const https = (req.headers.get("x-forwarded-proto") ?? req.nextUrl.protocol.replace(":", "")) === "https";
   const headers = new Headers(req.headers);
   headers.set("x-nonce", nonce);
-  headers.set("Content-Security-Policy", csp(nonce));
+  headers.set("Content-Security-Policy", csp(nonce, https));
   const res = NextResponse.next({ request: { headers } });
-  res.headers.set("Content-Security-Policy", csp(nonce));
+  res.headers.set("Content-Security-Policy", csp(nonce, https));
   return res;
 }
 

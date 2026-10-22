@@ -1,0 +1,17 @@
+{
+  "name": "HomeServices Direct",
+  "dockerComposeFile": ["../docker-compose.yml", "docker-compose.devcontainer.yml"],
+  "service": "workspace",
+  "runServices": ["workspace", "db", "redis", "mailpit"],
+  "workspaceFolder": "/workspaces/APP",
+  "forwardPorts": [3000, 8025],
+  "portsAttributes": {
+    "3000": { "label": "App", "onAutoForward": "openBrowser" },
+    "8025": { "label": "Test inbox (Mailpit)", "onAutoForward": "notify" }
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postAttachCommand": { "app": "npm run dev" },
+  "customizations": {
+    "vscode": { "extensions": ["Prisma.prisma", "bradlc.vscode-tailwindcss", "dbaeumer.vscode-eslint"] }
+  }
+}

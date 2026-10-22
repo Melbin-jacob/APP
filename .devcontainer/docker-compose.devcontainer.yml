@@ -1,0 +1,8 @@
+# Codespaces / VS Code dev container: a Node workspace next to the same
+# db, redis and mailpit services the root compose file defines.
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm
+    command: sleep infinity
+    volumes: ["..:/workspaces/APP:cached"]
+    depends_on: [db, redis, mailpit]

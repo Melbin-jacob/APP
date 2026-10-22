@@ -86,8 +86,53 @@ async function main() {
       ],
     });
   }
+  // ── Fixtures for manual testing ───────────────────────────────────────────
+  await db.user.upsert({
+    where: { email: "customer@homeservices.local" },
+    create: { email: "customer@homeservices.local", name: "Casey Customer", role: "CUSTOMER", passwordHash: password, tosVersion: TOS, tosAcceptedAt: new Date() },
+    update: {},
+  });
+
+  // A trader waiting in the admin approval queue, with a credential to verify.
+  if (!(await db.user.findUnique({ where: { email: "pending@homeservices.local" } }))) {
+    await db.user.create({
+      data: {
+        email: "pending@homeservices.local", name: "Pat Pending", role: "TRADER", passwordHash: password, tosVersion: TOS, tosAcceptedAt: new Date(),
+        trader: {
+          create: {
+            businessName: "Pending Roofing Co", slug: "pending-roofing-co", phone: "+44 20 7946 0999", city: "London", postcode: "SE1 7PB",
+            latitude: 51.5007, longitude: -0.1246, status: "PENDING", hourlyRatePence: 5500,
+            categories: { create: { categoryId: bySlug["roofing"].id, isPrimary: true } },
+            credentials: { create: { type: "LICENSE", name: "NFRC roofing membership", issuer: "NFRC", documentUrl: "s3://private/credentials/pending.pdf" } },
+          },
+        },
+      },
+    });
+  }
+
+  const trader0 = await db.traderProfile.findFirst({ where: { user: { email: "trader0@homeservices.local" } } });
+  if (trader0) {
+    // Open jobs to mark "Completed" → review email lands in the test inbox.
+    if ((await db.job.count({ where: { traderId: trader0.id } })) === 0) {
+      await db.job.createMany({
+        data: [
+          { traderId: trader0.id, title: "Replace kitchen tap", customerEmail: "customer@homeservices.local", customerName: "Casey" },
+          { traderId: trader0.id, title: "Boiler annual service", customerEmail: "alex@example.test", customerName: "Alex" },
+        ],
+      });
+    }
+    // A review in the moderation queue.
+    if (!(await db.review.findFirst({ where: { traderId: trader0.id, status: "PENDING_MODERATION" } }))) {
+      const flagged = await db.review.create({
+        data: { traderId: trader0.id, authorName: "Spammy McSpam", rating: 1, comment: "TERRIBLE!!! visit www.cheap-deals.biz instead", status: "PENDING_MODERATION", reportCount: 3 },
+      });
+      await db.reviewReport.create({ data: { reviewId: flagged.id, reason: "SPAM", details: "Advertising a competitor" } });
+    }
+  }
+
   await db.siteSetting.upsert({ where: { key: "ads.sideBanners.enabled" }, create: { key: "ads.sideBanners.enabled", value: true }, update: {} });
-  console.log("Seeded. Admin: admin@homeservices.local / ChangeMe-123456");
+  console.log("Seeded. Password for all demo accounts: ChangeMe-123456");
+  console.log("  admin@homeservices.local (super-admin) · trader0@homeservices.local (trader) · customer@homeservices.local (customer)");
 }
 
 main().finally(() => db.$disconnect());
