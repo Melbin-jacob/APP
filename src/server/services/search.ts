@@ -1,6 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { parsePostcode } from "@/lib/postcode";
+import { lookupPostcode } from "./geo";
 
 export const searchQuerySchema = z.object({
   q: z.string().trim().max(80).optional(),
@@ -38,13 +40,19 @@ export type TraderCard = {
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 /**
- * Resolve "City or Zip" to a point. Production should call a geocoder
- * (Mapbox / Google / postcodes.io) behind this function; this fallback
- * centres on the traders we already know in that city or postcode district.
+ * Resolve "City or Zip" to a point. Full postcodes/ZIPs go through the
+ * postcode lookup; city names and partial codes centre on the traders we
+ * already know in that city or postcode district.
  */
 export async function geocode(location: string): Promise<{ lat: number; lng: number } | null> {
   const term = location.trim();
   if (!term) return null;
+  // A full postcode/ZIP resolves exactly; search must still work if the
+  // lookup service is down, so failures fall through to the estimate below.
+  if (parsePostcode(term)) {
+    const hit = await lookupPostcode(term).catch(() => null);
+    if (hit) return { lat: hit.latitude, lng: hit.longitude };
+  }
   const outward = term.toUpperCase().split(/\s+/)[0];
   const rows = await db.$queryRaw<{ lat: number | null; lng: number | null }[]>`
     SELECT AVG("latitude")::float AS lat, AVG("longitude")::float AS lng

@@ -6,6 +6,7 @@ import { plainText, slugify } from "@/lib/sanitize";
 import { audit } from "../audit";
 import { ApiError } from "../http";
 import { getSetting } from "../settings";
+import { lookupPostcode } from "./geo";
 
 const password = z
   .string()
@@ -27,15 +28,15 @@ export const customerRegistrationInput = base;
 
 const ukOrUsPostcode = /^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}|\d{5}(-\d{4})?)$/i;
 
+// The business location comes only from the postcode, resolved on the
+// server: city and coordinates sent by the browser are never trusted.
+
 export const traderRegistrationInput = base.extend({
   businessName: z.string().trim().min(2).max(100),
   phone: z.string().trim().regex(/^\+?[0-9 ()-]{7,20}$/, "Enter a valid phone number"),
   categoryId: z.string().cuid(),
   hourlyRatePence: z.number().int().min(0).max(100_000).optional(),
-  city: z.string().trim().min(2).max(80),
-  postcode: z.string().trim().regex(ukOrUsPostcode, "Enter a valid postcode / ZIP"),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
+  postcode: z.string({ error: "Enter your business postcode / ZIP" }).trim().regex(ukOrUsPostcode, "Enter a full UK postcode or a 5-digit US ZIP code"),
   serviceRadiusKm: z.number().int().min(1).max(300).default(25),
   servicePostcodes: z.array(z.string().trim().toUpperCase().max(10)).max(100).default([]),
 });
@@ -79,6 +80,9 @@ export async function registerTrader(input: z.infer<typeof traderRegistrationInp
   const category = await db.category.findFirst({ where: { id: input.categoryId, isActive: true } });
   if (!category) throw new ApiError(422, "invalid_category", "Unknown trade category");
 
+  const location = await lookupPostcode(input.postcode);
+  if (!location) throw new ApiError(422, "postcode_not_found", "We couldn't find that postcode. Check it and try again.");
+
   const requireApproval = await getSetting("traders.requireApproval");
   const passwordHash = await hashPassword(input.password);
   const businessName = plainText(input.businessName, 100);
@@ -100,10 +104,12 @@ export async function registerTrader(input: z.infer<typeof traderRegistrationInp
             slug,
             phone: input.phone,
             hourlyRatePence: input.hourlyRatePence,
-            city: plainText(input.city, 80),
-            postcode: input.postcode.toUpperCase(),
-            latitude: input.latitude,
-            longitude: input.longitude,
+            city: location.city,
+            postcode: location.postcode,
+            country: location.country,
+            currency: location.country === "US" ? "USD" : "GBP",
+            latitude: location.latitude,
+            longitude: location.longitude,
             serviceRadiusKm: input.serviceRadiusKm,
             status: requireApproval ? "PENDING" : "APPROVED",
             categories: { create: { categoryId: category.id, isPrimary: true } },

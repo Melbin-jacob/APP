@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { api, ClientApiError } from "@/lib/api-client";
 import { LIABILITY_DISCLAIMER } from "@/lib/legal";
+import { PostcodeLookup, type VerifiedLocation } from "./PostcodeLookup";
 
 type Category = { id: string; name: string };
 type Errors = Record<string, string>;
@@ -25,10 +26,10 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<null | { status?: string }>(null);
-  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-
-  const locate = () =>
-    navigator.geolocation?.getCurrentPosition((p) => setCoords({ latitude: p.coords.latitude, longitude: p.coords.longitude }));
+  // Businesses must enter a postcode that resolves to a real place before the
+  // rest of their details can be filled in or submitted.
+  const [location, setLocation] = useState<VerifiedLocation | null>(null);
+  const locked = type === "trader" && !location;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,19 +44,16 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
       marketingOptIn: f.get("marketingOptIn") === "on",
     };
     if (type === "trader") {
+      if (!location) return;
       Object.assign(payload, {
         businessName: str("businessName"),
         phone: str("phone"),
         categoryId: str("categoryId"),
         hourlyRatePence: str("hourlyRate") ? Math.round(Number(str("hourlyRate")) * 100) : undefined,
-        city: str("city"),
-        postcode: str("postcode"),
+        // The server re-resolves the postcode; city and coordinates come from there.
+        postcode: location.postcode,
         serviceRadiusKm: Number(str("serviceRadiusKm") || 25),
         servicePostcodes: str("servicePostcodes").split(/[\s,]+/).filter(Boolean),
-        // Production: geocode server-side from postcode; the browser location
-        // is an optional shortcut here.
-        latitude: coords?.latitude ?? Number(str("latitude")),
-        longitude: coords?.longitude ?? Number(str("longitude")),
       });
     }
     setBusy(true);
@@ -68,6 +66,10 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
     } catch (err) {
       if (err instanceof ClientApiError && err.issues) {
         setErrors(Object.fromEntries(err.issues.map((i) => [i.path, i.message])));
+      }
+      if (err instanceof ClientApiError && err.code === "postcode_not_found") {
+        setErrors({ postcode: err.message });
+        setLocation(null);
       }
       setFormError(err instanceof ClientApiError ? err.message : "Something went wrong");
     } finally {
@@ -110,32 +112,36 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
       </div>
 
       {type === "trader" && (
-        <fieldset className="grid gap-4 border-t border-ink-200 pt-5 sm:grid-cols-2">
-          <legend className="mb-2 text-sm font-semibold">Business details</legend>
-          <Field id="businessName" label="Business name" error={errors.businessName}><input id="businessName" name="businessName" required className="input" /></Field>
-          <Field id="phone" label="Phone number" error={errors.phone}><input id="phone" name="phone" type="tel" required className="input" autoComplete="tel" /></Field>
-          <Field id="categoryId" label="Trade category" error={errors.categoryId}>
-            <select id="categoryId" name="categoryId" required className="input" defaultValue="">
-              <option value="" disabled>Choose…</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </Field>
-          <Field id="hourlyRate" label="Hourly rate (£)" error={errors.hourlyRatePence}><input id="hourlyRate" name="hourlyRate" type="number" min={0} step="1" className="input" /></Field>
-          <Field id="city" label="City" error={errors.city}><input id="city" name="city" required className="input" autoComplete="address-level2" /></Field>
-          <Field id="postcode" label="Postcode / ZIP" error={errors.postcode}><input id="postcode" name="postcode" required className="input" autoComplete="postal-code" /></Field>
-          <Field id="serviceRadiusKm" label="Service radius (km)" error={errors.serviceRadiusKm}><input id="serviceRadiusKm" name="serviceRadiusKm" type="number" min={1} max={300} defaultValue={25} className="input" /></Field>
-          <Field id="servicePostcodes" label="Also cover these postcodes (optional)" error={errors.servicePostcodes}><input id="servicePostcodes" name="servicePostcodes" placeholder="SW1A, SW1B" className="input" /></Field>
-          <div className="sm:col-span-2">
-            <button type="button" onClick={locate} className="btn-ghost text-xs">{coords ? "✓ Location captured" : "Use my current location for the map pin"}</button>
-            {!coords && (
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <input name="latitude" placeholder="Latitude" className="input" inputMode="decimal" />
-                <input name="longitude" placeholder="Longitude" className="input" inputMode="decimal" />
-              </div>
-            )}
-            {(errors.latitude || errors.longitude) && <p className="mt-1 text-xs text-rose-600">A valid location is required.</p>}
+        <div className="space-y-4 border-t border-ink-200 pt-5">
+          <h2 className="text-sm font-semibold">Business details</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <PostcodeLookup onChange={setLocation} serverError={errors.postcode} />
           </div>
-        </fieldset>
+          {/* A disabled fieldset disables every control inside it. */}
+          <fieldset disabled={locked} aria-describedby={locked ? "postcode-status" : undefined}
+            className={`grid gap-4 transition sm:grid-cols-2 ${locked ? "pointer-events-none opacity-50" : ""}`}>
+            <legend className="sr-only">Business information</legend>
+            <Field id="city" label="Area (from your postcode)">
+              <input id="city" readOnly tabIndex={-1} value={location ? [location.city, location.region].filter((v, i, a) => v && a.indexOf(v) === i).join(", ") : ""}
+                placeholder="Filled in from your postcode" className="input bg-ink-100" />
+            </Field>
+            <Field id="businessName" label="Business name" error={errors.businessName}><input id="businessName" name="businessName" required className="input" /></Field>
+            <Field id="phone" label="Phone number" error={errors.phone}><input id="phone" name="phone" type="tel" required className="input" autoComplete="tel" /></Field>
+            <Field id="categoryId" label="Trade category" error={errors.categoryId}>
+              <select id="categoryId" name="categoryId" required className="input" defaultValue="">
+                <option value="" disabled>Choose…</option>
+                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </Field>
+            <Field id="hourlyRate" label={`Hourly rate (${location?.country === "US" ? "$" : "£"})`} error={errors.hourlyRatePence}>
+              <input id="hourlyRate" name="hourlyRate" type="number" min={0} step="1" className="input" />
+            </Field>
+            <Field id="serviceRadiusKm" label="Service radius (km)" error={errors.serviceRadiusKm}><input id="serviceRadiusKm" name="serviceRadiusKm" type="number" min={1} max={300} defaultValue={25} className="input" /></Field>
+            <div className="sm:col-span-2">
+              <Field id="servicePostcodes" label="Also cover these postcode areas (optional)" error={errors.servicePostcodes}><input id="servicePostcodes" name="servicePostcodes" placeholder="SW1A, SW1B" className="input" /></Field>
+            </div>
+          </fieldset>
+        </div>
       )}
 
       <div className="space-y-3 border-t border-ink-200 pt-5">
@@ -155,7 +161,9 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
       </div>
 
       {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
-      <button type="submit" disabled={busy} className="btn-primary w-full">{busy ? "Creating account…" : "Create account"}</button>
+      <button type="submit" disabled={busy || locked} className="btn-primary w-full">
+        {busy ? "Creating account…" : locked ? "Enter a valid postcode to continue" : "Create account"}
+      </button>
     </form>
   );
 }

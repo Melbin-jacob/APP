@@ -51,7 +51,10 @@ Password for all: **`ChangeMe-123456`**
 
 **Registration and sign-in**
 - `/register`: try submitting without ticking the Terms box (it's blocked).
-- Register as a business: it goes to the admin approval queue.
+- Register as a business. The details stay locked until you enter a postcode that exists:
+  - `SW1A 1AA` matches *Westminster, London*; a US ZIP such as `90210` matches *Beverly Hills, CA* and switches the rate to $.
+  - A made-up code such as `ZZ9 9ZZ` is rejected, and so is a partial one like `SW1A`.
+  - Once registered, the business goes to the admin approval queue.
 - `/login` → **Email me a link**: the magic link arrives in the test inbox.
 - Enter a wrong password 5 times: you'll be rate-limited.
 

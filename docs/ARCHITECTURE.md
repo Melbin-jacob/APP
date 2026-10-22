@@ -95,7 +95,8 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 ### Public
 | Method & path | Auth | Rate limit | Description |
 |---|---|---|---|
-| `POST /api/auth/register` | – | 5/h/IP | `{accountType:"customer"\|"trader", email, password, name, acceptTerms:true, …trader fields}` → 201 |
+| `GET /api/geo/postcode?code=` | – | 30/min | Resolves a full UK postcode or US ZIP → `{location: {postcode, city, region, country, latitude, longitude}}`; 404 unknown, 422 malformed, 503 lookup service down |
+| `POST /api/auth/register` | – | 5/h/IP | `{accountType:"customer"\|"trader", email, password, name, acceptTerms:true, …trader fields}` → 201. A trader's city and coordinates are resolved on the server from `postcode`; any sent by the client are ignored |
 | `POST /api/auth/callback/credentials`, `/signin/email`, `/signin/google` | – | login 5/15min/account + 50/15min/IP; magic link 3/15min | NextAuth |
 | `GET /api/search?q&category&location&lat&lng&radiusKm&sort&page&pageSize` | – | 120/min | PostGIS + trigram search → `{items, total, page, pageSize}` |
 | `GET /api/search/autocomplete?q` | – | 120/min | `{suggestions:[{type, label, slug}]}` |

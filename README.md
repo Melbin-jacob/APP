@@ -60,6 +60,7 @@ tests/             Vitest unit tests
 - Add an SES configuration set for bounces and complaints.
 - Schedule `POST /api/cron/flush-banner-stats` every 5 minutes with `Authorization: Bearer $CRON_SECRET`.
 - Put the app behind a trusted proxy that overwrites `X-Forwarded-For`, since rate limiting keys on it.
-- Replace the fallback `geocode()` in `src/server/services/search.ts` with a real geocoder (Mapbox, Google or postcodes.io).
+- Postcode lookups use postcodes.io (UK) and zippopotam.us (US), both free with no API key. For other countries or higher volume,
+  swap in a commercial geocoder behind `lookupPostcode()` in `src/server/services/geo.ts`.
 - Add an upload pipeline that issues S3 presigned URLs for logos, gallery images and credentials. Store credential documents in a private bucket.
 - Have counsel review the `/terms` and `/privacy` pages and `src/lib/legal.ts`.

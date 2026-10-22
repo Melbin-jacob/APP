@@ -13,6 +13,7 @@ export const RATE_LIMITS = {
   reviewReport: { limit: 10, windowSeconds: 60 * 60 },
   newsletter: { limit: 5, windowSeconds: 60 * 60 },
   search: { limit: 120, windowSeconds: 60 },
+  geoLookup: { limit: 30, windowSeconds: 60 },
   callClick: { limit: 30, windowSeconds: 60 * 60 },
 } satisfies Record<string, RateLimitRule>;
 
@@ -62,7 +63,7 @@ export async function rateLimit(
     };
   } catch {
     // Fail closed for auth-sensitive policies, open for read paths.
-    const failOpen = policy === "search" || policy === "callClick";
+    const failOpen = policy === "search" || policy === "callClick" || policy === "geoLookup";
     return { ok: failOpen, remaining: 0, retryAfterSeconds: failOpen ? 0 : 60 };
   }
 }
