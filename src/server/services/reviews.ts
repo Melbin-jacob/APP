@@ -86,7 +86,13 @@ export async function createReviewRequest(
     reviewUrl,
     expiresAt,
   });
-  await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request" });
+  try {
+    await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request" });
+  } catch (err) {
+    // Revoke so the cooldown check above doesn't block a retry for 30 days.
+    await db.reviewRequest.update({ where: { id: request.id }, data: { status: "REVOKED" } });
+    throw err;
+  }
   await db.reviewRequest.update({ where: { id: request.id }, data: { status: "SENT", sentAt: new Date() } });
 
   return { id: request.id, expiresAt };
