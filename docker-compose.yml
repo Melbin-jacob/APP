@@ -35,10 +35,14 @@ services:
       POSTGRES_DB: homeservices
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d homeservices"]
+      # Check over TCP, not the Unix socket: on first start the image runs a
+      # temporary socket-only server to create the database, then restarts.
+      # A socket check passes too early and the app hits that restart.
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d homeservices"]
       interval: 3s
       timeout: 3s
-      retries: 20
+      retries: 40
+      start_period: 60s
 
   redis:
     image: redis:7-alpine
