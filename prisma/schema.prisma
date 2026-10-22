@@ -117,7 +117,9 @@ model Category {
 
 model TraderProfile {
   id               String       @id @default(cuid())
-  userId           String       @unique
+  // Null for listings imported from public directories that no one has
+  // claimed yet; set when the business owner claims the listing.
+  userId           String?      @unique
   businessName     String
   slug             String       @unique
   phone            String // real number; never rendered directly when masking is on
@@ -142,10 +144,15 @@ model TraderProfile {
   verifiedAt       DateTime?
   ratingAvg        Decimal      @default(0) @db.Decimal(3, 2)
   ratingCount      Int          @default(0)
+  website          String?
+  // Imported listings: stable source reference (re-imports update in place)
+  // and internal notes from the source data, never shown publicly.
+  importRef        String?      @unique
+  importNotes      String?      @db.Text
   createdAt        DateTime     @default(now())
   updatedAt        DateTime     @updatedAt
 
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   categories     TraderCategory[]
   services       Service[]
   serviceAreas   ServiceArea[]

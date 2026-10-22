@@ -41,7 +41,7 @@ Source of truth: [`prisma/schema.prisma`](../prisma/schema.prisma); hand-written
 |---|---|
 | `User` | Identity for all roles. `role` (CUSTOMER/TRADER/ADMIN/SUPER_ADMIN), `status` (ACTIVE/SUSPENDED/BANNED/PENDING_DELETION), Argon2id `passwordHash`, **`tosVersion` + `tosAcceptedAt`** (proof of disclaimer acceptance), `deletedAt`. |
 | `Account`, `VerificationToken` | NextAuth adapter: OAuth links, magic-link tokens. |
-| `TraderProfile` | Business listing. `latitude/longitude` + PostGIS **`location geography(Point,4326)`** (trigger-maintained, GIST index), `serviceRadiusKm`, `hourlyRatePence`, `phone` (never exposed) + `trackingPhone`, `operatingHours` JSON, `status` (PENDING/APPROVED/…), denormalised `ratingAvg/ratingCount`. |
+| `TraderProfile` | Business listing. `latitude/longitude` + PostGIS **`location geography(Point,4326)`** (trigger-maintained, GIST index), `serviceRadiusKm`, `hourlyRatePence`, `phone` (never exposed) + `trackingPhone`, `operatingHours` JSON, `status` (PENDING/APPROVED/…), denormalised `ratingAvg/ratingCount`. `userId` is **nullable**: null = an unclaimed listing imported from a public directory (`importRef` = source + row, `importNotes` for ops only, `website`). |
 | `Category`, `TraderCategory` | Trade taxonomy (trigram index on name for autocomplete); M:N with a primary flag. |
 | `Service` | Priced service lines a trader offers. |
 | `ServiceArea` | Explicit postcode/ZIP coverage in addition to the radius. |
@@ -149,6 +149,16 @@ The brief asks for a super-admin-only console. Moderation and approvals are open
 `ADMIN` so ops staff can work the queues without access to ads and settings.
 Change `minRole` in `admin/layout.tsx` and `requireRole("ADMIN")` calls to make it
 SUPER_ADMIN-only.
+
+### Directory import
+
+`prisma/import-directory.ts` loads `prisma/data/*.json` (made from the spreadsheet by
+`scripts/directory/convert_xlsx.py`) as APPROVED, unclaimed listings, in batches of 100 per transaction.
+It upserts on `importRef`, never touches a listing with an owner, and deletes unclaimed listings from the same
+source that are gone from the file. Coordinates are town-centre approximations (region centre with a 50 km
+radius when the town is unknown). Public profiles of unclaimed listings say so and offer claim / removal
+links; the phone is still only revealed through the counted Call button, and hidden when absent (`canCall`).
+Claiming is currently manual: support attaches the listing to the owner's account (sets `userId`).
 
 ## 5. Markets, languages and currencies
 

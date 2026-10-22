@@ -30,6 +30,7 @@ export default function PrivacyPage() {
           <tbody>
             <tr><td>Name, email, password (stored as a one-way hash)</td><td>You</td><td>Create and secure your account</td><td>Identifiers</td></tr>
             <tr><td>Business details: name, phone, postal code, rates, photos, licences and insurance documents</td><td>Businesses</td><td>Publish the listing; verify credentials</td><td>Identifiers; professional information</td></tr>
+            <tr><td>Business name, trade, phone, address and website of businesses that haven’t joined</td><td>Publicly available business directories</td><td>Show an “unclaimed” listing so customers can find local trades; the business can claim or remove it</td><td>Identifiers; professional information</td></tr>
             <tr><td>Business location (derived from the postal code)</td><td>Postal-code lookup</td><td>Show listings to nearby customers</td><td>Geolocation (approximate)</td></tr>
             <tr><td>Customer email and name entered by a business to request a review</td><td>The business</td><td>Send one review invitation</td><td>Identifiers</td></tr>
             <tr><td>Reviews, ratings and reports</td><td>You</td><td>Publish reviews; moderate abuse</td><td>Commercial information</td></tr>
@@ -50,6 +51,9 @@ export default function PrivacyPage() {
       <h2>4. Who we share it with</h2>
       <ul>
         <li><strong>The public:</strong> business listings and published reviews (with the display name you chose).</li>
+        <li><strong>Unclaimed listings:</strong> some listings were compiled from publicly available business directories and are marked
+          “Unclaimed”. Owners can claim them or ask us to remove them at <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>;
+          we remove listings on request.</li>
         <li><strong>Service providers</strong> under contract, only to run the service: cloud hosting and databases, email delivery, and a
           postal-code lookup service (which receives only a business postal code). They may not use the data for their own purposes.</li>
         <li><strong>Advertising partners:</strong> only if you accept advertising cookies. See <Link href="/legal/privacy-choices">Do Not Sell or Share</Link>.</li>

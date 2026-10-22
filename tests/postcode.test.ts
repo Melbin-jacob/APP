@@ -5,7 +5,7 @@ vi.mock("@/lib/redis", () => ({ cached: (_k: string, _t: number, load: () => unk
 const { lookupPostcode } = await import("@/server/services/geo");
 
 describe("launch markets", () => {
-  it("defaults to the United States and Canada", () => expect(SUPPORTED_COUNTRIES).toEqual(["US", "CA"]));
+  it("defaults to Canada, then the United States", () => expect(SUPPORTED_COUNTRIES).toEqual(["CA", "US"]));
 });
 
 describe("parsePostcode", () => {

@@ -44,7 +44,7 @@ export async function createReviewRequest(
   });
   if (!trader) throw notFound("Trader");
   if (trader.status !== "APPROVED") throw new ApiError(403, "trader_not_approved", "Your profile must be approved first");
-  if (trader.user.email.toLowerCase() === input.customerEmail) throw conflict("You can't review your own business");
+  if (trader.user?.email.toLowerCase() === input.customerEmail) throw conflict("You can't review your own business");
 
   // One live request per customer per trader per cooldown window — stops a
   // trader from carpet-bombing a customer or farming reviews via aliases.

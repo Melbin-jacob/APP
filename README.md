@@ -25,11 +25,29 @@ Or run `docker compose up --build` and open http://localhost:3000. The test inbo
 cp .env.example .env            # then fill in the secrets (openssl rand -base64 32)
 npm install
 npx prisma migrate deploy       # creates tables, PostGIS trigger, GIST/trigram indexes
-npm run db:seed                 # categories, 16 demo traders, banners, super-admin
+npm run db:seed                 # categories, the business directory, settings, test logins
 npm run dev
 ```
 
-Seeded logins (dev only): `admin@`, `trader0@` and `customer@homeservices.local`, all with password `ChangeMe-123456`.
+Seeded logins (dev only): `admin@` and `customer@homeservices.local`, both with password `ChangeMe-123456`.
+There are no fake businesses: listings come from the business directory (below) or from real sign-ups.
+
+### Business directory
+
+`prisma/data/windsor-essex-directory.json` holds 894 Windsor-Essex (Ontario) businesses, converted from the
+`windsor_essex_trades_directory.xlsx` spreadsheet. They are listed as **unclaimed**: no owner account,
+marked "Unclaimed listing" on their profile with *claim* and *request removal* links (handled by support).
+
+To load an updated spreadsheet:
+
+```bash
+python3 scripts/directory/convert_xlsx.py new-sheet.xlsx prisma/data/windsor-essex-directory.json
+npm run db:import-directory      # or restart Docker: the seed runs the import
+```
+
+The import is idempotent (matched on the sheet's `#` column), never touches a listing a business has claimed,
+and removes unclaimed listings that are no longer in the file. New trades need an entry in
+`scripts/directory/convert_xlsx.py` and `prisma/categories.ts`, plus a translated name in `src/i18n/messages/*.ts`.
 
 With `EMAIL_TRANSPORT=console`, emails such as review requests and magic links are printed to the
 server log instead of being sent. This setting is refused when `NODE_ENV=production`.
@@ -42,6 +60,7 @@ server log instead of being sent. This setting is refused when `NODE_ENV=product
 | `npm run typecheck` / `lint` / `test` | tsc, ESLint, Vitest |
 | `npm run smoke` | Every public page renders (HTTP 200) on a running app; set `BASE_URL` to test another environment |
 | `npm run db:migrate` / `db:deploy` / `db:seed` / `db:studio` | Prisma |
+| `npm run db:import-directory` | Load or refresh the business directory from `prisma/data` |
 
 ## Layout
 
@@ -64,7 +83,7 @@ tests/             Vitest unit tests
 - Set the legal-entity variables (`LEGAL_ENTITY_NAME`, `LEGAL_ADDRESS`, `LEGAL_JURISDICTION`, `PRIVACY_OFFICER`, `*_EMAIL`)
   and make sure the privacy and security mailboxes exist and are monitored.
 - Put the app behind a trusted proxy that overwrites `X-Forwarded-For`, since rate limiting keys on it.
-- Markets: `NEXT_PUBLIC_SUPPORTED_COUNTRIES` (default `US,CA`). Adding a country means a rule in `src/lib/postcode.ts`,
+- Markets: `NEXT_PUBLIC_SUPPORTED_COUNTRIES` (default `CA,US`; the directory is Canada-only, so US visitors see no listings until US businesses sign up). Adding a country means a rule in `src/lib/postcode.ts`,
   a lookup in `src/server/services/geo.ts` (zippopotam.us covers ~60 countries) and translated postal labels.
 - Visitor country comes from the hosting edge's geo header (`x-vercel-ip-country` on Vercel,
   `CloudFront-Viewer-Country` on AWS, `cf-ipcountry` on Cloudflare). Make sure your edge sets one.

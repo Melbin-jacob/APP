@@ -5,7 +5,7 @@ const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 
 const get = (path, headers = {}) => fetch(`${BASE}${path}`, { redirect: "manual", headers });
 
-const search = await get("/api/search?pageSize=1", { "x-country-code": "US" }).then((r) => r.json());
+const search = await get("/api/search?pageSize=1", { "x-country-code": "CA" }).then((r) => r.json());
 const slug = search.items?.[0]?.slug;
 if (!slug) {
   console.error("No listings found: is the database seeded?");

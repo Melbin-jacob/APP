@@ -12,7 +12,7 @@ export const POST = route<{ params: Promise<{ slug: string }> }>(async (req, { p
     where: { slug: (await params).slug, status: "APPROVED" },
     select: { id: true, phone: true, trackingPhone: true },
   });
-  if (!trader) throw notFound("Trader");
+  if (!trader || !trader.phone) throw notFound("Trader");
   await db.callEvent.create({ data: { traderId: trader.id, visitorHash: visitor } });
   const number = trader.trackingPhone ?? trader.phone;
   return NextResponse.json({ tel: `tel:${number.replace(/[^+\d]/g, "")}`, display: number });

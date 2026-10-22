@@ -34,6 +34,7 @@ export function getPublicTrader(slug: string) {
       where: { slug, status: "APPROVED" },
       select: {
         id: true, slug: true, businessName: true, bio: true, hourlyRatePence: true, currency: true, country: true,
+        website: true, userId: true, phone: true,
         logoUrl: true, coverImageUrl: true, addressLine: true, city: true, postcode: true,
         serviceRadiusKm: true, operatingHours: true, verifiedAt: true, ratingAvg: true, ratingCount: true,
         createdAt: true,
@@ -53,6 +54,9 @@ export function getPublicTrader(slug: string) {
         },
       },
     });
-    return t ? { ...t, ratingAvg: Number(t.ratingAvg) } : null;
+    if (!t) return null;
+    // Never expose the number itself (it's revealed via the call endpoint) or who owns the listing.
+    const { phone, userId, ...rest } = t;
+    return { ...rest, ratingAvg: Number(t.ratingAvg), canCall: phone !== "", claimed: userId !== null };
   });
 }

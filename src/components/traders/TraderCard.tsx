@@ -43,7 +43,7 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
           </p>
         )}
         <div className="mt-auto flex w-full gap-2 pt-4">
-          <CallButton slug={trader.slug} className="btn-primary flex-1 px-3 py-2 text-xs" />
+          {trader.canCall && <CallButton slug={trader.slug} className="btn-primary flex-1 px-3 py-2 text-xs" />}
           <Link href={`/traders/${trader.slug}#quote`} className="btn-ghost flex-1 px-3 py-2 text-xs">{t("card.requestQuote")}</Link>
         </div>
       </div>

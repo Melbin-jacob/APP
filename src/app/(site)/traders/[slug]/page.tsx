@@ -7,6 +7,7 @@ import { Price } from "@/components/traders/Price";
 import { ReportReviewButton } from "@/components/traders/ReportReviewButton";
 import { Icon } from "@/components/ui/Icon";
 import { StarRating } from "@/components/ui/StarRating";
+import { COMPANY } from "@/lib/company";
 import { countryName, formatDate } from "@/lib/format";
 import { getI18n } from "@/i18n/server";
 import { getPublicTrader } from "@/server/services/catalog";
@@ -38,6 +39,21 @@ export default async function TraderProfilePage({ params }: Props) {
             {t("profile.otherCountry", { country: countryName(trader.country, visitor.locale) })}
           </p>
         )}
+        {!trader.claimed && (
+          // Listings imported from public directories: unconfirmed until the owner claims them.
+          <aside role="note" className="mb-4 rounded-md border border-accent-400/40 bg-accent-400/10 p-4 text-sm text-ink-700">
+            <strong className="block text-ink-900">{t("profile.unclaimedTitle")}</strong>
+            <p className="mt-1">{t("profile.unclaimedBody")}</p>
+            <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <a className="font-medium text-brand-700 underline" href={`mailto:${COMPANY.supportEmail}?subject=${encodeURIComponent(`Claim listing: ${trader.slug}`)}`}>
+                {t("profile.claim")}
+              </a>
+              <a className="text-ink-500 underline" href={`mailto:${COMPANY.privacyEmail}?subject=${encodeURIComponent(`Remove listing: ${trader.slug}`)}`}>
+                {t("profile.requestRemoval")}
+              </a>
+            </p>
+          </aside>
+        )}
         <header className="card overflow-hidden">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {trader.coverImageUrl && <img src={trader.coverImageUrl} alt="" className="h-48 w-full object-cover sm:h-64" />}
@@ -49,7 +65,7 @@ export default async function TraderProfilePage({ params }: Props) {
               <h1 className="text-2xl font-bold">{trader.businessName}</h1>
               <p className="mt-1 flex items-center gap-1 text-sm text-ink-500">
                 <Icon name="pin" className="h-4 w-4" />
-                {t("profile.location", { place: `${trader.city}, ${trader.postcode}`, km: trader.serviceRadiusKm })}
+                {t("profile.location", { place: [trader.addressLine, trader.city, trader.postcode].filter(Boolean).join(", "), km: trader.serviceRadiusKm })}
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <StarRating value={trader.ratingAvg} count={trader.ratingCount} size="md" />
@@ -67,7 +83,12 @@ export default async function TraderProfilePage({ params }: Props) {
                   <span className="text-sm font-normal text-ink-500">{t("profile.perHour")}</span>
                 </p>
               )}
-              <CallButton slug={trader.slug} className="btn-primary" />
+              {trader.canCall && <CallButton slug={trader.slug} className="btn-primary" />}
+              {trader.website && (
+                <a href={trader.website} target="_blank" rel="nofollow noopener noreferrer ugc" className="text-sm text-brand-700 underline">
+                  {t("profile.website")}
+                </a>
+              )}
             </div>
           </div>
         </header>
@@ -140,7 +161,7 @@ export default async function TraderProfilePage({ params }: Props) {
             <section id="quote" className="card p-6">
               <h2 className="mb-2 font-semibold">{t("profile.quoteTitle")}</h2>
               <p className="mb-4 text-sm text-ink-500">{t("profile.quoteBody", { name: trader.businessName })}</p>
-              <CallButton slug={trader.slug} className="btn-primary w-full" />
+              {trader.canCall && <CallButton slug={trader.slug} className="btn-primary w-full" />}
             </section>
             {Object.keys(hours).length > 0 && (
               <section className="card p-6">

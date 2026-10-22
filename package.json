@@ -2,7 +2,7 @@
   "name": "homeservices-direct",
   "version": "0.1.0",
   "private": true,
-  "description": "HomeServices Direct — marketplace connecting local customers with independent home-service traders.",
+  "description": "HomeServices Direct \u2014 marketplace connecting local customers with independent home-service traders.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -14,7 +14,8 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "db:import-directory": "tsx prisma/import-directory.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

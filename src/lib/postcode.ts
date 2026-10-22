@@ -57,7 +57,7 @@ export const COUNTRIES: Record<CountryCode, CountryRule> = {
 const isCountry = (c: string): c is CountryCode => c in COUNTRIES;
 
 /** Countries open for business, in display order. Defaults to the launch markets. */
-export const SUPPORTED_COUNTRIES: CountryCode[] = (process.env.NEXT_PUBLIC_SUPPORTED_COUNTRIES ?? "US,CA")
+export const SUPPORTED_COUNTRIES: CountryCode[] = (process.env.NEXT_PUBLIC_SUPPORTED_COUNTRIES ?? "CA,US")
   .split(",")
   .map((c) => c.trim().toUpperCase())
   .filter(isCountry);

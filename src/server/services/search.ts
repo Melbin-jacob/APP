@@ -13,7 +13,7 @@ export const searchQuerySchema = z.object({
   lng: z.coerce.number().min(-180).max(180).optional(),
   radiusKm: z.coerce.number().int().min(1).max(200).default(25),
   sort: z.enum(["relevance", "distance", "rating"]).default("relevance"),
-  page: z.coerce.number().int().min(1).max(50).default(1),
+  page: z.coerce.number().int().min(1).max(500).default(1),
   pageSize: z.coerce.number().int().min(1).max(48).default(12),
 });
 
@@ -36,6 +36,7 @@ export type TraderCard = {
   categorySlug: string | null;
   categoryIcon: string | null;
   distanceKm: number | null;
+  canCall: boolean;
 };
 
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
@@ -127,7 +128,7 @@ export async function searchTraders(query: SearchQuery, country: CountryCode): P
              t."logoUrl", t."coverImageUrl", t."hourlyRatePence", t."currency",
              t."ratingAvg"::float AS "ratingAvg", t."ratingCount",
              pc."name" AS "categoryName", pc."slug" AS "categorySlug", pc."icon" AS "categoryIcon",
-             ${distanceSql} AS "distanceKm"
+             ${distanceSql} AS "distanceKm", (t."phone" <> '') AS "canCall"
       FROM "TraderProfile" t
       LEFT JOIN LATERAL (
         SELECT c."name", c."slug", c."icon" FROM "TraderCategory" tc

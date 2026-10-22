@@ -27,9 +27,9 @@ describe("getVisitor", () => {
     expect(await getVisitor()).toMatchObject({ country: "CA", currency: "CAD", locale: "en" });
   });
 
-  it("shows the launch market to visitors elsewhere, with their own currency", async () => {
+  it("shows the first launch market to visitors elsewhere, with their own currency", async () => {
     headerMap = { "cf-ipcountry": "DE", "accept-language": "de-DE" };
-    expect(await getVisitor()).toMatchObject({ country: "US", outsideMarkets: "DE", currency: "EUR", locale: "de" });
+    expect(await getVisitor()).toMatchObject({ country: "CA", outsideMarkets: "DE", currency: "EUR", locale: "de" });
   });
 
   it("lets explicit choices win over location", async () => {
@@ -40,7 +40,7 @@ describe("getVisitor", () => {
 
   it("ignores tampered cookies", async () => {
     headerMap = { "x-vercel-ip-country": "US" };
-    cookieMap = { hsd_country: "GB", hsd_locale: "xx", hsd_currency: "BTC" };
+    cookieMap = { hsd_country: "GB", hsd_locale: "xx", hsd_currency: "BTC" }; // GB isn't an open market
     expect(await getVisitor()).toMatchObject({ country: "US", locale: "en", currency: "USD" });
   });
 });
