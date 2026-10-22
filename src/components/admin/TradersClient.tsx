@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
@@ -12,10 +13,23 @@ type Trader = {
   credentials: { id: string; type: string; name: string; status: string; expiresAt: string | null }[];
 };
 
-export function AdminTradersClient() {
+// "CREDENTIALS" lists traders of any status with documents awaiting checks.
+const VIEWS = { PENDING: "Pending approval", APPROVED: "Approved", SUSPENDED: "Suspended", REJECTED: "Rejected", CREDENTIALS: "Credentials to check" } as const;
+type View = keyof typeof VIEWS;
+
+export function AdminTradersClient({ initialStatus }: { initialStatus?: string }) {
   const qc = useQueryClient();
-  const [status, setStatus] = useState("PENDING");
-  const q = useQuery({ queryKey: ["admin-traders", status], queryFn: () => api<{ traders: Trader[] }>(`/api/admin/traders?status=${status}`) });
+  const router = useRouter();
+  const pathname = usePathname();
+  const [status, setStatusState] = useState<View>(initialStatus && initialStatus in VIEWS ? (initialStatus as View) : "PENDING");
+  const setStatus = (v: View) => {
+    setStatusState(v);
+    router.replace(`${pathname}?status=${v}`, { scroll: false });
+  };
+  const q = useQuery({
+    queryKey: ["admin-traders", status],
+    queryFn: () => api<{ traders: Trader[] }>(status === "CREDENTIALS" ? "/api/admin/traders?credentials=PENDING" : `/api/admin/traders?status=${status}`),
+  });
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin-traders"] });
   const setTrader = useMutation({
     mutationFn: ({ id, status, reason }: { id: string; status: string; reason?: string }) =>
@@ -30,8 +44,8 @@ export function AdminTradersClient() {
   return (
     <>
       <PageTitle actions={
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="input w-44">
-          {["PENDING", "APPROVED", "SUSPENDED", "REJECTED"].map((s) => <option key={s}>{s}</option>)}
+        <select value={status} onChange={(e) => setStatus(e.target.value as View)} className="input w-52" aria-label="Show traders">
+          {(Object.keys(VIEWS) as View[]).map((v) => <option key={v} value={v}>{VIEWS[v]}</option>)}
         </select>
       }>Traders</PageTitle>
       <div className="space-y-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { StarRating } from "@/components/ui/StarRating";
 import { api } from "@/lib/api-client";
@@ -14,10 +15,20 @@ type Review = {
 };
 
 const FILTERS = { "Needs moderation": "status=PENDING_MODERATION", Reported: "reported=1", Published: "status=PUBLISHED", Removed: "status=REMOVED" } as const;
+type Filter = keyof typeof FILTERS;
+// URL slug ↔ tab, so dashboard tiles can deep-link (/admin/reviews?filter=published).
+const SLUGS: Record<string, Filter> = { moderation: "Needs moderation", reported: "Reported", published: "Published", removed: "Removed" };
+const slugOf = (f: Filter) => Object.keys(SLUGS).find((k) => SLUGS[k] === f)!;
 
-export function AdminReviewsClient() {
+export function AdminReviewsClient({ initialFilter }: { initialFilter?: string }) {
   const qc = useQueryClient();
-  const [filter, setFilter] = useState<keyof typeof FILTERS>("Needs moderation");
+  const router = useRouter();
+  const pathname = usePathname();
+  const [filter, setFilterState] = useState<Filter>((initialFilter && SLUGS[initialFilter]) || "Needs moderation");
+  const setFilter = (f: Filter) => {
+    setFilterState(f);
+    router.replace(`${pathname}?filter=${slugOf(f)}`, { scroll: false });
+  };
   const q = useQuery({ queryKey: ["admin-reviews", filter], queryFn: () => api<{ reviews: Review[] }>(`/api/admin/reviews?${FILTERS[filter]}`) });
   const act = useMutation({
     mutationFn: ({ id, action, reason }: { id: string; action: string; reason?: string }) =>
@@ -29,7 +40,7 @@ export function AdminReviewsClient() {
     <>
       <PageTitle actions={
         <div className="flex gap-1">
-          {(Object.keys(FILTERS) as (keyof typeof FILTERS)[]).map((f) => (
+          {(Object.keys(FILTERS) as Filter[]).map((f) => (
             <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1 text-xs ${filter === f ? "bg-brand-500 text-white" : "bg-white"}`}>{f}</button>
           ))}
         </div>

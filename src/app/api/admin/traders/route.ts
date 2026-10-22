@@ -5,11 +5,13 @@ import { requireRole } from "@/server/auth";
 import { route } from "@/server/http";
 
 // GET /api/admin/traders?status=PENDING — approval queue and directory.
+// GET /api/admin/traders?credentials=PENDING — traders with documents to check.
 export const GET = route(async (req) => {
   await requireRole("ADMIN");
   const status = z.enum(["PENDING", "APPROVED", "SUSPENDED", "REJECTED"]).optional().parse(req.nextUrl.searchParams.get("status") ?? undefined);
+  const credentials = z.enum(["PENDING"]).optional().parse(req.nextUrl.searchParams.get("credentials") ?? undefined);
   const traders = await db.traderProfile.findMany({
-    where: { status },
+    where: { status, ...(credentials ? { credentials: { some: { status: credentials } } } : {}) },
     orderBy: { createdAt: "desc" },
     take: 100,
     include: {

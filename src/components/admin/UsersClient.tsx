@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { api, ClientApiError } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
@@ -8,10 +9,23 @@ import { Badge, PageTitle, statusTone } from "./ui";
 
 type User = { id: string; email: string; name: string | null; role: string; status: string; createdAt: string; lastLoginAt: string | null };
 
-export function AdminUsersClient() {
+const ROLES = { "": "All roles", CUSTOMER: "Customers", TRADER: "Traders", ADMIN: "Admins", SUPER_ADMIN: "Super-admins" } as const;
+type RoleFilter = keyof typeof ROLES;
+
+export function AdminUsersClient({ initialRole }: { initialRole?: string }) {
   const qc = useQueryClient();
+  const router = useRouter();
+  const pathname = usePathname();
   const [q, setQ] = useState("");
-  const users = useQuery({ queryKey: ["admin-users", q], queryFn: () => api<{ users: User[] }>(`/api/admin/users?q=${encodeURIComponent(q)}`) });
+  const [role, setRoleState] = useState<RoleFilter>(initialRole && initialRole in ROLES ? (initialRole as RoleFilter) : "");
+  const setRole = (r: RoleFilter) => {
+    setRoleState(r);
+    router.replace(r ? `${pathname}?role=${r}` : pathname, { scroll: false });
+  };
+  const users = useQuery({
+    queryKey: ["admin-users", q, role],
+    queryFn: () => api<{ users: User[] }>(`/api/admin/users?q=${encodeURIComponent(q)}${role ? `&role=${role}` : ""}`),
+  });
   const update = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => {
       const reason = prompt(`Reason for setting ${status}?`);
@@ -23,7 +37,14 @@ export function AdminUsersClient() {
 
   return (
     <>
-      <PageTitle actions={<input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search email or name" className="input w-64" />}>Users</PageTitle>
+      <PageTitle actions={
+        <div className="flex flex-wrap gap-2">
+          <select value={role} onChange={(e) => setRole(e.target.value as RoleFilter)} className="input w-40" aria-label="Filter by role">
+            {(Object.keys(ROLES) as RoleFilter[]).map((r) => <option key={r} value={r}>{ROLES[r]}</option>)}
+          </select>
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search email or name" className="input w-64" aria-label="Search users" />
+        </div>
+      }>Users</PageTitle>
       {update.error && <p className="mb-3 text-sm text-rose-600">{update.error instanceof ClientApiError ? update.error.message : "Failed"}</p>}
       <div className="card overflow-x-auto">
         <table className="w-full text-left text-sm">

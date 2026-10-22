@@ -11,12 +11,12 @@ export default async function AdminOverview() {
     <>
       <PageTitle>Overview</PageTitle>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-6">
-        <Stat label="Customers" value={d.totals.customers} />
-        <Stat label="Live traders" value={d.totals.traders} />
-        <Stat label="Published reviews" value={d.totals.reviews} />
-        <Stat label="Traders to approve" value={d.queues.pendingTraders} tone={d.queues.pendingTraders ? "warn" : undefined} />
-        <Stat label="Reviews to moderate" value={d.queues.pendingReviews} tone={d.queues.pendingReviews ? "warn" : undefined} />
-        <Stat label="Credentials to check" value={d.queues.pendingCredentials} tone={d.queues.pendingCredentials ? "warn" : undefined} />
+        <Stat label="Customers" value={d.totals.customers} href="/admin/users?role=CUSTOMER" />
+        <Stat label="Live traders" value={d.totals.traders} href="/admin/traders?status=APPROVED" />
+        <Stat label="Published reviews" value={d.totals.reviews} href="/admin/reviews?filter=published" />
+        <Stat label="Traders to approve" value={d.queues.pendingTraders} tone={d.queues.pendingTraders ? "warn" : undefined} href="/admin/traders?status=PENDING" />
+        <Stat label="Reviews to moderate" value={d.queues.pendingReviews} tone={d.queues.pendingReviews ? "warn" : undefined} href="/admin/reviews?filter=moderation" />
+        <Stat label="Credentials to check" value={d.queues.pendingCredentials} tone={d.queues.pendingCredentials ? "warn" : undefined} href="/admin/traders?status=CREDENTIALS" />
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <MiniBars title="New users / day (30d)" points={d.series.signups} />
