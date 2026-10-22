@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/layout/SiteHeader";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { getI18n } from "@/i18n/server";
 import { resolveReviewToken } from "@/server/services/reviews";
 
 // The token is in the URL: never leak it via Referer, never index the page.
-export const metadata: Metadata = { title: "Leave a review", referrer: "no-referrer", robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("review.pageTitle"), referrer: "no-referrer", robots: { index: false, follow: false } };
+}
 
 type Props = { searchParams: Promise<{ token?: string; rating?: string }> };
 
@@ -13,7 +17,7 @@ type Props = { searchParams: Promise<{ token?: string; rating?: string }> };
 // pre-fetch links); only the POST from the form does.
 export default async function ReviewPage({ searchParams }: Props) {
   const { token = "", rating } = await searchParams;
-  const request = await resolveReviewToken(token);
+  const [request, { t }] = await Promise.all([resolveReviewToken(token), getI18n()]);
   const preset = Number(rating);
 
   return (
@@ -23,8 +27,8 @@ export default async function ReviewPage({ searchParams }: Props) {
         <div className="card p-6 sm:p-8">
           {request ? (
             <>
-              <h1 className="text-xl font-bold">How was your service with {request.trader.businessName}?</h1>
-              <p className="mt-1 text-sm text-ink-500">Your review will appear on their public profile as a verified customer review.</p>
+              <h1 className="text-xl font-bold">{t("review.title", { name: request.trader.businessName })}</h1>
+              <p className="mt-1 text-sm text-ink-500">{t("review.intro")}</p>
               <ReviewForm
                 token={token}
                 businessName={request.trader.businessName}
@@ -35,11 +39,9 @@ export default async function ReviewPage({ searchParams }: Props) {
             </>
           ) : (
             <>
-              <h1 className="text-xl font-bold">This review link is no longer valid</h1>
-              <p className="mt-2 text-sm text-ink-500">
-                Links work once and expire after a couple of weeks. If you still want to leave a review, ask the business to send a new link.
-              </p>
-              <Link href="/" className="btn-primary mt-6">Go to homepage</Link>
+              <h1 className="text-xl font-bold">{t("review.invalidTitle")}</h1>
+              <p className="mt-2 text-sm text-ink-500">{t("review.invalidBody")}</p>
+              <Link href="/" className="btn-primary mt-6">{t("review.home")}</Link>
             </>
           )}
         </div>

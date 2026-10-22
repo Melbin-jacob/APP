@@ -1,16 +1,18 @@
 import { db } from "@/lib/db";
+import type { CountryCode } from "@/lib/postcode";
 import { cached } from "@/lib/redis";
 import { searchTraders } from "./search";
 
 export type CategorySummary = { id: string; slug: string; name: string; icon: string; traderCount: number };
 
-export function getPopularCategories(limit = 16): Promise<CategorySummary[]> {
-  return cached(`categories:popular:${limit}`, 300, async () => {
+/** Categories ranked by how many approved professionals each has in `country`. */
+export function getPopularCategories(country: CountryCode, limit = 16): Promise<CategorySummary[]> {
+  return cached(`categories:popular:${country}:${limit}`, 300, async () => {
     const rows = await db.$queryRaw<CategorySummary[]>`
       SELECT c."id", c."slug", c."name", c."icon", COUNT(t."id")::int AS "traderCount"
       FROM "Category" c
       LEFT JOIN "TraderCategory" tc ON tc."categoryId" = c."id"
-      LEFT JOIN "TraderProfile" t ON t."id" = tc."traderId" AND t."status" = 'APPROVED'
+      LEFT JOIN "TraderProfile" t ON t."id" = tc."traderId" AND t."status" = 'APPROVED' AND t."country" = ${country}
       WHERE c."isActive"
       GROUP BY c."id"
       ORDER BY COUNT(t."id") DESC, c."sortOrder" ASC
@@ -19,9 +21,9 @@ export function getPopularCategories(limit = 16): Promise<CategorySummary[]> {
   });
 }
 
-export function getFeaturedTraders(category?: string) {
-  return cached(`traders:featured:${category ?? "all"}`, 120, async () =>
-    (await searchTraders({ category, sort: "rating", page: 1, pageSize: 8, radiusKm: 25 })).items,
+export function getFeaturedTraders(country: CountryCode, category?: string) {
+  return cached(`traders:featured:${country}:${category ?? "all"}`, 120, async () =>
+    (await searchTraders({ category, sort: "rating", page: 1, pageSize: 8, radiusKm: 25 }, country)).items,
   );
 }
 
@@ -31,7 +33,7 @@ export function getPublicTrader(slug: string) {
     const t = await db.traderProfile.findFirst({
       where: { slug, status: "APPROVED" },
       select: {
-        id: true, slug: true, businessName: true, bio: true, hourlyRatePence: true, currency: true,
+        id: true, slug: true, businessName: true, bio: true, hourlyRatePence: true, currency: true, country: true,
         logoUrl: true, coverImageUrl: true, addressLine: true, city: true, postcode: true,
         serviceRadiusKm: true, operatingHours: true, verifiedAt: true, ratingAvg: true, ratingCount: true,
         createdAt: true,

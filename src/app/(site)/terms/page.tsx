@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/layout/SiteShell";
+import { EnglishOnlyNotice } from "@/components/legal/EnglishOnlyNotice";
 import { LIABILITY_DISCLAIMER, TOS_VERSION } from "@/lib/legal";
 
 export const metadata = { title: "Terms of Service" };
@@ -7,7 +8,9 @@ export const metadata = { title: "Terms of Service" };
 export default function TermsPage() {
   return (
     <SiteShell>
-      <article className="card prose-sm mx-auto my-10 max-w-3xl space-y-4 p-8 text-sm leading-relaxed text-ink-700">
+      <EnglishOnlyNotice />
+      {/* Legal text stays English until professionally translated. */}
+      <article lang="en" dir="ltr" className="card prose-sm mx-auto my-10 max-w-3xl space-y-4 p-8 text-sm leading-relaxed text-ink-700">
         <h1 className="text-2xl font-bold text-ink-900">Terms of Service</h1>
         <p className="text-xs text-ink-500">Version {TOS_VERSION}</p>
         <h2 className="pt-2 text-lg font-semibold text-ink-900">1. Nature of the platform</h2>

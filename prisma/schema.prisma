@@ -124,13 +124,13 @@ model TraderProfile {
   trackingPhone    String? // provider-issued masked/tracking number
   bio              String?      @db.Text
   hourlyRatePence  Int?
-  currency         String       @default("GBP") @db.Char(3)
+  currency         String       @default("USD") @db.Char(3) // ISO 4217; the professional's own pricing currency
   logoUrl          String?
   coverImageUrl    String?
   addressLine      String?
   city             String
   postcode         String
-  country          String       @default("GB") @db.Char(2)
+  country          String       @default("US") @db.Char(2) // ISO 3166-1; listings are only shown to visitors in this market
   latitude         Float
   longitude        Float
   // Maintained by trigger `trader_profile_sync_location`; GIST-indexed.
@@ -157,6 +157,7 @@ model TraderProfile {
   callEvents     CallEvent[]
 
   @@index([status, ratingAvg(sort: Desc)])
+  @@index([country, status, ratingAvg(sort: Desc)])
   @@index([postcode])
   @@index([location], map: "TraderProfile_location_gist", type: Gist)
   @@index([businessName(ops: raw("gin_trgm_ops"))], map: "TraderProfile_businessName_trgm", type: Gin)

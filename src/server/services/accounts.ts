@@ -7,6 +7,7 @@ import { audit } from "../audit";
 import { ApiError } from "../http";
 import { getSetting } from "../settings";
 import { lookupPostcode } from "./geo";
+import { COUNTRIES, type CountryCode, isSupportedCountry, parsePostcode } from "@/lib/postcode";
 
 const password = z
   .string()
@@ -26,17 +27,16 @@ const base = z.object({
 
 export const customerRegistrationInput = base;
 
-const ukOrUsPostcode = /^([A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}|\d{5}(-\d{4})?)$/i;
-
-// The business location comes only from the postcode, resolved on the
-// server: city and coordinates sent by the browser are never trusted.
+// The business location comes only from the country + postal code, resolved
+// on the server: city and coordinates sent by the browser are never trusted.
 
 export const traderRegistrationInput = base.extend({
   businessName: z.string().trim().min(2).max(100),
   phone: z.string().trim().regex(/^\+?[0-9 ()-]{7,20}$/, "Enter a valid phone number"),
   categoryId: z.string().cuid(),
   hourlyRatePence: z.number().int().min(0).max(100_000).optional(),
-  postcode: z.string({ error: "Enter your business postcode / ZIP" }).trim().regex(ukOrUsPostcode, "Enter a full UK postcode or a 5-digit US ZIP code"),
+  country: z.string().refine(isSupportedCountry, "We're not open for businesses in that country yet"),
+  postcode: z.string({ error: "Enter your business postal code" }).trim().min(3).max(12),
   serviceRadiusKm: z.number().int().min(1).max(300).default(25),
   servicePostcodes: z.array(z.string().trim().toUpperCase().max(10)).max(100).default([]),
 });
@@ -80,8 +80,13 @@ export async function registerTrader(input: z.infer<typeof traderRegistrationInp
   const category = await db.category.findFirst({ where: { id: input.categoryId, isActive: true } });
   if (!category) throw new ApiError(422, "invalid_category", "Unknown trade category");
 
-  const location = await lookupPostcode(input.postcode);
-  if (!location) throw new ApiError(422, "postcode_not_found", "We couldn't find that postcode. Check it and try again.");
+  const country = input.country as CountryCode;
+  const rule = COUNTRIES[country];
+  if (!parsePostcode(country, input.postcode)) throw new ApiError(422, "invalid_postcode", rule.formatHint);
+  const location = await lookupPostcode(country, input.postcode);
+  if (!location) {
+    throw new ApiError(422, "postcode_not_found", `We couldn't find that ${rule.postalLabel.toLowerCase()}. Check it and try again.`);
+  }
 
   const requireApproval = await getSetting("traders.requireApproval");
   const passwordHash = await hashPassword(input.password);
@@ -107,7 +112,7 @@ export async function registerTrader(input: z.infer<typeof traderRegistrationInp
             city: location.city,
             postcode: location.postcode,
             country: location.country,
-            currency: location.country === "US" ? "USD" : "GBP",
+            currency: rule.currency,
             latitude: location.latitude,
             longitude: location.longitude,
             serviceRadiusKm: input.serviceRadiusKm,

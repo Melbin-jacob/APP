@@ -1,14 +1,18 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { TraderDashboard } from "@/components/dashboard/TraderDashboard";
 import { db } from "@/lib/db";
+import { getI18n } from "@/i18n/server";
 import { getPrincipal } from "@/server/auth";
 
-export const metadata = { title: "Business dashboard" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getI18n()).t("dashboard.title") };
+}
 
 export default async function DashboardPage() {
-  const user = await getPrincipal();
+  const [user, { t }] = await Promise.all([getPrincipal(), getI18n()]);
   if (!user || user.role !== "TRADER") redirect("/login?callbackUrl=/dashboard");
   const profile = await db.traderProfile.findUnique({
     where: { userId: user.id },
@@ -23,14 +27,18 @@ export default async function DashboardPage() {
           <div>
             <h1 className="text-xl font-bold">{profile.businessName}</h1>
             <p className="text-sm text-ink-500">
-              Status: <strong>{profile.status}</strong> · {Number(profile.ratingAvg).toFixed(1)}★ from {profile.ratingCount} reviews ·{" "}
-              {profile._count.callEvents} call clicks
+              {t("dashboard.summary", {
+                status: t(`dashboard.statuses.${profile.status}`),
+                rating: Number(profile.ratingAvg).toFixed(1),
+                count: profile.ratingCount,
+                calls: profile._count.callEvents,
+              })}
             </p>
           </div>
-          {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">View public profile</Link>}
+          {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">{t("dashboard.viewProfile")}</Link>}
         </header>
         {profile.status === "PENDING" && (
-          <p className="rounded-md bg-accent-400/15 p-4 text-sm text-ink-700">Your profile is awaiting approval. You can request reviews once it&apos;s live.</p>
+          <p className="rounded-md bg-accent-400/15 p-4 text-sm text-ink-700">{t("dashboard.pendingNote")}</p>
         )}
         <TraderDashboard />
       </div>

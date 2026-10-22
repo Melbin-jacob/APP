@@ -38,3 +38,19 @@ export async function cached<T>(key: string, ttlSeconds: number, load: () => Pro
 export async function invalidate(...keys: string[]) {
   if (keys.length) await redis.del(...keys).catch(() => {});
 }
+
+/** Deletes every key starting with `prefix` (e.g. all per-country variants of a cache). */
+export async function invalidatePrefix(...prefixes: string[]) {
+  try {
+    for (const prefix of prefixes) {
+      let cursor = "0";
+      do {
+        const [next, keys] = await redis.scan(cursor, "MATCH", `${prefix}*`, "COUNT", 200);
+        cursor = next;
+        if (keys.length) await redis.del(...keys);
+      } while (cursor !== "0");
+    }
+  } catch {
+    // Cache entries expire on their own; a failed purge only delays freshness.
+  }
+}

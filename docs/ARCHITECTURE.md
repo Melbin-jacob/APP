@@ -59,9 +59,11 @@ Source of truth: [`prisma/schema.prisma`](../prisma/schema.prisma); hand-written
 ## 3. Frontend component hierarchy
 
 ```
-app/layout.tsx  (RootLayout: <html>, Providers[Session, ReactQuery], CookieConsent)
+app/layout.tsx  (RootLayout: <html lang dir>, PreferencesProvider[locale, messages, currency, rates, country],
+│                Providers[Session, ReactQuery], CookieConsent)
 ├── (site)/…  each page renders <SiteShell fullBleed?>
 │   SiteShell
+│   ├── PreferencesBar (country · language · currency; "not in your country yet" notice)
 │   ├── SiteHeader (Logo, nav, Login/Register, "List Your Business" CTA, MobileNav)
 │   ├── {fullBleed}            ← Hero on the home page
 │   ├── AdRail[left] · <main> · AdRail[right]   (rails omitted when the admin switch is OFF)
@@ -95,12 +97,13 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 ### Public
 | Method & path | Auth | Rate limit | Description |
 |---|---|---|---|
-| `GET /api/geo/postcode?code=` | – | 30/min | Resolves a full UK postcode or US ZIP → `{location: {postcode, city, region, country, latitude, longitude}}`; 404 unknown, 422 malformed, 503 lookup service down |
+| `GET /api/geo/postcode?country=&code=` | – | 30/min | Resolves a US ZIP or Canadian postal code → `{location: {postcode, city, region, country, latitude, longitude}}`; 404 unknown, 422 malformed / country not open, 503 lookup service down |
+| `POST /api/preferences` `{country?, locale?, currency?}` | – | – | Remembers the visitor's market, language and currency (1-year cookies); overrides location-based defaults |
 | `POST /api/auth/register` | – | 5/h/IP | `{accountType:"customer"\|"trader", email, password, name, acceptTerms:true, …trader fields}` → 201. A trader's city and coordinates are resolved on the server from `postcode`; any sent by the client are ignored |
 | `POST /api/auth/callback/credentials`, `/signin/email`, `/signin/google` | – | login 5/15min/account + 50/15min/IP; magic link 3/15min | NextAuth |
-| `GET /api/search?q&category&location&lat&lng&radiusKm&sort&page&pageSize` | – | 120/min | PostGIS + trigram search → `{items, total, page, pageSize}` |
-| `GET /api/search/autocomplete?q` | – | 120/min | `{suggestions:[{type, label, slug}]}` |
-| `GET /api/categories` | – | – | categories with approved-trader counts |
+| `GET /api/search?q&category&location&lat&lng&radiusKm&sort&page&pageSize` | – | 120/min | PostGIS + trigram search **within the visitor's country** → `{items, total, page, pageSize, country}` |
+| `GET /api/search/autocomplete?q` | – | 120/min | `{suggestions:[{type, label, slug}]}`: category names in the visitor's language, businesses in their country |
+| `GET /api/categories` | – | – | categories with approved-trader counts in the visitor's country |
 | `GET /api/traders/:slug` | – | – | public profile (no phone, no documents) |
 | `POST /api/traders/:slug/call` | – | 30/h | logs CallEvent, returns `{tel, display}` |
 | `POST /api/reviews` | token | 5/h/IP | `{token, rating 1-5, comment?, authorName}` → 201 `{id, status}` / 410 token used/expired |
@@ -139,7 +142,29 @@ The brief asks for a super-admin-only console. Moderation and approvals are open
 Change `minRole` in `admin/layout.tsx` and `requireRole("ADMIN")` calls to make it
 SUPER_ADMIN-only.
 
-## 5. Post-job review workflow
+## 5. Markets, languages and currencies
+
+**Visitor context** (`src/server/visitor.ts`, resolved once per request):
+
+| | Explicit choice (cookie) | Else location | Else |
+|---|---|---|---|
+| Market (listings shown) | `hsd_country`, if open | edge geo header (`x-vercel-ip-country`, `CloudFront-Viewer-Country`, `cf-ipcountry`), then the `Accept-Language` region, if that country is open | first of `NEXT_PUBLIC_SUPPORTED_COUNTRIES`, with a "not in your country yet" notice |
+| Language | `hsd_locale` | best match in `Accept-Language` | English |
+| Currency | `hsd_currency` | local currency of the detected country (even outside our markets) | market's currency |
+
+- **Listings never cross markets.** Search, autocomplete, category counts and the home directory filter on
+  `TraderProfile.country`, which is set from the server-side postal-code lookup at registration. The market
+  comes from the visitor context, never from the query string. Profile pages stay reachable by direct link
+  and say which country the business is in.
+- **Languages:** 12 locales (`src/i18n/messages/*.ts`). English is the source; the type checker and a unit test
+  ensure every locale has every key with the same placeholders. Only the active locale is sent to the browser.
+  Arabic renders right-to-left. No locale prefix in URLs (one URL per page; add `/fr/...` routing if per-language SEO matters).
+  The admin console, emails, server error messages and the Terms/Privacy pages are English for now.
+- **Currencies:** prices are stored in the professional's own currency (minor units) and converted for display with
+  ECB rates (`src/server/services/fx.ts`, cached 6 h, fallback table if unreachable). Converted prices are prefixed `≈`
+  and show the original on hover. Nothing is charged through the platform, so display conversion is sufficient.
+
+## 6. Post-job review workflow
 
 1. Trader clicks **Mark completed** (or enters a customer email) → `createReviewRequest`.
    Checks: trader approved, not self-review, no request to that email in 30 days, daily cap.
@@ -154,7 +179,7 @@ SUPER_ADMIN-only.
    spam-screened (links, floods, all-caps → moderation queue), and the trader's rating aggregate is recomputed.
    The profile cache is invalidated, so the review shows up right away.
 
-## 6. Security & compliance mapping
+## 7. Security & compliance mapping
 
 | Requirement | Implementation |
 |---|---|

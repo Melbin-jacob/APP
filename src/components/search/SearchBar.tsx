@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState, type FormEvent } from "react";
+import { usePrefs } from "@/components/providers/PreferencesProvider";
 import { Icon } from "@/components/ui/Icon";
 import { api } from "@/lib/api-client";
 
@@ -20,6 +21,7 @@ function useDebounced<T>(value: T, ms = 200) {
 /** Dual input: Location (city/zip) + Keyword/Category with typeahead. */
 export function SearchBar({ initial }: { initial?: { q?: string; location?: string } }) {
   const router = useRouter();
+  const { t, country, locale } = usePrefs();
   const listId = useId();
   const [location, setLocation] = useState(initial?.location ?? "");
   const [q, setQ] = useState(initial?.q ?? "");
@@ -28,7 +30,8 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
   const term = useDebounced(q.trim());
 
   const { data } = useQuery({
-    queryKey: ["autocomplete", term],
+    // Suggestions depend on the visitor's market and language.
+    queryKey: ["autocomplete", country, locale, term],
     queryFn: () => api<{ suggestions: Suggestion[] }>(`/api/search/autocomplete?q=${encodeURIComponent(term)}`),
     enabled: term.length >= 2,
     staleTime: 5 * 60_000,
@@ -52,13 +55,13 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
 
   return (
     <form role="search" onSubmit={onSubmit} className="relative mx-auto flex w-full max-w-2xl flex-col overflow-visible rounded-xl bg-white shadow-lg sm:flex-row sm:rounded-full">
-      <label className="flex items-center gap-2 border-b border-ink-200 px-4 py-3 sm:w-48 sm:border-b-0 sm:border-r">
+      <label className="flex items-center gap-2 border-b border-ink-200 px-4 py-3 sm:w-48 sm:border-b-0 sm:border-e">
         <Icon name="pin" className="h-4 w-4 shrink-0 text-brand-500" />
-        <span className="sr-only">Location</span>
+        <span className="sr-only">{t("search.location")}</span>
         <input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          placeholder="City or Zip"
+          placeholder={t("search.locationPlaceholder")}
           maxLength={80}
           autoComplete="postal-code"
           className="w-full bg-transparent text-sm outline-none placeholder:text-ink-500"
@@ -66,7 +69,7 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
       </label>
       <div className="relative flex flex-1 items-center">
         <label className="flex-1 px-4 py-3">
-          <span className="sr-only">Service or business</span>
+          <span className="sr-only">{t("search.query")}</span>
           <input
             role="combobox"
             aria-expanded={open && suggestions.length > 0}
@@ -83,15 +86,15 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
               if (e.key === "ArrowUp") { e.preventDefault(); setActive((a) => Math.max(a - 1, -1)); }
               if (e.key === "Escape") setOpen(false);
             }}
-            placeholder="Plumber, Electrician, Painter…"
+            placeholder={t("search.queryPlaceholder")}
             className="w-full bg-transparent text-sm outline-none placeholder:text-ink-500"
           />
         </label>
-        <button type="submit" aria-label="Search" className="m-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-500 text-white hover:bg-accent-600">
+        <button type="submit" aria-label={t("search.submit")} className="m-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-500 text-white hover:bg-accent-600">
           <Icon name="search" className="h-5 w-5" />
         </button>
         {open && suggestions.length > 0 && (
-          <ul id={listId} role="listbox" className="absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-lg bg-white py-1 text-left shadow-lg">
+          <ul id={listId} role="listbox" className="absolute inset-x-0 top-full z-30 mt-2 overflow-hidden rounded-lg bg-white py-1 text-start shadow-lg">
             {suggestions.map((s, i) => (
               <li
                 key={`${s.type}-${s.slug}`}
@@ -102,7 +105,7 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
                 className={`flex cursor-pointer items-center justify-between px-4 py-2 text-sm ${i === active ? "bg-brand-50" : "hover:bg-ink-100"}`}
               >
                 <span className="text-ink-900">{s.label}</span>
-                <span className="text-xs text-ink-500">{s.type === "category" ? "Category" : "Business"}</span>
+                <span className="text-xs text-ink-500">{s.type === "category" ? t("search.typeCategory") : t("search.typeBusiness")}</span>
               </li>
             ))}
           </ul>

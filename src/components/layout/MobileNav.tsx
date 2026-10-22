@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export function MobileNav({ items }: { items: { href: string; label: string }[] }) {
+export function MobileNav({ items, cta, menuLabel }: { items: { href: string; label: string }[]; cta: string; menuLabel: string }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="md:hidden">
@@ -12,7 +12,7 @@ export function MobileNav({ items }: { items: { href: string; label: string }[] 
         className="rounded p-2 text-ink-700"
         aria-expanded={open}
         aria-controls="mobile-nav"
-        aria-label="Toggle menu"
+        aria-label={menuLabel}
         onClick={() => setOpen((o) => !o)}
       >
         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
@@ -27,7 +27,7 @@ export function MobileNav({ items }: { items: { href: string; label: string }[] 
             </Link>
           ))}
           <Link href="/register?type=trader" onClick={() => setOpen(false)} className="btn-accent mt-2 w-full">
-            List Your Business
+            {cta}
           </Link>
         </nav>
       )}

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { invalidate } from "@/lib/redis";
+import { invalidate, invalidatePrefix } from "@/lib/redis";
 import { requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ipHash, notFound, parseJson, route } from "@/server/http";
@@ -28,6 +28,7 @@ export const PATCH = route<{ params: Promise<{ id: string }> }>(async (req, { pa
       ipHash: ipHash(req), metadata: { from: trader.status, reason: input.reason },
     }, tx);
   });
-  await invalidate(`trader:${trader.slug}`, "categories:popular:16", "categories:popular:100", "traders:featured:all");
+  await invalidate(`trader:${trader.slug}`);
+  await invalidatePrefix("categories:popular:", "traders:featured:");
   return NextResponse.json({ ok: true });
 });

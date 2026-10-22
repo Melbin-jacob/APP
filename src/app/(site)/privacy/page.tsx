@@ -1,4 +1,5 @@
 import { SiteShell } from "@/components/layout/SiteShell";
+import { EnglishOnlyNotice } from "@/components/legal/EnglishOnlyNotice";
 
 export const metadata = { title: "Privacy & Cookies" };
 
@@ -6,7 +7,9 @@ export const metadata = { title: "Privacy & Cookies" };
 export default function PrivacyPage() {
   return (
     <SiteShell>
-      <article className="card mx-auto my-10 max-w-3xl space-y-4 p-8 text-sm leading-relaxed text-ink-700">
+      <EnglishOnlyNotice />
+      {/* Legal text stays English until professionally translated. */}
+      <article lang="en" dir="ltr" className="card mx-auto my-10 max-w-3xl space-y-4 p-8 text-sm leading-relaxed text-ink-700">
         <h1 className="text-2xl font-bold text-ink-900">Privacy & Cookies</h1>
         <h2 className="pt-2 text-lg font-semibold text-ink-900">What we collect</h2>
         <p>Account details you give us; listings and reviews; anonymised (hashed) network identifiers for security and abuse prevention.</p>

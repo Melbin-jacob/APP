@@ -34,14 +34,28 @@ Password for all: **`ChangeMe-123456`**
 | Email | Role | Use it to test |
 |---|---|---|
 | `admin@homeservices.local` | Super-admin | Ops console at `/admin` |
-| `trader0@homeservices.local` | Trader (Swift Plumbing & Heating) | Business dashboard at `/dashboard` |
+| `trader0@homeservices.local` | Trader (Swift Plumbing & Heating, New York) | Business dashboard at `/dashboard` |
 | `customer@homeservices.local` | Customer | Account page, data export / delete |
 | `pending@homeservices.local` | Trader awaiting approval | Approval flow |
 
 ## What to try
 
+Demo businesses: 8 in **New York** (US, priced in USD) and 8 in **Toronto** (Canada, priced in CAD).
+
+**Countries, languages and currencies** (the dark bar at the top of every page)
+- You only see businesses in your own country. Locally there's no hosting-provider location,
+  so the country comes from your browser language: `en-US` → United States, `en-CA` / `fr-CA` → Canada.
+  Use the **country** menu to switch: New York listings ↔ Toronto listings.
+- Pick any of the 12 languages; the whole public site switches (Arabic switches to right-to-left).
+- Pick a currency: prices convert and show `≈` (hover one to see the professional's own price).
+- Your choices are remembered for a year, even after closing the browser.
+- To simulate a visitor from another country, send the header the hosting edge would set:
+  `curl -H "x-country-code: CA" http://localhost:3000/api/search` (only Toronto results).
+  From a country we don't serve yet (e.g. `DE`), the site says so, shows US listings, and prices default to EUR.
+
 **Public site**
-- Home page: search with a location (`London`) and keyword (`plumb`). Typing 2+ letters shows suggestions.
+- Home page: search with a location (`New York` or `10001`) and keyword (`plumb`). Typing 2+ letters shows suggestions,
+  in your language (try `plom` in Spanish).
 - Click the category filter tabs above the listing cards.
 - Open a trader profile: services, opening hours, verified credentials, reviews, disclaimer.
 - Click **Call Now**: the number is revealed and the click is counted.
@@ -51,10 +65,11 @@ Password for all: **`ChangeMe-123456`**
 
 **Registration and sign-in**
 - `/register`: try submitting without ticking the Terms box (it's blocked).
-- Register as a business. The details stay locked until you enter a postcode that exists:
-  - `SW1A 1AA` matches *Westminster, London*; a US ZIP such as `90210` matches *Beverly Hills, CA* and switches the rate to $.
-  - A made-up code such as `ZZ9 9ZZ` is rejected, and so is a partial one like `SW1A`.
-  - Once registered, the business goes to the admin approval queue.
+- Register as a business. Pick the country (it starts on yours), then the details stay locked until you enter a code that exists:
+  - United States: a ZIP such as `10001` matches *New York City, NY*; the rate is in USD.
+  - Canada: a postal code such as `M5V 3L9` matches *Toronto, ON*; the rate is in CAD.
+  - A made-up code (`00000`) or a partial one (`M5V`) is rejected.
+  - Once registered, the business goes to the admin approval queue, and it's only listed to visitors in its own country.
 - `/login` → **Email me a link**: the magic link arrives in the test inbox.
 - Enter a wrong password 5 times: you'll be rate-limited.
 

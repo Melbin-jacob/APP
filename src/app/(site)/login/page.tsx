@@ -1,7 +1,11 @@
 import { SiteShell } from "@/components/layout/SiteShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 
-export const metadata = { title: "Sign in" };
+import { getI18n } from "@/i18n/server";
+
+export async function generateMetadata() {
+  return { title: (await getI18n()).t("login.title") };
+}
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ sent?: string; error?: string; callbackUrl?: string }> }) {
   const sp = await searchParams;

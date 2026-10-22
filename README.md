@@ -60,7 +60,13 @@ tests/             Vitest unit tests
 - Add an SES configuration set for bounces and complaints.
 - Schedule `POST /api/cron/flush-banner-stats` every 5 minutes with `Authorization: Bearer $CRON_SECRET`.
 - Put the app behind a trusted proxy that overwrites `X-Forwarded-For`, since rate limiting keys on it.
-- Postcode lookups use postcodes.io (UK) and zippopotam.us (US), both free with no API key. For other countries or higher volume,
-  swap in a commercial geocoder behind `lookupPostcode()` in `src/server/services/geo.ts`.
+- Markets: `NEXT_PUBLIC_SUPPORTED_COUNTRIES` (default `US,CA`). Adding a country means a rule in `src/lib/postcode.ts`,
+  a lookup in `src/server/services/geo.ts` (zippopotam.us covers ~60 countries) and translated postal labels.
+- Visitor country comes from the hosting edge's geo header (`x-vercel-ip-country` on Vercel,
+  `CloudFront-Viewer-Country` on AWS, `cf-ipcountry` on Cloudflare). Make sure your edge sets one.
+- Exchange rates: European Central Bank reference rates via frankfurter.app, cached 6 hours, with built-in
+  fallback rates if it's unreachable. Converted prices are labelled approximate.
+- Translations: 12 languages in `src/i18n/messages/`, machine-quality. Have native speakers review them, and have
+  counsel review the translated liability disclaimer. The Terms and Privacy pages are English-only for now.
 - Add an upload pipeline that issues S3 presigned URLs for logos, gallery images and credentials. Store credential documents in a private bucket.
 - Have counsel review the `/terms` and `/privacy` pages and `src/lib/legal.ts`.

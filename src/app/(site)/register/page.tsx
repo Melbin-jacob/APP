@@ -1,12 +1,16 @@
+import type { Metadata } from "next";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { RegisterForm } from "@/components/auth/RegisterForm";
 import { db } from "@/lib/db";
+import { getI18n } from "@/i18n/server";
 
-export const metadata = { title: "Create an account" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getI18n()).t("register.title") };
+}
 
 export default async function RegisterPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   const { type } = await searchParams;
-  const categories = await db.category.findMany({ where: { isActive: true }, orderBy: { name: "asc" }, select: { id: true, name: true } });
+  const categories = await db.category.findMany({ where: { isActive: true }, select: { id: true, slug: true, name: true } });
   return (
     <SiteShell>
       <div className="mx-auto max-w-2xl py-12">

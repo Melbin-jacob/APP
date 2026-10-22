@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { parsePostcode } from "@/lib/postcode";
+import { type CountryCode, parsePostcode } from "@/lib/postcode";
+import { cached } from "@/lib/redis";
 import { lookupPostcode } from "./geo";
 
 export const searchQuerySchema = z.object({
@@ -40,42 +41,45 @@ export type TraderCard = {
 const escapeLike = (s: string) => s.replace(/[\\%_]/g, (c) => `\\${c}`);
 
 /**
- * Resolve "City or Zip" to a point. Full postcodes/ZIPs go through the
- * postcode lookup; city names and partial codes centre on the traders we
- * already know in that city or postcode district.
+ * Resolve "City or ZIP" to a point within the visitor's country. Full
+ * postal codes go through the postal-code lookup; city names and partial
+ * codes centre on the professionals we already list there.
  */
-export async function geocode(location: string): Promise<{ lat: number; lng: number } | null> {
+export async function geocode(location: string, country: CountryCode): Promise<{ lat: number; lng: number } | null> {
   const term = location.trim();
   if (!term) return null;
-  // A full postcode/ZIP resolves exactly; search must still work if the
+  // A full postal code resolves exactly; search must still work if the
   // lookup service is down, so failures fall through to the estimate below.
-  if (parsePostcode(term)) {
-    const hit = await lookupPostcode(term).catch(() => null);
+  if (parsePostcode(country, term)) {
+    const hit = await lookupPostcode(country, term).catch(() => null);
     if (hit) return { lat: hit.latitude, lng: hit.longitude };
   }
   const outward = term.toUpperCase().split(/\s+/)[0];
   const rows = await db.$queryRaw<{ lat: number | null; lng: number | null }[]>`
     SELECT AVG("latitude")::float AS lat, AVG("longitude")::float AS lng
     FROM "TraderProfile"
-    WHERE "city" ILIKE ${escapeLike(term)} OR UPPER("postcode") LIKE ${escapeLike(outward) + "%"}`;
+    WHERE "country" = ${country}
+      AND ("city" ILIKE ${escapeLike(term)} OR UPPER("postcode") LIKE ${escapeLike(outward) + "%"})`;
   const row = rows[0];
   return row?.lat != null && row.lng != null ? { lat: row.lat, lng: row.lng } : null;
 }
 
 /**
- * Geo + keyword + category search over approved traders.
+ * Geo + keyword + category search over approved traders in one country.
+ * `country` comes from the visitor (location or their choice), never from the
+ * query string, so listings never cross markets.
  * All user input reaches SQL as bound parameters via Prisma.sql.
  */
-export async function searchTraders(query: SearchQuery): Promise<{ items: TraderCard[]; total: number }> {
+export async function searchTraders(query: SearchQuery, country: CountryCode): Promise<{ items: TraderCard[]; total: number }> {
   let point: { lat: number; lng: number } | null =
     query.lat != null && query.lng != null ? { lat: query.lat, lng: query.lng } : null;
-  if (!point && query.location) point = await geocode(query.location);
+  if (!point && query.location) point = await geocode(query.location, country);
 
   const geoPoint = point
     ? Prisma.sql`ST_SetSRID(ST_MakePoint(${point.lng}, ${point.lat}), 4326)::geography`
     : null;
 
-  const where: Prisma.Sql[] = [Prisma.sql`t."status" = 'APPROVED'`];
+  const where: Prisma.Sql[] = [Prisma.sql`t."status" = 'APPROVED'`, Prisma.sql`t."country" = ${country}`];
 
   if (query.category) {
     where.push(Prisma.sql`EXISTS (
@@ -139,17 +143,30 @@ export async function searchTraders(query: SearchQuery): Promise<{ items: Trader
   return { items, total: Number(count[0]?.total ?? 0) };
 }
 
-/** Typeahead over categories + business names, trigram-ranked. */
-export async function autocomplete(term: string) {
+const fold = (v: string) => v.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+/**
+ * Typeahead: categories matched in the visitor's language (and English),
+ * plus approved businesses in their country, trigram-ranked.
+ */
+export async function autocomplete(term: string, country: CountryCode, categoryLabel: (slug: string, fallback: string) => string) {
   const q = term.trim().slice(0, 40);
   if (q.length < 2) return [];
+  const needle = fold(q);
+  const categories = await cached("categories:active", 300, () =>
+    db.category.findMany({ where: { isActive: true }, select: { slug: true, name: true }, orderBy: { sortOrder: "asc" } }),
+  );
+  const categoryHits = categories
+    .filter((c) => fold(categoryLabel(c.slug, c.name)).includes(needle) || fold(c.name).includes(needle))
+    .map((c) => ({ type: "category" as const, label: categoryLabel(c.slug, c.name), slug: c.slug }))
+    .sort((a, b) => Number(fold(b.label).startsWith(needle)) - Number(fold(a.label).startsWith(needle)))
+    .slice(0, 5);
+
   const like = `${escapeLike(q)}%`;
-  return db.$queryRaw<{ type: "category" | "trader"; label: string; slug: string }[]>`
-    (SELECT 'category' AS type, "name" AS label, "slug" FROM "Category"
-      WHERE "isActive" AND ("name" ILIKE ${like} OR similarity("name", ${q}) > 0.3)
-      ORDER BY similarity("name", ${q}) DESC LIMIT 5)
-    UNION ALL
-    (SELECT 'trader' AS type, "businessName" AS label, "slug" FROM "TraderProfile"
-      WHERE "status" = 'APPROVED' AND ("businessName" ILIKE ${like} OR similarity("businessName", ${q}) > 0.3)
-      ORDER BY similarity("businessName", ${q}) DESC LIMIT 5)`;
+  const traders = await db.$queryRaw<{ type: "trader"; label: string; slug: string }[]>`
+    SELECT 'trader' AS type, "businessName" AS label, "slug" FROM "TraderProfile"
+    WHERE "status" = 'APPROVED' AND "country" = ${country}
+      AND ("businessName" ILIKE ${like} OR similarity("businessName", ${q}) > 0.3)
+    ORDER BY similarity("businessName", ${q}) DESC LIMIT 5`;
+  return [...categoryHits, ...traders];
 }
