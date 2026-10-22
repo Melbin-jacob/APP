@@ -4,7 +4,7 @@
   "service": "workspace",
   "runServices": ["workspace", "db", "redis", "mailpit"],
   "workspaceFolder": "/workspaces/APP",
-  "forwardPorts": [3000, 8025],
+  "forwardPorts": [3000, "mailpit:8025"],
   "portsAttributes": {
     "3000": { "label": "App", "onAutoForward": "openBrowser" },
     "8025": { "label": "Test inbox (Mailpit)", "onAutoForward": "notify" }

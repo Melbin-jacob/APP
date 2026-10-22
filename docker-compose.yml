@@ -1,4 +1,6 @@
 # Full local stack: app + PostGIS + Redis + Mailpit (test inbox).
+# Only the app (3000) and the inbox (8025) are exposed; db and redis stay
+# on the internal network so a local Postgres/Redis can't clash.
 #   docker compose up --build
 #   App:   http://localhost:3000
 #   Inbox: http://localhost:8025   (every email the app sends lands here)
@@ -32,7 +34,6 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: homeservices
     volumes: [pgdata:/var/lib/postgresql/data]
-    ports: ["5432:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d homeservices"]
       interval: 3s
@@ -41,11 +42,10 @@ services:
 
   redis:
     image: redis:7-alpine
-    ports: ["6379:6379"]
 
   mailpit:
     image: axllent/mailpit:v1.21
-    ports: ["8025:8025", "1025:1025"]
+    ports: ["8025:8025"]
 
 volumes:
   pgdata:

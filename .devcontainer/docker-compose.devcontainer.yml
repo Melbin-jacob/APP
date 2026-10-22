@@ -4,5 +4,6 @@ services:
   workspace:
     image: mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm
     command: sleep infinity
-    volumes: ["..:/workspaces/APP:cached"]
+    # Paths resolve relative to the FIRST compose file (repo root), so "." is the repo.
+    volumes: [".:/workspaces/APP:cached"]
     depends_on: [db, redis, mailpit]
