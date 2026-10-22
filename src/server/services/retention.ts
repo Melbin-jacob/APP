@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 export const RETENTION_DAYS = {
   searchQueries: 395, // ~13 months of search analytics
   callEvents: 730, // 24 months of click-to-call stats for businesses
+  quoteRequests: 730, // 24 months: the business's record of who asked for what
+  decidedClaims: 730, // listing claims, 24 months after the decision
   auditLogs: 730, // 24 months of security / admin audit trail
   expiredReviewLinks: 90, // unused review links, after they expire
   unconfirmedNewsletter: 30, // sign-ups never confirmed by email
@@ -17,7 +19,7 @@ const ago = (days: number) => new Date(Date.now() - days * 86_400_000);
 /** Deletes data past its retention period. Safe to run repeatedly. */
 export async function applyRetention() {
   const now = new Date();
-  const [searches, calls, audits, tokens, links, newsletter, accounts] = await db.$transaction([
+  const [searches, calls, audits, tokens, links, newsletter, accounts, quotes, claims] = await db.$transaction([
     db.searchQuery.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.searchQueries) } } }),
     db.callEvent.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.callEvents) } } }),
     db.auditLog.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.auditLogs) } } }),
@@ -29,9 +31,12 @@ export async function applyRetention() {
       where: { confirmedAt: null, createdAt: { lt: ago(RETENTION_DAYS.unconfirmedNewsletter) } },
     }),
     db.user.deleteMany({ where: { status: "PENDING_DELETION", deletedAt: { lt: ago(RETENTION_DAYS.deletedAccounts) } } }),
+    db.quoteRequest.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.quoteRequests) } } }),
+    db.listingClaim.deleteMany({ where: { status: { not: "PENDING" }, decidedAt: { lt: ago(RETENTION_DAYS.decidedClaims) } } }),
   ]);
   return {
     searchQueries: searches.count, callEvents: calls.count, auditLogs: audits.count, verificationTokens: tokens.count,
     reviewLinks: links.count, unconfirmedNewsletter: newsletter.count, deletedAccounts: accounts.count,
+    quoteRequests: quotes.count, decidedClaims: claims.count,
   };
 }

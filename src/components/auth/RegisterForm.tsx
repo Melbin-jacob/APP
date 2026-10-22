@@ -26,7 +26,7 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE = /^\+?[0-9 ()-]{7,20}$/;
 
-export function RegisterForm({ initialType, categories }: { initialType: "customer" | "trader"; categories: Category[] }) {
+export function RegisterForm({ initialType, categories, next }: { initialType: "customer" | "trader"; categories: Category[]; next?: string }) {
   const { t, locale, country: visitorCountry } = usePrefs();
   const [type, setType] = useState(initialType);
   const [errors, setErrors] = useState<Errors>({});
@@ -133,7 +133,7 @@ export function RegisterForm({ initialType, categories }: { initialType: "custom
         <p className="mt-2 text-sm text-ink-500">
           {type === "trader" && done.status === "PENDING" ? t("register.pendingApproval") : t("register.ready")}
         </p>
-        <Link href={type === "trader" ? "/dashboard" : "/"} className="btn-primary mt-6">{t("register.continue")}</Link>
+        <Link href={type === "trader" ? "/dashboard" : next ?? "/"} className="btn-primary mt-6">{t("register.continue")}</Link>
       </div>
     );
   }

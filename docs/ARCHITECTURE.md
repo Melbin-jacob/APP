@@ -42,6 +42,9 @@ Source of truth: [`prisma/schema.prisma`](../prisma/schema.prisma); hand-written
 | `User` | Identity for all roles. `role` (CUSTOMER/TRADER/ADMIN/SUPER_ADMIN), `status` (ACTIVE/SUSPENDED/BANNED/PENDING_DELETION), Argon2id `passwordHash`, **`tosVersion` + `tosAcceptedAt`** (proof of disclaimer acceptance), `deletedAt`. |
 | `Account`, `VerificationToken` | NextAuth adapter: OAuth links, magic-link tokens. |
 | `TraderProfile` | Business listing. `latitude/longitude` + PostGIS **`location geography(Point,4326)`** (trigger-maintained, GIST index), `serviceRadiusKm`, `hourlyRatePence`, `phone` (never exposed) + `trackingPhone`, `operatingHours` JSON, `status` (PENDING/APPROVED/…), denormalised `ratingAvg/ratingCount`. `userId` is **nullable**: null = an unclaimed listing imported from a public directory (`importRef` = source + row, `importNotes` for ops only, `website`). |
+| `ListingClaim` | A signed-in user asking to manage an unclaimed listing: name, role, phone, note; PENDING → APPROVED/REJECTED by ops. Approving sets `TraderProfile.userId` and makes the user a TRADER, in one transaction that fails if the listing was taken meanwhile. |
+| `QuoteRequest` | "Request a quote" form: name, phone, address, optional email, description, `contactTimes[]`, note; NEW/CONTACTED/CLOSED. Emailed to the owner, or to ops for unclaimed listings. |
+| `MediaFile` | Uploaded logos: re-encoded WebP bytes (≤512 px, metadata stripped), served from `/api/media/:id` with a 1-year immutable cache. |
 | `Category`, `TraderCategory` | Trade taxonomy (trigram index on name for autocomplete); M:N with a primary flag. |
 | `Service` | Priced service lines a trader offers. |
 | `ServiceArea` | Explicit postcode/ZIP coverage in addition to the radius. |
@@ -106,6 +109,9 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 | `GET /api/categories` | – | – | categories with approved-trader counts in the visitor's country |
 | `GET /api/traders/:slug` | – | – | public profile (no phone, no documents) |
 | `POST /api/traders/:slug/call` | – | 30/h | logs CallEvent, returns `{tel, display}` |
+| `POST /api/traders/:slug/quotes` | optional | 5/h/IP | `{name, phone, addressLine, city, postcode (business's country), description ≥20, contactTimes[], contactNote?, email?, consent:true}` → 201 `{sentToBusiness}`; honeypot field `website` |
+| `POST /api/traders/:slug/claim` | user | 5/day/user | `{contactName, jobTitle, phone, message?, authorised:true}` → 201; 409 if already owned / pending / you already have a business |
+| `GET /api/media/:id` | – | – | uploaded image, immutable cache, `nosniff`, sandbox CSP |
 | `POST /api/reviews` | token | 5/h/IP | `{token, rating 1-5, comment?, authorName}` → 201 `{id, status}` / 410 token used/expired |
 | `POST /api/reviews/:id/report` | optional | 10/h | `{reason, details?}` → 202 |
 | `POST /api/newsletter` | – | 5/h | double opt-in, always 202 · `GET /api/newsletter/confirm?email&sig` |
@@ -131,6 +137,8 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 | `PUT /api/trader/categories` `{categoryIds, primaryId}` | trades offered; refuses to drop a trade a service still uses |
 | `PUT /api/trader/service-areas` `{postcodes}` | extra coverage: US ZIPs, Canadian FSAs (`M5V`) |
 | `PUT /api/trader/location` `{postcode}` | move within own country; coordinates from the server-side lookup |
+| `POST/DELETE /api/trader/logo` | upload (multipart `file`, ≤5 MB, 20/h) or remove the logo |
+| `GET /api/trader/quotes`, `PATCH /api/trader/quotes/:id` `{status}` | quote requests to this business; scoped by owner |
 
 ### Admin (`ADMIN` ⊂ `SUPER_ADMIN`)
 | Path | Min role | Description |
@@ -138,6 +146,8 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 | `GET /api/admin/users`, `PATCH /api/admin/users/:id` `{status?, role?, reason}` | ADMIN (admin accounts: SUPER_ADMIN) | manage/suspend/ban |
 | `GET /api/admin/traders?status`, `PATCH /api/admin/traders/:id` | ADMIN | approval queue |
 | `PATCH /api/admin/credentials/:id` | ADMIN | verify/reject credential |
+| `GET /api/admin/claims?status`, `PATCH /api/admin/claims/:id` `{decision, note?}` | ADMIN | verify listing claims; approve attaches the listing |
+| `GET /api/admin/quotes?view=forward\|all`, `PATCH /api/admin/quotes/:id` `{status}` | ADMIN | quote requests to pass on for unclaimed listings |
 | `GET /api/admin/reviews?status&reported`, `PATCH /api/admin/reviews/:id` `{action}` | ADMIN | moderation |
 | `GET /api/admin/analytics?days` | ADMIN | growth, searches, queues, health |
 | `GET/PUT /api/admin/settings` | SUPER_ADMIN | feature switches incl. **side-banner kill switch** |
@@ -158,7 +168,12 @@ It upserts on `importRef`, never touches a listing with an owner, and deletes un
 source that are gone from the file. Coordinates are town-centre approximations (region centre with a 50 km
 radius when the town is unknown). Public profiles of unclaimed listings say so and offer claim / removal
 links; the phone is still only revealed through the counted Call button, and hidden when absent (`canCall`).
-Claiming is currently manual: support attaches the listing to the owner's account (sets `userId`).
+Claiming: the owner signs in and submits `/traders/:slug/claim`; ops verify (e.g. by calling the listed number) and
+approve in *Ops console → Listing claims*. Quote requests to unclaimed listings go to ops (*Quote requests*) to pass on by phone.
+
+Businesses without a logo show their initials on a colour derived from the name (`src/lib/avatar.ts`), so no
+stock photos. Logos are uploaded from the business profile editor and re-encoded server-side (`src/server/services/media.ts`):
+SVG and non-images are refused, so no uploaded bytes are ever served as-is.
 
 ## 5. Markets, languages and currencies
 

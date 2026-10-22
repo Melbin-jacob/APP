@@ -14,7 +14,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function BusinessProfilePage() {
   const [user, { t }] = await Promise.all([getPrincipal(), getI18n()]);
-  if (!user || user.role !== "TRADER") redirect("/login?callbackUrl=/dashboard/profile");
+  if (!user) redirect("/login?callbackUrl=/dashboard/profile");
+  if (user.role !== "TRADER") redirect("/account");
   requireCurrentTerms(user, "/dashboard/profile");
 
   const [trader, categories] = await Promise.all([

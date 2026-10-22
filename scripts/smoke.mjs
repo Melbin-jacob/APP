@@ -13,7 +13,7 @@ if (!slug) {
 }
 
 const pages = [
-  "/", "/search?q=plumb", "/search?location=10001", "/categories", `/traders/${slug}`,
+  "/", "/search?q=plumb", "/search?location=10001", "/categories", `/traders/${slug}`, `/traders/${slug}/quote`, `/traders/${slug}/claim`,
   "/login", "/register", "/register?type=trader", "/review?token=invalid", "/unsubscribe?t=invalid",
   "/terms", "/privacy", "/legal", "/legal/cookies", "/legal/privacy-choices", "/legal/privacy-rights",
   "/legal/disclaimer", "/legal/accessibility", "/legal/security", "/.well-known/security.txt", "/api/health",

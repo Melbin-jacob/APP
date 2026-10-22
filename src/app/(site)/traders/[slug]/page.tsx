@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { LegalDisclaimer } from "@/components/legal/LegalDisclaimer";
+import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
 import { CallButton } from "@/components/traders/CallButton";
 import { Price } from "@/components/traders/Price";
 import { ReportReviewButton } from "@/components/traders/ReportReviewButton";
@@ -45,9 +47,9 @@ export default async function TraderProfilePage({ params }: Props) {
             <strong className="block text-ink-900">{t("profile.unclaimedTitle")}</strong>
             <p className="mt-1">{t("profile.unclaimedBody")}</p>
             <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-              <a className="font-medium text-brand-700 underline" href={`mailto:${COMPANY.supportEmail}?subject=${encodeURIComponent(`Claim listing: ${trader.slug}`)}`}>
+              <Link className="font-medium text-brand-700 underline" href={`/traders/${trader.slug}/claim`}>
                 {t("profile.claim")}
-              </a>
+              </Link>
               <a className="text-ink-500 underline" href={`mailto:${COMPANY.privacyEmail}?subject=${encodeURIComponent(`Remove listing: ${trader.slug}`)}`}>
                 {t("profile.requestRemoval")}
               </a>
@@ -58,8 +60,7 @@ export default async function TraderProfilePage({ params }: Props) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {trader.coverImageUrl && <img src={trader.coverImageUrl} alt="" className="h-48 w-full object-cover sm:h-64" />}
           <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            {trader.logoUrl && <img src={trader.logoUrl} alt={t("profile.logo", { name: trader.businessName })} className="h-20 w-20 rounded-lg border border-ink-200 object-cover" />}
+            <BusinessAvatar name={trader.businessName} logoUrl={trader.logoUrl} alt={t("profile.logo", { name: trader.businessName })} />
             <div className="flex-1">
               {primary && <span className="text-xs font-semibold uppercase tracking-wide text-brand-600">{categoryLabel(primary)}</span>}
               <h1 className="text-2xl font-bold">{trader.businessName}</h1>
@@ -161,7 +162,10 @@ export default async function TraderProfilePage({ params }: Props) {
             <section id="quote" className="card p-6">
               <h2 className="mb-2 font-semibold">{t("profile.quoteTitle")}</h2>
               <p className="mb-4 text-sm text-ink-500">{t("profile.quoteBody", { name: trader.businessName })}</p>
-              {trader.canCall && <CallButton slug={trader.slug} className="btn-primary w-full" />}
+              <div className="space-y-2">
+                <Link href={`/traders/${trader.slug}/quote`} className="btn-primary w-full">{t("profile.quoteButton")}</Link>
+                {trader.canCall && <CallButton slug={trader.slug} className="btn-ghost w-full" />}
+              </div>
             </section>
             {Object.keys(hours).length > 0 && (
               <section className="card p-6">

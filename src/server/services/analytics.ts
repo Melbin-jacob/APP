@@ -28,6 +28,8 @@ export async function getDashboard(days = 30) {
       db.traderProfile.count({ where: { status: "PENDING" } }),
       db.review.count({ where: { status: "PENDING_MODERATION" } }),
       db.credential.count({ where: { status: "PENDING" } }),
+      db.listingClaim.count({ where: { status: "PENDING" } }),
+      db.quoteRequest.count({ where: { status: "NEW", trader: { userId: null } } }),
     ]),
     db.$queryRaw<{ keyword: string; count: number }[]>`
       SELECT LOWER("keyword") AS keyword, COUNT(*)::int AS count FROM "SearchQuery"
@@ -39,7 +41,7 @@ export async function getDashboard(days = 30) {
 
   return {
     totals: { customers: totals[0], traders: totals[1], reviews: totals[2] },
-    queues: { pendingTraders: pending[0], pendingReviews: pending[1], pendingCredentials: pending[2] },
+    queues: { pendingTraders: pending[0], pendingReviews: pending[1], pendingCredentials: pending[2], pendingClaims: pending[3], quotesToForward: pending[4] },
     series: { signups, searches, reviews },
     topSearches,
     health: {

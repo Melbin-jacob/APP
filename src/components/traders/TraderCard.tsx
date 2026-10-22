@@ -6,18 +6,21 @@ import { Icon } from "@/components/ui/Icon";
 import { StarRating } from "@/components/ui/StarRating";
 import { useT } from "@/components/providers/PreferencesProvider";
 import type { TraderCard as TraderCardData } from "@/server/services/search";
+import { BusinessAvatar } from "./BusinessAvatar";
 import { CallButton } from "./CallButton";
 import { Price } from "./Price";
-
-const FALLBACK = "https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=800&q=60";
 
 export function TraderCard({ trader }: { trader: TraderCardData }) {
   const t = useT();
   return (
     <article className="card flex h-full flex-col overflow-hidden">
       <Link href={`/traders/${trader.slug}`} className="relative block aspect-[4/3] bg-ink-200">
-        {/* eslint-disable-next-line @next/next/no-img-element -- user-uploaded hosts vary */}
-        <img src={trader.coverImageUrl ?? trader.logoUrl ?? FALLBACK} alt="" className="h-full w-full object-cover" loading="lazy" />
+        {trader.coverImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- user-supplied hosts vary
+          <img src={trader.coverImageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+        ) : (
+          <BusinessAvatar name={trader.businessName} logoUrl={trader.logoUrl} className="h-full w-full p-6" textClassName="text-5xl" />
+        )}
         {trader.categoryName && (
           <span className="absolute start-2 top-2 rounded-full bg-accent-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
             {trader.categorySlug ? t.maybe(`categories.names.${trader.categorySlug}`, trader.categoryName) : trader.categoryName}
@@ -44,7 +47,7 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
         )}
         <div className="mt-auto flex w-full gap-2 pt-4">
           {trader.canCall && <CallButton slug={trader.slug} className="btn-primary flex-1 px-3 py-2 text-xs" />}
-          <Link href={`/traders/${trader.slug}#quote`} className="btn-ghost flex-1 px-3 py-2 text-xs">{t("card.requestQuote")}</Link>
+          <Link href={`/traders/${trader.slug}/quote`} className="btn-ghost flex-1 px-3 py-2 text-xs">{t("card.requestQuote")}</Link>
         </div>
       </div>
       <LegalDisclaimer variant="compact" />

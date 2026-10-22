@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
 import { api, ClientApiError } from "@/lib/api-client";
+import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
 import { formatMoney } from "@/lib/format";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
@@ -68,6 +69,7 @@ export function BusinessProfileEditor({ data }: { data: EditorData }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div className="space-y-6">
+        <LogoSection data={data} />
         <DetailsSection data={data} />
         <LocationSection data={data} />
         <HoursSection data={data} />
@@ -79,6 +81,66 @@ export function BusinessProfileEditor({ data }: { data: EditorData }) {
         <GallerySection data={data} />
       </div>
     </div>
+  );
+}
+
+// ─── Logo ───────────────────────────────────────────────────────────────────
+
+const MAX_LOGO_BYTES = 5 * 1024 * 1024;
+
+function LogoSection({ data }: { data: EditorData }) {
+  const { t } = usePrefs();
+  const router = useRouter();
+  const [logo, setLogo] = useState(data.details.logoUrl);
+  const [localError, setLocalError] = useState("");
+  const upload = useMutation({
+    mutationFn: async (file: File) => {
+      const body = new FormData();
+      body.set("file", file);
+      // Not api(): that helper sends JSON. Same-origin fetch, so the CSRF Origin check passes.
+      const res = await fetch("/api/trader/logo", { method: "POST", body });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new ClientApiError(res.status, json?.error?.code ?? "error", json?.error?.message ?? "Upload failed");
+      return json as { logoUrl: string };
+    },
+    onSuccess: (r) => { setLogo(r.logoUrl); router.refresh(); },
+  });
+  const remove = useMutation({
+    mutationFn: () => api("/api/trader/logo", { method: "DELETE" }),
+    onSuccess: () => { setLogo(""); router.refresh(); },
+  });
+  const pick = (file: File | undefined) => {
+    setLocalError("");
+    upload.reset();
+    if (!file) return;
+    if (!/^image\/(png|jpeg|webp|gif|avif|heic|heif)$/.test(file.type)) return setLocalError(t("business.logoType"));
+    if (file.size > MAX_LOGO_BYTES) return setLocalError(t("business.logoTooBig"));
+    upload.mutate(file);
+  };
+  const error = localError || (upload.error instanceof ClientApiError && upload.error.status < 500 ? upload.error.message : upload.error || remove.error ? t("common.somethingWrong") : "");
+
+  return (
+    <Section title={t("business.logo")} hint={t("business.logoHint")}>
+      <div className="flex flex-wrap items-center gap-4">
+        <BusinessAvatar name={data.details.businessName} logoUrl={logo || null} className="h-24 w-24 rounded-xl" textClassName="text-3xl" alt={t("business.logo")} />
+        <div className="space-y-2">
+          <label className="btn-primary cursor-pointer">
+            {upload.isPending ? t("business.uploading") : logo ? t("business.logoReplace") : t("business.logoUpload")}
+            <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" disabled={upload.isPending}
+              onChange={(e) => { pick(e.target.files?.[0]); e.target.value = ""; }} />
+          </label>
+          {logo && (
+            <button type="button" className="ms-2 text-sm text-rose-700 underline" disabled={remove.isPending}
+              onClick={() => window.confirm(t("business.logoConfirmRemove")) && remove.mutate()}>
+              {t("business.remove")}
+            </button>
+          )}
+          <p className="text-xs text-ink-500">{t("business.logoFormats")}</p>
+          {upload.isSuccess && <p role="status" className="text-sm text-brand-700">✓ {t("business.saved")}</p>}
+          {error && <p role="alert" className="text-sm text-rose-600">{error}</p>}
+        </div>
+      </div>
+    </Section>
   );
 }
 
@@ -99,7 +161,6 @@ function DetailsSection({ data }: { data: EditorData }) {
           bio: f.bio,
           hourlyRatePence: toMinor(f.hourlyRate),
           serviceRadiusKm: Number(f.serviceRadiusKm),
-          logoUrl: f.logoUrl.trim() || null,
           coverImageUrl: f.coverImageUrl.trim() || null,
         },
       }),
@@ -119,14 +180,9 @@ function DetailsSection({ data }: { data: EditorData }) {
           </Field>
         </div>
         <Field id="b-bio" label={t("business.bio")}><textarea id="b-bio" rows={5} maxLength={4000} value={f.bio} onChange={set("bio")} className="input" /></Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="b-logo" label={t("business.logoUrl")} hint={t("business.imageHint")}>
-            <input id="b-logo" type="url" placeholder="https://" value={f.logoUrl} onChange={set("logoUrl")} className="input" dir="ltr" />
-          </Field>
-          <Field id="b-cover" label={t("business.coverUrl")} hint={t("business.imageHint")}>
-            <input id="b-cover" type="url" placeholder="https://" value={f.coverImageUrl} onChange={set("coverImageUrl")} className="input" dir="ltr" />
-          </Field>
-        </div>
+        <Field id="b-cover" label={t("business.coverUrl")} hint={t("business.imageHint")}>
+          <input id="b-cover" type="url" placeholder="https://" value={f.coverImageUrl} onChange={set("coverImageUrl")} className="input" dir="ltr" />
+        </Field>
         <SaveRow pending={m.isPending} success={m.isSuccess} error={m.isError ? errorText(m.error, t("common.somethingWrong")) : ""} label={t("business.save")} />
       </form>
     </Section>

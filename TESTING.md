@@ -61,7 +61,11 @@ then approve it as admin under *Ops console → Traders*.
 - Click the category filter tabs above the listing cards.
 - Open a listing (e.g. `/traders/appliance-medic`): it's marked **Unclaimed listing** with *claim* and *request removal*
   links, and shows the business website.
+- Cards and profiles show the business's initials on a colour (or its logo, once it uploads one).
 - Click **Call Now**: the number is revealed and the click is counted. The few listings without a phone number have no Call button.
+- Click **Request Quote** (on a card or profile): fill in name, phone, address, the job and when to contact you, tick consent
+  and send. For an unclaimed listing the request goes to ops (subject "Quote request to forward…" in the test inbox);
+  with an email you also get a copy.
 - Report a review from a profile page.
 - Subscribe to the newsletter, then click the confirmation link in the test inbox.
 - Side ad banners appear on wide screens (wider than 1280px).
@@ -80,8 +84,15 @@ then approve it as admin under *Ops console → Traders*.
 - Edit your name and email preferences, change your password (or set one if you signed up with an email link),
   see and delete reviews you've written, and **Sign out**.
 
-**Business profile** (as a business you registered and approved: *Dashboard → Edit business profile*, or `/dashboard/profile`)
-- Business details: name, phone, about, hourly rate, service radius, logo and cover photo links.
+**Claim a listing** (the owner's side)
+1. Sign in as `customer@…`, open a listing and click *Is this your business? Claim it*. Fill in your role and phone and submit.
+2. As admin: *Ops console → Listing claims* → **Approve**.
+3. Back as the customer: *My account* now leads to the business dashboard (no need to sign in again). Upload a logo in
+   *Edit business profile*: it replaces the initials everywhere. New quote requests now appear in the dashboard and by email.
+
+**Business profile** (as a business you registered and approved, or a listing you claimed: *Dashboard → Edit business profile*, or `/dashboard/profile`)
+- Logo: upload a PNG, JPEG or WebP (up to 5 MB), or remove it to go back to the initials.
+- Business details: name, phone, about, hourly rate, service radius, cover photo link.
 - Business location: enter a new ZIP / postal code; it's looked up like at sign-up.
 - Opening hours per day.
 - Trades: tick every trade you offer and pick the primary one.
@@ -101,6 +112,7 @@ then approve it as admin under *Ops console → Traders*.
 
 **Ops console (`/admin`, as admin)**
 - Overview: totals, queues, daily charts, top searches, system health.
+- Listing claims: verify and approve or reject claims. Quote requests: requests sent to unclaimed listings, to pass on by phone.
 - Traders: approve a business you registered, verify a licence, suspend a trader. Imported listings show *Unclaimed (imported listing)* and the spreadsheet notes.
 - Users: suspend or ban a user. They're signed out of everything within a minute.
 - Reviews: reviews containing links, and reported reviews, land in the moderation queue. Publish, remove, or dismiss reports.

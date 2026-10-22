@@ -2,7 +2,7 @@
   "name": "homeservices-direct",
   "version": "0.1.0",
   "private": true,
-  "description": "HomeServices Direct \u2014 marketplace connecting local customers with independent home-service traders.",
+  "description": "HomeServices Direct — marketplace connecting local customers with independent home-service traders.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -33,6 +33,7 @@
     "nodemailer": "^10.2.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "sharp": "^0.35.5",
     "zod": "^4.6.7"
   },
   "devDependencies": {

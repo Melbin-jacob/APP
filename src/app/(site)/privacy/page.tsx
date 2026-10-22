@@ -33,6 +33,8 @@ export default function PrivacyPage() {
             <tr><td>Business name, trade, phone, address and website of businesses that haven’t joined</td><td>Publicly available business directories</td><td>Show an “unclaimed” listing so customers can find local trades; the business can claim or remove it</td><td>Identifiers; professional information</td></tr>
             <tr><td>Business location (derived from the postal code)</td><td>Postal-code lookup</td><td>Show listings to nearby customers</td><td>Geolocation (approximate)</td></tr>
             <tr><td>Customer email and name entered by a business to request a review</td><td>The business</td><td>Send one review invitation</td><td>Identifiers</td></tr>
+            <tr><td>Quote requests: your name, phone, address, optional email, the job description and when to contact you</td><td>You</td><td>Pass your request to the business you chose (or, if it hasn’t joined yet, have our team pass it on by phone)</td><td>Identifiers; commercial information</td></tr>
+            <tr><td>Listing claims: name, role, phone and notes from someone claiming a business</td><td>You</td><td>Verify that you represent the business before giving you control of its listing</td><td>Identifiers; professional information</td></tr>
             <tr><td>Reviews, ratings and reports</td><td>You</td><td>Publish reviews; moderate abuse</td><td>Commercial information</td></tr>
             <tr><td>Searches, call-button clicks</td><td>Your use of the site</td><td>Show results; give businesses aggregate stats; improve the service</td><td>Internet activity</td></tr>
             <tr><td>Network address (stored only as a one-way hash), country from your connection</td><td>Your browser</td><td>Security, rate limiting, showing listings for your country</td><td>Internet activity; approximate location</td></tr>
@@ -54,6 +56,8 @@ export default function PrivacyPage() {
         <li><strong>Unclaimed listings:</strong> some listings were compiled from publicly available business directories and are marked
           “Unclaimed”. Owners can claim them or ask us to remove them at <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>;
           we remove listings on request.</li>
+        <li><strong>The business you ask for a quote:</strong> the details you enter in its quote form, only with your consent and only
+          for that request. Businesses may not use them for marketing.</li>
         <li><strong>Service providers</strong> under contract, only to run the service: cloud hosting and databases, email delivery, and a
           postal-code lookup service (which receives only a business postal code). They may not use the data for their own purposes.</li>
         <li><strong>Advertising partners:</strong> only if you accept advertising cookies. See <Link href="/legal/privacy-choices">Do Not Sell or Share</Link>.</li>
@@ -69,6 +73,8 @@ export default function PrivacyPage() {
             <tr><td>Account and listing data</td><td>Until you delete your account</td></tr>
             <tr><td>Deleted accounts</td><td>Personal details erased immediately; the de-identified record is removed after {months(RETENTION_DAYS.deletedAccounts)}</td></tr>
             <tr><td>Search history (not linked to your account)</td><td>{months(RETENTION_DAYS.searchQueries)}</td></tr>
+            <tr><td>Quote requests</td><td>{months(RETENTION_DAYS.quoteRequests)}, or until you delete your account</td></tr>
+            <tr><td>Listing claims</td><td>{months(RETENTION_DAYS.decidedClaims)} after we decide them</td></tr>
             <tr><td>Call-button click statistics</td><td>{months(RETENTION_DAYS.callEvents)}</td></tr>
             <tr><td>Security and admin audit logs</td><td>{months(RETENTION_DAYS.auditLogs)}</td></tr>
             <tr><td>Unused review links</td><td>{months(RETENTION_DAYS.expiredReviewLinks)} after they expire</td></tr>

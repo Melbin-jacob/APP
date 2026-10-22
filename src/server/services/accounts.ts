@@ -147,10 +147,12 @@ export async function exportUserData(userId: string) {
       accounts: { select: { provider: true, providerAccountId: true } },
       reviews: { select: { id: true, traderId: true, rating: true, comment: true, createdAt: true, status: true } },
       reviewReports: { select: { reviewId: true, reason: true, details: true, createdAt: true } },
+      claims: { select: { traderId: true, status: true, contactName: true, jobTitle: true, phone: true, message: true, createdAt: true, decidedAt: true } },
       trader: {
         include: {
           categories: true, services: true, serviceAreas: true, gallery: true, credentials: true,
           jobs: true, reviews: { select: { id: true, rating: true, comment: true, authorName: true, createdAt: true } },
+          quoteRequests: { select: { id: true, name: true, phone: true, email: true, addressLine: true, city: true, postcode: true, description: true, contactTimes: true, contactNote: true, status: true, createdAt: true } },
         },
       },
     },
@@ -159,8 +161,16 @@ export async function exportUserData(userId: string) {
     where: { customerEmail: user.email },
     select: { traderId: true, status: true, createdAt: true, usedAt: true },
   });
+  // Quote requests this person sent, signed in or with the same email.
+  const quoteRequestsSent = await db.quoteRequest.findMany({
+    where: { OR: [{ customerId: userId }, { email: user.email }] },
+    select: {
+      traderId: true, name: true, phone: true, email: true, addressLine: true, city: true, postcode: true,
+      description: true, contactTimes: true, contactNote: true, status: true, createdAt: true,
+    },
+  });
   const newsletter = await db.newsletterSubscriber.findUnique({ where: { email: user.email } });
-  return { exportedAt: new Date().toISOString(), user, reviewRequestsReceived: reviewRequests, newsletter };
+  return { exportedAt: new Date().toISOString(), user, reviewRequestsReceived: reviewRequests, quoteRequestsSent, newsletter };
 }
 
 /**
@@ -174,6 +184,8 @@ export async function deleteAccount(userId: string, ipHash: string) {
     const user = await tx.user.findUniqueOrThrow({ where: { id: userId } });
     await tx.reviewRequest.updateMany({ where: { customerEmail: user.email }, data: { customerEmail: tombstone, customerName: null } });
     await tx.newsletterSubscriber.deleteMany({ where: { email: user.email } });
+    await tx.quoteRequest.deleteMany({ where: { OR: [{ customerId: userId }, { email: user.email }] } });
+    await tx.listingClaim.deleteMany({ where: { userId } });
     await tx.review.updateMany({ where: { authorId: userId }, data: { authorName: "Former customer", authorId: null } });
     await tx.account.deleteMany({ where: { userId } });
     await tx.traderProfile.deleteMany({ where: { userId } });

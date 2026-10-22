@@ -7,6 +7,8 @@ import { getPrincipal, requireCurrentTerms } from "@/server/auth";
 const NAV = [
   { href: "/admin", label: "Overview", minRole: "ADMIN" },
   { href: "/admin/traders", label: "Traders", minRole: "ADMIN" },
+  { href: "/admin/claims", label: "Listing claims", minRole: "ADMIN" },
+  { href: "/admin/quotes", label: "Quote requests", minRole: "ADMIN" },
   { href: "/admin/users", label: "Users", minRole: "ADMIN" },
   { href: "/admin/reviews", label: "Reviews", minRole: "ADMIN" },
   { href: "/admin/banners", label: "Ad banners", minRole: "SUPER_ADMIN" },

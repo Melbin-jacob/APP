@@ -57,6 +57,8 @@ model User {
   reviews       Review[]
   reviewReports ReviewReport[]
   auditLogs     AuditLog[]     @relation("AuditActor")
+  claims        ListingClaim[]
+  quoteRequests QuoteRequest[]
 
   @@index([role, status])
   @@index([createdAt])
@@ -116,43 +118,43 @@ model Category {
 }
 
 model TraderProfile {
-  id               String       @id @default(cuid())
+  id              String                                 @id @default(cuid())
   // Null for listings imported from public directories that no one has
   // claimed yet; set when the business owner claims the listing.
-  userId           String?      @unique
-  businessName     String
-  slug             String       @unique
-  phone            String // real number; never rendered directly when masking is on
-  trackingPhone    String? // provider-issued masked/tracking number
-  bio              String?      @db.Text
-  hourlyRatePence  Int?
-  currency         String       @default("USD") @db.Char(3) // ISO 4217; the professional's own pricing currency
-  logoUrl          String?
-  coverImageUrl    String?
-  addressLine      String?
-  city             String
-  postcode         String
-  country          String       @default("US") @db.Char(2) // ISO 3166-1; listings are only shown to visitors in this market
-  latitude         Float
-  longitude        Float
+  userId          String?                                @unique
+  businessName    String
+  slug            String                                 @unique
+  phone           String // real number; never rendered directly when masking is on
+  trackingPhone   String? // provider-issued masked/tracking number
+  bio             String?                                @db.Text
+  hourlyRatePence Int?
+  currency        String                                 @default("USD") @db.Char(3) // ISO 4217; the professional's own pricing currency
+  logoUrl         String?
+  coverImageUrl   String?
+  addressLine     String?
+  city            String
+  postcode        String
+  country         String                                 @default("US") @db.Char(2) // ISO 3166-1; listings are only shown to visitors in this market
+  latitude        Float
+  longitude       Float
   // Maintained by trigger `trader_profile_sync_location`; GIST-indexed.
-  location         Unsupported("geography(Point, 4326)")?
-  serviceRadiusKm  Int          @default(25)
+  location        Unsupported("geography(Point, 4326)")?
+  serviceRadiusKm Int                                    @default(25)
   // { "mon": [{ "open": "08:00", "close": "18:00" }], ... }
-  operatingHours   Json?
-  status           TraderStatus @default(PENDING)
-  verifiedAt       DateTime?
-  ratingAvg        Decimal      @default(0) @db.Decimal(3, 2)
-  ratingCount      Int          @default(0)
-  website          String?
+  operatingHours  Json?
+  status          TraderStatus                           @default(PENDING)
+  verifiedAt      DateTime?
+  ratingAvg       Decimal                                @default(0) @db.Decimal(3, 2)
+  ratingCount     Int                                    @default(0)
+  website         String?
   // Imported listings: stable source reference (re-imports update in place)
   // and internal notes from the source data, never shown publicly.
-  importRef        String?      @unique
-  importNotes      String?      @db.Text
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  importRef       String?                                @unique
+  importNotes     String?                                @db.Text
+  createdAt       DateTime                               @default(now())
+  updatedAt       DateTime                               @updatedAt
 
-  user           User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user           User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
   categories     TraderCategory[]
   services       Service[]
   serviceAreas   ServiceArea[]
@@ -162,6 +164,9 @@ model TraderProfile {
   reviewRequests ReviewRequest[]
   reviews        Review[]
   callEvents     CallEvent[]
+  claims         ListingClaim[]
+  quoteRequests  QuoteRequest[]
+  media          MediaFile[]
 
   @@index([status, ratingAvg(sort: Desc)])
   @@index([country, status, ratingAvg(sort: Desc)])
@@ -483,4 +488,83 @@ model EmailOptOut {
   createdAt DateTime   @default(now())
 
   @@id([email, scope])
+}
+
+// ─── Listing ownership, uploads, quote requests ─────────────────────────────
+
+enum ClaimStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// A signed-in user asking to take over an unclaimed (imported) listing.
+// Ops verify it (e.g. by calling the listed number) before attaching it.
+model ListingClaim {
+  id          String      @id @default(cuid())
+  traderId    String
+  userId      String
+  status      ClaimStatus @default(PENDING)
+  contactName String
+  jobTitle    String // the claimant's role at the business
+  phone       String
+  message     String?     @db.Text
+  decidedAt   DateTime?
+  decidedById String?
+  createdAt   DateTime    @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([traderId, userId])
+  @@index([status, createdAt])
+}
+
+// Images uploaded by businesses (logos), re-encoded server-side and served
+// from /api/media/:id. Stored in Postgres: small, and no bucket to configure.
+model MediaFile {
+  id          String   @id @default(cuid())
+  traderId    String
+  contentType String
+  bytes       Bytes
+  width       Int
+  height      Int
+  createdAt   DateTime @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId])
+}
+
+enum QuoteStatus {
+  NEW
+  CONTACTED // the business (or ops, for unclaimed listings) has followed up
+  CLOSED
+}
+
+// "Request a quote" form. Sent to the business when the listing is claimed;
+// otherwise to ops, who pass it on by phone.
+model QuoteRequest {
+  id           String      @id @default(cuid())
+  traderId     String
+  customerId   String? // set when the customer was signed in
+  name         String
+  email        String?     @db.Citext
+  phone        String
+  addressLine  String
+  city         String
+  postcode     String
+  description  String      @db.Text
+  contactTimes String[] // e.g. WEEKDAY_MORNING, WEEKEND
+  contactNote  String?
+  status       QuoteStatus @default(NEW)
+  ipHash       String?
+  createdAt    DateTime    @default(now())
+
+  trader   TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  customer User?         @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  @@index([traderId, createdAt])
+  @@index([status, createdAt])
+  @@index([customerId])
 }

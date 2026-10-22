@@ -13,6 +13,7 @@ export async function myTraderProfile(userId: string) {
 /** Drop every cache that can show this business (profile, listings, category counts). */
 export async function invalidateTrader(slug: string) {
   await invalidate(`trader:${slug}`);
+  await invalidate("markets:counts");
   await invalidatePrefix("traders:featured:", "categories:popular:");
 }
 

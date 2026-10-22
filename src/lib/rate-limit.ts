@@ -15,6 +15,9 @@ export const RATE_LIMITS = {
   search: { limit: 120, windowSeconds: 60 },
   geoLookup: { limit: 30, windowSeconds: 60 },
   callClick: { limit: 30, windowSeconds: 60 * 60 },
+  quoteRequest: { limit: 5, windowSeconds: 60 * 60 }, // per IP
+  listingClaim: { limit: 5, windowSeconds: 60 * 60 * 24 }, // per user
+  upload: { limit: 20, windowSeconds: 60 * 60 }, // per user
 } satisfies Record<string, RateLimitRule>;
 
 export type RateLimitResult = { ok: boolean; remaining: number; retryAfterSeconds: number };

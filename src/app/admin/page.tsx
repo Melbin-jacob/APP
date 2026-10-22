@@ -17,6 +17,8 @@ export default async function AdminOverview() {
         <Stat label="Traders to approve" value={d.queues.pendingTraders} tone={d.queues.pendingTraders ? "warn" : undefined} href="/admin/traders?status=PENDING" />
         <Stat label="Reviews to moderate" value={d.queues.pendingReviews} tone={d.queues.pendingReviews ? "warn" : undefined} href="/admin/reviews?filter=moderation" />
         <Stat label="Credentials to check" value={d.queues.pendingCredentials} tone={d.queues.pendingCredentials ? "warn" : undefined} href="/admin/traders?status=CREDENTIALS" />
+        <Stat label="Listing claims to verify" value={d.queues.pendingClaims} tone={d.queues.pendingClaims ? "warn" : undefined} href="/admin/claims" />
+        <Stat label="Quote requests to pass on" value={d.queues.quotesToForward} tone={d.queues.quotesToForward ? "warn" : undefined} href="/admin/quotes" />
       </div>
       <div className="mt-6 grid gap-4 lg:grid-cols-3">
         <MiniBars title="New users / day (30d)" points={d.series.signups} />

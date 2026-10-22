@@ -37,9 +37,8 @@ export async function middleware(req: NextRequest) {
     if (pathname.startsWith("/admin") && !ADMIN_ROLES.has(token.role as string)) {
       return NextResponse.rewrite(new URL("/404", req.url));
     }
-    if (pathname.startsWith("/dashboard") && token.role !== "TRADER") {
-      return NextResponse.redirect(new URL("/account", req.url));
-    }
+    // /dashboard checks the role itself, from the database: the token's role is
+    // stale after a listing claim is approved, until the next sign-in.
   }
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
