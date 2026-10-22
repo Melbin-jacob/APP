@@ -1,9 +1,19 @@
 import { db } from "@/lib/db";
-import type { CountryCode } from "@/lib/postcode";
+import { type CountryCode, SUPPORTED_COUNTRIES } from "@/lib/postcode";
 import { cached } from "@/lib/redis";
 import { searchTraders } from "./search";
 
 export type CategorySummary = { id: string; slug: string; name: string; icon: string; traderCount: number };
+
+/** Approved listings per open market, e.g. { CA: 894, US: 0 }. */
+export function getMarketCounts(): Promise<Record<CountryCode, number>> {
+  return cached("markets:counts", 300, async () => {
+    const rows = await db.traderProfile.groupBy({ by: ["country"], where: { status: "APPROVED", country: { in: [...SUPPORTED_COUNTRIES] } }, _count: true });
+    const counts = Object.fromEntries(SUPPORTED_COUNTRIES.map((c) => [c, 0])) as Record<CountryCode, number>;
+    for (const r of rows) counts[r.country as CountryCode] = r._count;
+    return counts;
+  });
+}
 
 /** Categories ranked by how many approved professionals each has in `country`. */
 export function getPopularCategories(country: CountryCode, limit = 16): Promise<CategorySummary[]> {

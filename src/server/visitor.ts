@@ -28,8 +28,11 @@ function detectCountry(h: Headers): string | null {
     if (v && /^[A-Z]{2}$/.test(v) && v !== "XX" && v !== "T1") return v;
   }
   // Local development / no edge geo: the browser's language region (en-CA → CA).
-  const region = h.get("accept-language")?.match(/^[a-z]{2,3}-([A-Z]{2})\b/i)?.[1];
-  return region ? region.toUpperCase() : null;
+  // Not "en-US": it's the factory default for English almost everywhere
+  // (including most Canadian computers), so it says nothing about location.
+  const tag = h.get("accept-language")?.match(/^([a-z]{2,3})-([A-Z]{2})\b/i);
+  if (!tag || (tag[1].toLowerCase() === "en" && tag[2].toUpperCase() === "US")) return null;
+  return tag[2].toUpperCase();
 }
 
 /** Country, language and currency for this request: explicit choice (cookie) → location → defaults. */

@@ -23,6 +23,8 @@ const ko: Messages = {
     language: "언어",
     currency: "통화",
     outsideMarkets: "아직 {country}에서는 서비스하지 않습니다. {market}의 전문가를 보여 드립니다.",
+    emptyMarket: "아직 {country}에 등록된 전문가가 없습니다.",
+    browseMarket: "{market}의 전문가 보기",
   },
   meta: {
     title: "HomeServices Direct: 내 주변 전문가 찾기",

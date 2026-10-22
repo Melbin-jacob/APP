@@ -23,6 +23,8 @@ const zh: Messages = {
     language: "语言",
     currency: "货币",
     outsideMarkets: "我们尚未在 {country} 开展服务。当前显示：{market} 的专业人士。",
+    emptyMarket: "{country} 暂时还没有入驻的专业人士。",
+    browseMarket: "查看 {market} 的专业人士",
   },
   meta: {
     title: "HomeServices Direct：发现您身边的本地专家",

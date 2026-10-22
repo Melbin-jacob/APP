@@ -23,6 +23,8 @@ const ru: Messages = {
     language: "Язык",
     currency: "Валюта",
     outsideMarkets: "Мы пока не работаем в этой стране ({country}). Показаны специалисты из страны: {market}.",
+    emptyMarket: "В этой стране ({country}) пока нет специалистов.",
+    browseMarket: "Показать специалистов: {market}",
   },
   meta: {
     title: "HomeServices Direct: найдите мастеров рядом с вами",

@@ -23,6 +23,8 @@ const hi: Messages = {
     language: "भाषा",
     currency: "मुद्रा",
     outsideMarkets: "हम अभी {country} में उपलब्ध नहीं हैं। {market} के पेशेवर दिखाए जा रहे हैं।",
+    emptyMarket: "{country} में अभी कोई पेशेवर सूचीबद्ध नहीं है।",
+    browseMarket: "{market} के पेशेवर देखें",
   },
   meta: {
     title: "HomeServices Direct: अपने आस-पास के विशेषज्ञ खोजें",

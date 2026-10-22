@@ -23,6 +23,8 @@ const en = {
     language: "Language",
     currency: "Currency",
     outsideMarkets: "We're not in {country} yet. Showing professionals in {market}.",
+    emptyMarket: "No professionals are listed in {country} yet.",
+    browseMarket: "See professionals in {market}",
   },
   meta: {
     title: "HomeServices Direct: Discover Local Experts Near You",

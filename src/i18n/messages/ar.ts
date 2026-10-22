@@ -23,6 +23,8 @@ const ar: Messages = {
     language: "اللغة",
     currency: "العملة",
     outsideMarkets: "لا تتوفر خدماتنا بعد في {country}. نعرض لك المحترفين في {market}.",
+    emptyMarket: "لا يوجد محترفون مسجلون في {country} بعد.",
+    browseMarket: "عرض المحترفين في {market}",
   },
   meta: {
     title: "HomeServices Direct: اعثر على خبراء محليين بالقرب منك",

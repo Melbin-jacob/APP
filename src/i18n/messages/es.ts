@@ -23,6 +23,8 @@ const es: Messages = {
     language: "Idioma",
     currency: "Moneda",
     outsideMarkets: "Aún no estamos en {country}. Mostrando profesionales en {market}.",
+    emptyMarket: "Todavía no hay profesionales en {country}.",
+    browseMarket: "Ver profesionales en {market}",
   },
   meta: {
     title: "HomeServices Direct: encuentra expertos locales cerca de ti",

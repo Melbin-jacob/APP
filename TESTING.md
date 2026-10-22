@@ -44,8 +44,10 @@ then approve it as admin under *Ops console → Traders*.
 
 **Countries, languages and currencies** (the dark bar at the top of every page)
 - You only see businesses in your own country. Locally there's no hosting-provider location,
-  so the country comes from your browser language: `en-US` → United States, `en-CA` / `fr-CA` → Canada.
-  Use the **country** menu to switch: Canada shows the Windsor-Essex listings; United States shows none yet.
+  so the country comes from your browser language: `en-CA` / `fr-CA` → Canada, `es-US` → United States.
+  `en-US` is ignored (it's the default on most computers, including in Canada), so it gets the default market, Canada.
+  Use the **country** menu to switch: Canada shows the Windsor-Essex listings. United States has none yet, so a bar
+  says so with a one-click *See professionals in Canada* button.
 - Pick any of the 12 languages; the whole public site switches (Arabic switches to right-to-left).
 - Pick a currency: prices convert and show `≈` (hover one to see the professional's own price).
 - Your choices are remembered for a year, even after closing the browser.

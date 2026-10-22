@@ -23,6 +23,8 @@ const de: Messages = {
     language: "Sprache",
     currency: "Währung",
     outsideMarkets: "In diesem Land ({country}) sind wir noch nicht vertreten. Angezeigt wird: {market}.",
+    emptyMarket: "In diesem Land ({country}) sind noch keine Fachleute eingetragen.",
+    browseMarket: "Fachleute anzeigen: {market}",
   },
   meta: {
     title: "HomeServices Direct: Fachleute in deiner Nähe finden",

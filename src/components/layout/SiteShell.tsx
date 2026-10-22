@@ -3,6 +3,7 @@ import { AdRail } from "@/components/ads/AdRail";
 import { PreferencesBar } from "@/components/prefs/PreferencesBar";
 import { getI18n } from "@/i18n/server";
 import { getSideBanners } from "@/server/services/banners";
+import { getMarketCounts } from "@/server/services/catalog";
 import { SiteFooter } from "./SiteFooter";
 import { SiteHeader } from "./SiteHeader";
 
@@ -16,16 +17,17 @@ import { SiteHeader } from "./SiteHeader";
  *   <SiteFooter/>
  */
 export async function SiteShell({ children, fullBleed }: { children: ReactNode; fullBleed?: ReactNode }) {
-  const [banners, { t, visitor }] = await Promise.all([
+  const [banners, { t, visitor }, marketCounts] = await Promise.all([
     getSideBanners().catch(() => ({}) as Awaited<ReturnType<typeof getSideBanners>>),
     getI18n(),
+    getMarketCounts().catch(() => undefined),
   ]);
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:start-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2">
         {t("common.skipToContent")}
       </a>
-      <PreferencesBar outsideMarkets={visitor.outsideMarkets} />
+      <PreferencesBar outsideMarkets={visitor.outsideMarkets} marketCounts={marketCounts} />
       <SiteHeader />
       {fullBleed}
       <div className="mx-auto flex w-full max-w-[1720px] flex-1 justify-center gap-6 px-4">

@@ -6,7 +6,7 @@ import { usePrefs } from "@/components/providers/PreferencesProvider";
 import { api } from "@/lib/api-client";
 import { CURRENCIES } from "@/lib/currency";
 import { countryName, currencyName, flag } from "@/lib/format";
-import { SUPPORTED_COUNTRIES } from "@/lib/postcode";
+import { type CountryCode, SUPPORTED_COUNTRIES } from "@/lib/postcode";
 import { LOCALES } from "@/i18n/locales";
 
 type Pref = "country" | "locale" | "currency";
@@ -17,7 +17,7 @@ type Pref = "country" | "locale" | "currency";
  * Country and currency names come from the runtime's locale data, which can
  * differ slightly between server and browser: suppressHydrationWarning.
  */
-export function PreferencesBar({ outsideMarkets }: { outsideMarkets: string | null }) {
+export function PreferencesBar({ outsideMarkets, marketCounts }: { outsideMarkets: string | null; marketCounts?: Record<CountryCode, number> }) {
   const { t, locale, currency, country } = usePrefs();
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -33,6 +33,9 @@ export function PreferencesBar({ outsideMarkets }: { outsideMarkets: string | nu
       setError(true);
     }
   };
+
+  // A market we've opened but nobody has listed in yet: point to one that has listings.
+  const otherMarkets = marketCounts && marketCounts[country] === 0 ? SUPPORTED_COUNTRIES.filter((c) => marketCounts[c] > 0) : [];
 
   const select = "cursor-pointer rounded border border-white/20 bg-ink-900 px-2 py-1 text-xs text-white hover:border-white/50 disabled:opacity-60";
 
@@ -68,6 +71,16 @@ export function PreferencesBar({ outsideMarkets }: { outsideMarkets: string | nu
       {outsideMarkets && (
         <p className="bg-accent-500 px-4 py-1.5 text-center text-xs font-medium text-white" role="status" suppressHydrationWarning>
           {t("prefs.outsideMarkets", { country: countryName(outsideMarkets, locale), market: countryName(country, locale) })}
+        </p>
+      )}
+      {otherMarkets.length > 0 && (
+        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-accent-500 px-4 py-1.5 text-center text-xs font-medium text-white" role="status" suppressHydrationWarning>
+          {t("prefs.emptyMarket", { country: countryName(country, locale) })}
+          {otherMarkets.map((c) => (
+            <button key={c} type="button" disabled={pending} onClick={() => change("country", c)} className="rounded bg-white px-2 py-0.5 font-semibold text-ink-900 hover:bg-white/90" suppressHydrationWarning>
+              {flag(c)} {t("prefs.browseMarket", { market: countryName(c, locale) })}
+            </button>
+          ))}
         </p>
       )}
       {error && <p className="bg-rose-600 px-4 py-1 text-center text-xs" role="alert">{t("common.somethingWrong")}</p>}

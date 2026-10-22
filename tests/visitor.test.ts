@@ -27,6 +27,13 @@ describe("getVisitor", () => {
     expect(await getVisitor()).toMatchObject({ country: "CA", currency: "CAD", locale: "en" });
   });
 
+  it("ignores en-US, the default browser language almost everywhere", async () => {
+    headerMap = { "accept-language": "en-US,en;q=0.9" };
+    expect(await getVisitor()).toMatchObject({ country: "CA", detectedCountry: null, outsideMarkets: null });
+    headerMap = { "accept-language": "es-US,es;q=0.9" };
+    expect(await getVisitor()).toMatchObject({ country: "US" });
+  });
+
   it("shows the first launch market to visitors elsewhere, with their own currency", async () => {
     headerMap = { "cf-ipcountry": "DE", "accept-language": "de-DE" };
     expect(await getVisitor()).toMatchObject({ country: "CA", outsideMarkets: "DE", currency: "EUR", locale: "de" });

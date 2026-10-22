@@ -23,6 +23,8 @@ const ja: Messages = {
     language: "言語",
     currency: "通貨",
     outsideMarkets: "{country} ではまだサービスを提供していません。{market} の専門家を表示しています。",
+    emptyMarket: "{country} にはまだ登録された専門家がいません。",
+    browseMarket: "{market} の専門家を見る",
   },
   meta: {
     title: "HomeServices Direct：近くの専門家を見つけよう",
