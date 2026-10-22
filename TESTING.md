@@ -73,6 +73,21 @@ Demo businesses: 8 in **New York** (US, priced in USD) and 8 in **Toronto** (Can
 - `/login` → **Email me a link**: the magic link arrives in the test inbox.
 - Enter a wrong password 5 times: you'll be rate-limited.
 
+**Your account** (any user: *My account* in the header)
+- Edit your name and email preferences, change your password (or set one if you signed up with an email link),
+  see and delete reviews you've written, and **Sign out**.
+- As `customer@…`, the demo includes one review you wrote.
+
+**Business profile** (as `trader0@…`: *Dashboard → Edit business profile*, or `/dashboard/profile`)
+- Business details: name, phone, about, hourly rate, service radius, logo and cover photo links.
+- Business location: enter a new ZIP / postal code; it's looked up like at sign-up.
+- Opening hours per day.
+- Trades: tick every trade you offer and pick the primary one.
+- Services: add, edit and remove services with a starting price and unit (per hour, job, visit…).
+  A trade can't be removed while a service still uses it.
+- Extra service areas (ZIP codes, or the first three characters of Canadian postal codes) and work photos.
+- Changes show on the public profile straight away.
+
 **Review workflow (trader → customer)**
 1. Sign in as `trader0@…` and go to `/dashboard`.
 2. Click **Mark completed** on a job, or use **Request a review** with any email.

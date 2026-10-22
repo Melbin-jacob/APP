@@ -36,7 +36,10 @@ export default async function DashboardPage() {
               })}
             </p>
           </div>
-          {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">{t("dashboard.viewProfile")}</Link>}
+          <div className="flex flex-wrap gap-2">
+            <Link href="/dashboard/profile" className="btn-primary">{t("dashboard.editProfile")}</Link>
+            {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">{t("dashboard.viewProfile")}</Link>}
+          </div>
         </header>
         {profile.status === "PENDING" && (
           <p className="rounded-md bg-accent-400/15 p-4 text-sm text-ink-700">{t("dashboard.pendingNote")}</p>

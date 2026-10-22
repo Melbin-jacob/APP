@@ -89,7 +89,7 @@ export default async function TraderProfilePage({ params }: Props) {
                       <span><strong>{s.title}</strong>{s.description && <span className="block text-ink-500">{s.description}</span>}</span>
                       {s.priceFromPence != null && (
                         <span className="shrink-0">
-                          <Price minor={s.priceFromPence} currency={trader.currency} template={(price) => t("profile.from", { price })} />
+                          <Price minor={s.priceFromPence} currency={trader.currency} label="profile.from" />
                           {s.priceUnit && `/${s.priceUnit}`}
                         </span>
                       )}

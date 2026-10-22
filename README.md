@@ -40,6 +40,7 @@ server log instead of being sent. This setting is refused when `NODE_ENV=product
 |---|---|
 | `npm run dev` / `build` / `start` | Next.js |
 | `npm run typecheck` / `lint` / `test` | tsc, ESLint, Vitest |
+| `npm run smoke` | Every public page renders (HTTP 200) on a running app; set `BASE_URL` to test another environment |
 | `npm run db:migrate` / `db:deploy` / `db:seed` / `db:studio` | Prisma |
 
 ## Layout

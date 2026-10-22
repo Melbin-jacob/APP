@@ -116,6 +116,10 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 | `GET /api/me/export` | user | JSON download of all personal data (GDPR Art. 15/20, CCPA) |
 |---|---|---|
 | `DELETE /api/me` `{confirm:"DELETE MY ACCOUNT"}` | user | erasure + de-identification |
+| `PATCH /api/me` `{name?, marketingOptIn?}` | user | edit own profile |
+| `POST /api/me/password` `{currentPassword?, newPassword}` | user | change password (current one required if set) or set one for email-link / Google accounts |
+| `DELETE /api/me/reviews/:id` | user (author) | remove a review you wrote |
+| `POST /api/me/accept-terms` | user | accept the current Terms |
 
 ### Trader (`role = TRADER`)
 | `GET/PATCH /api/trader/me` | profile read / customise (bio, rate, hours, logo, gallery…) |
@@ -123,6 +127,10 @@ Every non-GET request must carry a same-origin `Origin` header (CSRF guard).
 | `GET/POST /api/trader/jobs` | list / log a job (customer email) |
 | `POST /api/trader/jobs/:id/complete` | complete job → review email (50/day) |
 | `GET/POST /api/trader/review-requests` | delivery status / ad-hoc review request `{customerEmail, customerName?}` |
+| `GET/POST /api/trader/services`, `PATCH/DELETE /api/trader/services/:id` | manage services `{title, categoryId (one of own trades), description?, priceFromPence?, priceUnit?}`; max 50 |
+| `PUT /api/trader/categories` `{categoryIds, primaryId}` | trades offered; refuses to drop a trade a service still uses |
+| `PUT /api/trader/service-areas` `{postcodes}` | extra coverage: US ZIPs, Canadian FSAs (`M5V`) |
+| `PUT /api/trader/location` `{postcode}` | move within own country; coordinates from the server-side lookup |
 
 ### Admin (`ADMIN` ⊂ `SUPER_ADMIN`)
 | Path | Min role | Description |

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { invalidate } from "@/lib/redis";
 import { plainText, safeUrl } from "@/lib/sanitize";
 import { requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { badRequest, notFound, parseJson, route } from "@/server/http";
+import { invalidateTrader } from "@/server/services/traders";
 
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
 const day = z.array(z.object({ open: hhmm, close: hhmm })).max(3);
@@ -73,6 +73,6 @@ export const PATCH = route(async (req) => {
     }
     await audit({ actorId: user.id, action: "trader.update_profile", entityType: "TraderProfile", entityId: profile.id, metadata: { fields: Object.keys(input) } }, tx);
   });
-  await invalidate(`trader:${profile.slug}`);
+  await invalidateTrader(profile.slug);
   return NextResponse.json({ ok: true });
 });

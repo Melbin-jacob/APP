@@ -39,7 +39,7 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
         <div className="mt-2"><StarRating value={trader.ratingAvg} count={trader.ratingCount} /></div>
         {trader.hourlyRatePence != null && (
           <p className="mt-1 text-xs text-ink-700">
-            <strong><Price minor={trader.hourlyRatePence} currency={trader.currency} template={(price) => t("card.perHour", { price })} /></strong>
+            <strong><Price minor={trader.hourlyRatePence} currency={trader.currency} label="card.perHour" /></strong>
           </p>
         )}
         <div className="mt-auto flex w-full gap-2 pt-4">
