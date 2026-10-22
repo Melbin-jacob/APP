@@ -6,7 +6,13 @@
 const esc = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
+import { COMPANY } from "@/lib/company";
+
 const BRAND = "#4caf2f";
+
+// Sender identity + mailing address: required in commercial email by
+// CAN-SPAM (US) and CASL (Canada).
+const senderLine = () => `${esc(COMPANY.name)} · ${esc(COMPANY.address)}`;
 const ACCENT = "#e8a317";
 
 function layout(title: string, body: string, footer: string) {
@@ -28,6 +34,7 @@ export function reviewRequestEmail(input: {
   customerName?: string | null;
   reviewUrl: string; // contains the single-use token
   expiresAt: Date;
+  unsubscribeUrl: string;
 }) {
   const subject = `How was your service with ${input.businessName}?`;
   const greeting = input.customerName ? `Hi ${esc(input.customerName)},` : "Hi there,";
@@ -52,7 +59,8 @@ export function reviewRequestEmail(input: {
      <a href="${esc(input.reviewUrl)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Submit Review</a>
      <p style="margin:20px 0 0;font-size:12px;color:#7b8794">This link is personal to you, works once, and expires on ${esc(expires)}.</p>`,
     `You received this because ${esc(input.businessName)} listed you as a customer on HomeServices Direct.
-     HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.`,
+     HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.<br><br>
+     <a href="${esc(input.unsubscribeUrl)}" style="color:#7b8794">Unsubscribe from review requests</a> · ${senderLine()}`,
   );
 
   const text = `${input.customerName ? `Hi ${input.customerName},` : "Hi there,"}
@@ -60,7 +68,10 @@ export function reviewRequestEmail(input: {
 ${input.businessName} recently completed a job for you. Leave a rating and comment here (single use, expires ${expires}):
 ${input.reviewUrl}
 
-HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.`;
+HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.
+
+Unsubscribe from review requests: ${input.unsubscribeUrl}
+${COMPANY.name} · ${COMPANY.address}`;
 
   return { subject, html, text };
 }

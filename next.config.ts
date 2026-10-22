@@ -6,8 +6,19 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(self)" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(), microphone=(), geolocation=(self), payment=(), usb=(), bluetooth=(), serial=(), browsing-topics=(), interest-cohort=()",
+  },
+  // Isolates our window from cross-origin popups (e.g. ad click-throughs) — blocks tab-nabbing and XS-leaks.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+  { key: "X-Permitted-Cross-Domain-Policies", value: "none" },
+  { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
+
+// Applied to every route except the sandboxed ad-frame document, which sets
+// its own looser policy and must stay frameable by our pages.
+const NOT_AD_FRAME = "/((?!api/banners/[^/]+/frame).*)";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -20,8 +31,13 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
-      // Everything except the sandboxed ad-frame document is unframeable.
-      { source: "/((?!api/banners/[^/]+/frame).*)", headers: [{ key: "X-Frame-Options", value: "DENY" }] },
+      { source: NOT_AD_FRAME, headers: [{ key: "X-Frame-Options", value: "DENY" }] },
+      // JSON APIs never render HTML; lock them down completely. (Pages get a
+      // per-request nonce CSP from middleware.)
+      {
+        source: "/api/((?!banners/[^/]+/frame).*)",
+        headers: [{ key: "Content-Security-Policy", value: "default-src 'none'; frame-ancestors 'none'; base-uri 'none'" }],
+      },
     ];
   },
 };

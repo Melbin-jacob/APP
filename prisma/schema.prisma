@@ -462,3 +462,18 @@ model SearchQuery {
 
   @@index([createdAt])
 }
+
+enum EmailScope {
+  REVIEW_REQUESTS // review invitations sent on behalf of businesses
+  NEWSLETTER
+}
+
+// Unsubscribe / suppression list (CAN-SPAM, CASL, RFC 8058 one-click).
+// Checked before every non-essential send; sign-in links are never suppressed.
+model EmailOptOut {
+  email     String     @db.Citext
+  scope     EmailScope
+  createdAt DateTime   @default(now())
+
+  @@id([email, scope])
+}

@@ -1,5 +1,5 @@
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
-import nodemailer from "nodemailer";
+import nodemailer, { type Transporter } from "nodemailer";
 import { env } from "@/lib/env";
 
 export type OutgoingEmail = {
@@ -9,10 +9,20 @@ export type OutgoingEmail = {
   text: string;
   /** SES configuration-set / SendGrid category for delivery analytics. */
   tag?: string;
+  /** Non-essential mail must carry a one-click unsubscribe (RFC 8058, Gmail/Yahoo sender rules). */
+  unsubscribe?: { url: string; oneClickUrl: string };
 };
 
+function listHeaders(email: OutgoingEmail): Record<string, string> {
+  if (!email.unsubscribe) return {};
+  return {
+    "List-Unsubscribe": `<${email.unsubscribe.oneClickUrl}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+}
+
 let ses: SESv2Client | undefined;
-let smtp: nodemailer.Transporter | undefined;
+let smtp: Transporter | undefined;
 
 export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: string }> {
   const { EMAIL_TRANSPORT, EMAIL_FROM, AWS_REGION, SMTP_URL } = env();
@@ -32,6 +42,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: str
           Simple: {
             Subject: { Data: email.subject, Charset: "UTF-8" },
             Body: { Html: { Data: email.html, Charset: "UTF-8" }, Text: { Data: email.text, Charset: "UTF-8" } },
+            Headers: Object.entries(listHeaders(email)).map(([Name, Value]) => ({ Name, Value })),
           },
         },
         EmailTags: email.tag ? [{ Name: "type", Value: email.tag }] : undefined,
@@ -41,6 +52,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: str
   }
 
   smtp ??= nodemailer.createTransport(SMTP_URL);
-  const info = await smtp.sendMail({ from: EMAIL_FROM, ...email });
+  const { to, subject, html, text } = email;
+  const info = await smtp.sendMail({ from: EMAIL_FROM, to, subject, html, text, headers: listHeaders(email) });
   return { messageId: info.messageId };
 }

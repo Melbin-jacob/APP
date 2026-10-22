@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/layout/SiteHeader";
-import { getPrincipal } from "@/server/auth";
+import { getPrincipal, requireCurrentTerms } from "@/server/auth";
 
 const NAV = [
   { href: "/admin", label: "Overview", minRole: "ADMIN" },
@@ -18,6 +18,7 @@ const NAV = [
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await getPrincipal();
   if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) notFound();
+  requireCurrentTerms(user, "/admin");
   const nav = NAV.filter((n) => n.minRole === "ADMIN" || user.role === "SUPER_ADMIN");
 
   return (

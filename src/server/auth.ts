@@ -11,7 +11,9 @@ import { rateLimit } from "@/lib/rate-limit";
 import { cached, invalidate } from "@/lib/redis";
 import { magicLinkEmail } from "./email/templates";
 import { sendEmail } from "./email/transport";
-import { forbidden, unauthorized } from "./http";
+import { redirect } from "next/navigation";
+import { TOS_VERSION } from "@/lib/legal";
+import { ApiError, clientIpFrom, forbidden, unauthorized } from "./http";
 
 const credentialsSchema = z.object({ email: z.string().email().max(254), password: z.string().min(1).max(200) });
 
@@ -31,7 +33,11 @@ export const authOptions: NextAuthOptions = {
         const parsed = credentialsSchema.safeParse(raw);
         if (!parsed.success) return null;
         const email = parsed.data.email.toLowerCase();
-        const ip = (req?.headers?.["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ?? "unknown";
+        const headers = (req?.headers ?? {}) as Record<string, string | string[] | undefined>;
+        const ip = clientIpFrom((n) => {
+          const v = headers[n];
+          return Array.isArray(v) ? v.join(",") : v;
+        });
 
         // Two budgets: per-account (stops targeted guessing) and per-IP (stops spraying).
         const [byEmail, byIp] = await Promise.all([rateLimit("login", `e:${email}`), rateLimit("loginIp", ip)]);
@@ -111,10 +117,25 @@ export async function requireUser(): Promise<Principal> {
   return user;
 }
 
-/** Hierarchical RBAC: SUPER_ADMIN ⊃ ADMIN. TRADER is a separate capability, checked exactly. */
+/** True when the user hasn't accepted the current Terms (OAuth / magic-link sign-ups, or Terms changed since). */
+export const needsTerms = (user: Pick<Principal, "tosVersion">) => user.tosVersion !== TOS_VERSION;
+
+/**
+ * Page guard: send users who haven't accepted the current Terms to accept them
+ * first. Not applied to the account page, so export and deletion always work.
+ */
+export function requireCurrentTerms(user: Pick<Principal, "tosVersion">, next: string) {
+  if (needsTerms(user)) redirect(`/legal/accept-terms?next=${encodeURIComponent(next)}`);
+}
+
+/**
+ * Hierarchical RBAC: SUPER_ADMIN ⊃ ADMIN. TRADER is a separate capability, checked exactly.
+ * Privileged APIs also require acceptance of the current Terms.
+ */
 export async function requireRole(role: Role): Promise<Principal> {
   const user = await requireUser();
   const allowed = role === "TRADER" ? user.role === "TRADER" : RANK[user.role] >= RANK[role];
   if (!allowed) throw forbidden();
+  if (needsTerms(user)) throw new ApiError(403, "terms_required", "Please accept the current Terms of Service first");
   return user;
 }

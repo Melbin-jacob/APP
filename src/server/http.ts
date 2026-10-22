@@ -20,10 +20,25 @@ export const forbidden = () => new ApiError(403, "forbidden", "Not allowed");
 export const notFound = (what = "Resource") => new ApiError(404, "not_found", `${what} not found`);
 export const conflict = (msg: string) => new ApiError(409, "conflict", msg);
 
-/** Best-effort client IP. Trust X-Forwarded-For only as set by our own edge (ALB/Vercel). */
-export function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0";
+/**
+ * Client IP for rate limiting and abuse logs.
+ *
+ * Clients can send any X-Forwarded-For they like, so its leftmost entry is
+ * attacker-controlled; trusting it would let one client dodge rate limits by
+ * rotating fake IPs. Prefer headers only the hosting platform can set, then
+ * the rightmost X-Forwarded-For entry, which our own proxy (ALB / CloudFront /
+ * Vercel) appended.
+ */
+export function clientIpFrom(get: (name: string) => string | null | undefined): string {
+  for (const name of ["x-vercel-forwarded-for", "cf-connecting-ip", "fly-client-ip", "x-real-ip"]) {
+    const v = get(name)?.split(",")[0]?.trim();
+    if (v) return v;
+  }
+  const chain = get("x-forwarded-for")?.split(",").map((s) => s.trim()).filter(Boolean);
+  return chain?.at(-1) ?? "0.0.0.0";
 }
+
+export const clientIp = (req: NextRequest) => clientIpFrom((n) => req.headers.get(n));
 
 export function ipHash(req: NextRequest) {
   return anonymise(clientIp(req), process.env.NEXTAUTH_SECRET ?? "dev");
@@ -49,11 +64,19 @@ export function assertSameOrigin(req: NextRequest) {
   if (!origin || origin !== expected) throw new ApiError(403, "csrf", "Cross-site request blocked");
 }
 
+const MAX_BODY_BYTES = 64 * 1024; // every JSON API body is small; refuse anything bigger
+
 export async function parseJson<T>(req: NextRequest, schema: ZodType<T>): Promise<T> {
+  const declared = Number(req.headers.get("content-length") ?? 0);
+  if (declared > MAX_BODY_BYTES) throw new ApiError(413, "payload_too_large", "Request body too large");
   let body: unknown;
   try {
-    body = await req.json();
-  } catch {
+    const text = await req.text();
+    // Content-Length can be absent (chunked) or wrong; check what actually arrived.
+    if (text.length > MAX_BODY_BYTES) throw new ApiError(413, "payload_too_large", "Request body too large");
+    body = JSON.parse(text);
+  } catch (err) {
+    if (err instanceof ApiError) throw err;
     throw badRequest("Body must be valid JSON");
   }
   return schema.parse(body);
@@ -61,17 +84,24 @@ export async function parseJson<T>(req: NextRequest, schema: ZodType<T>): Promis
 
 type Handler<C> = (req: NextRequest, ctx: C) => Promise<Response>;
 
-/** Uniform error envelope: { error: { code, message, issues? } }. Never leaks stack traces. */
-export function route<C = unknown>(handler: Handler<C>): Handler<C> {
+/**
+ * Uniform error envelope: { error: { code, message, issues? } }. Never leaks stack traces.
+ * `sameOrigin: false` is only for endpoints authorised by a signed token rather
+ * than a cookie (e.g. one-click unsubscribe POSTed by mail providers).
+ */
+export function route<C = unknown>(handler: Handler<C>, opts: { sameOrigin?: boolean } = {}): Handler<C> {
   return async (req, ctx) => {
     try {
-      assertSameOrigin(req);
-      return await handler(req, ctx);
+      if (opts.sameOrigin !== false) assertSameOrigin(req);
+      const res = await handler(req, ctx);
+      // API responses default to uncacheable: most carry personal or per-visitor data.
+      if (!res.headers.has("Cache-Control")) res.headers.set("Cache-Control", "no-store");
+      return res;
     } catch (err) {
       if (err instanceof ApiError) {
         return NextResponse.json({ error: { code: err.code, message: err.message } }, {
           status: err.status,
-          headers: err.headers,
+          headers: { "Cache-Control": "no-store", ...err.headers },
         });
       }
       if (err instanceof ZodError) {

@@ -5,7 +5,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { TraderDashboard } from "@/components/dashboard/TraderDashboard";
 import { db } from "@/lib/db";
 import { getI18n } from "@/i18n/server";
-import { getPrincipal } from "@/server/auth";
+import { getPrincipal, requireCurrentTerms } from "@/server/auth";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getI18n()).t("dashboard.title") };
@@ -14,6 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function DashboardPage() {
   const [user, { t }] = await Promise.all([getPrincipal(), getI18n()]);
   if (!user || user.role !== "TRADER") redirect("/login?callbackUrl=/dashboard");
+  requireCurrentTerms(user, "/dashboard");
   const profile = await db.traderProfile.findUnique({
     where: { userId: user.id },
     select: { businessName: true, slug: true, status: true, ratingAvg: true, ratingCount: true, _count: { select: { callEvents: true } } },

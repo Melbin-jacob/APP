@@ -32,12 +32,18 @@ describe("review request email", () => {
     customerName: "<img>",
     reviewUrl: "https://app.test/review?token=abc",
     expiresAt: new Date("2026-11-05"),
+    unsubscribeUrl: "https://app.test/unsubscribe?t=abc.def",
   });
   it("uses the required subject line", () => expect(mail.subject).toBe(`How was your service with Bob's <script>"Pipes"</script>?`));
   it("escapes every interpolated value in HTML", () => {
     expect(mail.html).not.toContain("<script>");
     expect(mail.html).not.toContain("<img>");
     expect(mail.html).toContain("&lt;script&gt;");
+  });
+  it("carries an unsubscribe link and the sender's mailing address (CAN-SPAM / CASL)", () => {
+    expect(mail.html).toContain("https://app.test/unsubscribe?t=abc.def");
+    expect(mail.text).toContain("https://app.test/unsubscribe?t=abc.def");
+    expect(mail.html).toMatch(/HomeServices Direct Inc\./);
   });
   it("has five star links carrying the rating and a submit CTA", () => {
     for (let n = 1; n <= 5; n++) expect(mail.html).toContain(`token=abc&amp;rating=${n}`);

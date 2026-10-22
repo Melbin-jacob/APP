@@ -90,6 +90,16 @@ Demo businesses: 8 in **New York** (US, priced in USD) and 8 in **Toronto** (Can
 - Ad banners: flip the site-wide switch and reload the home page; create, pause, or delete banners.
 - Audit log: every action above is recorded.
 
+**Legal & compliance** (footer section on every page)
+- Open each link: Legal centre, Terms, Privacy Policy, Cookie Policy, Do Not Sell or Share, Your privacy rights,
+  Legal disclaimer, Accessibility, Security. Machine-readable security contact: `/.well-known/security.txt`.
+- **Cookie settings** in the footer reopens the consent dialog. Advertising scripts in the side banners only load after you
+  accept advertising cookies.
+- **Unsubscribe:** request a review as `trader0`, open the email in the test inbox and click *Unsubscribe from review requests*.
+  Requesting another review for that email is then refused.
+- **Terms gate:** an account that hasn't accepted the current Terms (e.g. someone who signed up with an email link) is sent to
+  an "accept the Terms" page before using the dashboard or admin console. Exporting or deleting data never requires it.
+
 **Privacy**
 - Sign in as `customer@…` → `/account`: export your data (JSON) or delete the account.
 - Cookie banner on first visit: Accept, Reject, or Customise.

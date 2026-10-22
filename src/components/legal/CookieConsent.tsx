@@ -5,10 +5,18 @@ import { useEffect, useState } from "react";
 import { useT } from "@/components/providers/PreferencesProvider";
 
 const COOKIE = "hsd_consent";
+const OPEN_EVENT = "open-cookie-settings";
 
-type Consent = { necessary: true; analytics: boolean; ads: boolean; v: 1 };
+export type Consent = { necessary: true; analytics: boolean; ads: boolean; gpc?: boolean; v: 1 };
 
-function read(): Consent | null {
+/** Global Privacy Control: a legally binding opt-out of sale/sharing in California and other US states. */
+export const gpcEnabled = () =>
+  typeof navigator !== "undefined" && (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true;
+
+/** Re-opens the banner (footer "Cookie settings" link). */
+export const openCookieSettings = () => window.dispatchEvent(new Event(OPEN_EVENT));
+
+export function readConsent(): Consent | null {
   const raw = document.cookie.split("; ").find((c) => c.startsWith(`${COOKIE}=`))?.split("=")[1];
   try {
     return raw ? (JSON.parse(decodeURIComponent(raw)) as Consent) : null;
@@ -17,15 +25,17 @@ function read(): Consent | null {
   }
 }
 
-function write(consent: Consent) {
+export function writeConsent(consent: Consent) {
   const secure = location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${COOKIE}=${encodeURIComponent(JSON.stringify(consent))}; Max-Age=${60 * 60 * 24 * 180}; Path=/; SameSite=Lax${secure}`;
   window.dispatchEvent(new CustomEvent("consent-change", { detail: consent }));
 }
 
 /**
- * GDPR/ePrivacy banner: nothing non-essential runs until the visitor opts in.
- * "Reject" is as prominent as "Accept", as regulators require.
+ * Consent banner (GDPR/ePrivacy, Quebec Law 25, CCPA/CPRA): nothing
+ * non-essential runs until the visitor opts in, and "Reject" is as prominent
+ * as "Accept". A Global Privacy Control signal is applied automatically as an
+ * opt-out of advertising and analytics; the visitor can't override it here.
  */
 export function CookieConsent() {
   const t = useT();
@@ -34,11 +44,32 @@ export function CookieConsent() {
   const [analytics, setAnalytics] = useState(false);
   const [ads, setAds] = useState(false);
 
-  useEffect(() => setOpen(!read()), []);
+  const [gpc, setGpc] = useState(false);
+
+  useEffect(() => {
+    const signal = gpcEnabled();
+    setGpc(signal);
+    const current = readConsent();
+    if (signal && (!current || current.ads || current.analytics)) {
+      // Honour GPC without asking: record the opt-out and skip the banner.
+      writeConsent({ necessary: true, analytics: false, ads: false, gpc: true, v: 1 });
+    } else if (!current) {
+      setOpen(true);
+    }
+    const reopen = () => {
+      const c = readConsent();
+      setAnalytics(!!c?.analytics);
+      setAds(!!c?.ads);
+      setCustom(true);
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_EVENT, reopen);
+    return () => window.removeEventListener(OPEN_EVENT, reopen);
+  }, []);
   if (!open) return null;
 
   const save = (c: Omit<Consent, "necessary" | "v">) => {
-    write({ necessary: true, v: 1, ...c });
+    writeConsent({ necessary: true, v: 1, ...(gpc ? { analytics: false, ads: false, gpc: true } : c) });
     setOpen(false);
   };
 
@@ -49,13 +80,14 @@ export function CookieConsent() {
           <p id="cc-title" className="font-semibold text-ink-900">{t("cookies.title")}</p>
           <p>
             {t("cookies.body")}{" "}
-            <Link href="/privacy" className="underline">{t("cookies.learnMore")}</Link>
+            <Link href="/legal/cookies" className="underline">{t("cookies.learnMore")}</Link>
           </p>
+          {gpc && <p className="mt-1 font-medium text-brand-700">{t("cookies.gpc")}</p>}
           {custom && (
             <div className="mt-2 flex flex-wrap gap-4">
               <label className="flex items-center gap-2"><input type="checkbox" checked disabled /> {t("cookies.essential")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} /> {t("cookies.analytics")}</label>
-              <label className="flex items-center gap-2"><input type="checkbox" checked={ads} onChange={(e) => setAds(e.target.checked)} /> {t("cookies.ads")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={analytics && !gpc} disabled={gpc} onChange={(e) => setAnalytics(e.target.checked)} /> {t("cookies.analytics")}</label>
+              <label className="flex items-center gap-2"><input type="checkbox" checked={ads && !gpc} disabled={gpc} onChange={(e) => setAds(e.target.checked)} /> {t("cookies.ads")}</label>
             </div>
           )}
         </div>

@@ -58,7 +58,10 @@ tests/             Vitest unit tests
 
 - Set `EMAIL_TRANSPORT=ses`, verify the sending domain, and configure SPF, DKIM and DMARC.
 - Add an SES configuration set for bounces and complaints.
-- Schedule `POST /api/cron/flush-banner-stats` every 5 minutes with `Authorization: Bearer $CRON_SECRET`.
+- Schedule `POST /api/cron/flush-banner-stats` every 5 minutes and `POST /api/cron/retention` daily,
+  both with `Authorization: Bearer $CRON_SECRET`. The retention job enforces the periods published in the Privacy Policy.
+- Set the legal-entity variables (`LEGAL_ENTITY_NAME`, `LEGAL_ADDRESS`, `LEGAL_JURISDICTION`, `PRIVACY_OFFICER`, `*_EMAIL`)
+  and make sure the privacy and security mailboxes exist and are monitored.
 - Put the app behind a trusted proxy that overwrites `X-Forwarded-For`, since rate limiting keys on it.
 - Markets: `NEXT_PUBLIC_SUPPORTED_COUNTRIES` (default `US,CA`). Adding a country means a rule in `src/lib/postcode.ts`,
   a lookup in `src/server/services/geo.ts` (zippopotam.us covers ~60 countries) and translated postal labels.
@@ -69,4 +72,6 @@ tests/             Vitest unit tests
 - Translations: 12 languages in `src/i18n/messages/`, machine-quality. Have native speakers review them, and have
   counsel review the translated liability disclaimer. The Terms and Privacy pages are English-only for now.
 - Add an upload pipeline that issues S3 presigned URLs for logos, gallery images and credentials. Store credential documents in a private bucket.
-- Have counsel review the `/terms` and `/privacy` pages and `src/lib/legal.ts`.
+- Have counsel review everything under the footer's **Legal & compliance** section (`/terms`, `/privacy`, `/legal/*`)
+  and `src/lib/legal.ts`. The pages are drafted for CCPA/CPRA, PIPEDA, Quebec Law 25, CAN-SPAM, CASL and ADA/AODA but are not legal advice.
+- Add multi-factor authentication for admin accounts before launch (see docs/ARCHITECTURE.md §7).

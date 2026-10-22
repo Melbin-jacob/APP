@@ -10,6 +10,7 @@ import { sendEmail } from "../email/transport";
 import { ApiError, conflict, notFound } from "../http";
 import { getSetting } from "../settings";
 import { invalidate } from "@/lib/redis";
+import { isOptedOut, unsubscribeLinks } from "./email-prefs";
 
 export const reviewRequestInput = z.object({
   customerEmail: z.string().trim().toLowerCase().email().max(254),
@@ -47,6 +48,11 @@ export async function createReviewRequest(
 
   // One live request per customer per trader per cooldown window — stops a
   // trader from carpet-bombing a customer or farming reviews via aliases.
+  // Customers who unsubscribed from review requests are never emailed again.
+  if (await isOptedOut(input.customerEmail, "REVIEW_REQUESTS")) {
+    throw new ApiError(409, "customer_opted_out", "This customer has opted out of review requests");
+  }
+
   const recent = await db.reviewRequest.findFirst({
     where: {
       traderId,
@@ -80,14 +86,16 @@ export async function createReviewRequest(
   });
 
   const reviewUrl = `${APP_URL}/review?token=${encodeURIComponent(token)}`;
+  const unsubscribe = unsubscribeLinks(input.customerEmail, "REVIEW_REQUESTS");
   const mail = reviewRequestEmail({
     businessName: trader.businessName,
     customerName: request.customerName,
     reviewUrl,
     expiresAt,
+    unsubscribeUrl: unsubscribe.url,
   });
   try {
-    await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request" });
+    await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request", unsubscribe });
   } catch (err) {
     // Revoke so the cooldown check above doesn't block a retry for 30 days.
     await db.reviewRequest.update({ where: { id: request.id }, data: { status: "REVOKED" } });

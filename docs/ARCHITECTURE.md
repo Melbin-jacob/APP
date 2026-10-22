@@ -194,3 +194,22 @@ SUPER_ADMIN-only.
 | Liability shield | `acceptTerms: z.literal(true)` makes registration impossible without acceptance; version + timestamp stored and audited; compact disclaimer on every TraderCard, full disclaimer on every profile page and in the footer. |
 | GDPR / CCPA | Cookie consent (opt-in, "Reject all" as prominent as "Accept"), self-service export and erasure, hashed IPs in logs, double-opt-in newsletter. |
 | Audit | `AuditLog` row for registrations (ToS version), admin actions, moderation, settings, exports, deletions. |
+
+### Additional controls (security & compliance review, Oct 2026)
+
+| Control | Implementation |
+|---|---|
+| Rate-limit IP spoofing | Client IP comes from platform headers (`x-vercel-forwarded-for`, `cf-connecting-ip`, `x-real-ip`) or the **rightmost** `X-Forwarded-For` entry, never the client-controlled leftmost one |
+| API hardening | JSON bodies capped at 64 KB (413); API responses default to `Cache-Control: no-store`; APIs get `Content-Security-Policy: default-src 'none'` |
+| Extra headers | `Cross-Origin-Opener-Policy: same-origin`, `X-Permitted-Cross-Domain-Policies: none`, tightened `Permissions-Policy` |
+| Dependencies | `npm audit --omit=dev`: 0 known vulnerabilities (nodemailer 10; patched postcss and deepmerge-ts via `overrides`). Remaining advisories are in dev-only tooling (ESLint, Tailwind 3 build) and need major upgrades |
+| Terms acceptance | Every account must accept the current `TOS_VERSION` (OAuth / magic-link sign-ups included) before privileged pages or APIs; export and deletion never require it |
+| Ad consent | Third-party ad scripts render only after advertising consent and never under Global Privacy Control (`ConsentGate`) |
+| Global Privacy Control | Treated as a CCPA/CPRA opt-out of sale/sharing: recorded automatically, ads/analytics stay off |
+| Email (CAN-SPAM, CASL, RFC 8058) | Signed unsubscribe links + `List-Unsubscribe` / `List-Unsubscribe-Post` headers, suppression list (`EmailOptOut`) checked before sending, sender mailing address in every commercial email |
+| Storage limitation | Daily `POST /api/cron/retention` deletes data past the periods in `RETENTION_DAYS`, which the Privacy Policy renders |
+| Disclosure | `/legal/security` policy and RFC 9116 `/.well-known/security.txt` |
+
+**Known gaps to close before launch:** multi-factor authentication for ADMIN / SUPER_ADMIN accounts; breached-password
+screening at sign-up (e.g. HIBP k-anonymity, per NIST 800-63B); professional translation and counsel review of legal pages;
+a documented incident-response and breach-notification runbook; a Quebec Law 25 privacy impact assessment for cross-border hosting.

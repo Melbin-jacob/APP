@@ -18,3 +18,15 @@
   .card { @apply rounded-lg bg-white shadow-card; }
   .label { @apply mb-1 block text-sm font-medium text-ink-700; }
 }
+
+/* Legal documents: readable defaults without a typography plugin. */
+@layer components {
+  .legal h2 { @apply pt-4 text-lg font-semibold text-ink-900; }
+  .legal h3 { @apply pt-2 font-semibold text-ink-900; }
+  .legal ul { @apply list-disc space-y-1 ps-5; }
+  .legal ol { @apply list-decimal space-y-1 ps-5; }
+  .legal a { @apply text-brand-700 underline; }
+  .legal table { @apply w-full border-collapse text-left text-xs; }
+  .legal th, .legal td { @apply border border-ink-200 px-2 py-1.5 align-top; }
+  .legal th { @apply bg-ink-100 font-semibold text-ink-900; }
+}
