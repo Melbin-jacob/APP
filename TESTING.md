@@ -36,6 +36,14 @@ Password for all: **`ChangeMe-123456`**
 | `admin@homeservices.local` | Super-admin | Ops console at `/admin` |
 | `customer@homeservices.local` | Customer | Account page, data export / delete |
 
+These two logins are restored every time the app starts with demo data (Docker does this on every start): password back to
+`ChangeMe-123456`, account active, Terms accepted. So if you changed the password or suspended one while testing, just restart.
+After 5 wrong passwords an account is locked for 15 minutes.
+
+Sign in at http://localhost:3000/login, then use **My account** in the header (it goes to `/admin` for the admin), or open
+http://localhost:3000/admin directly. There's only one admin account; make more from *Ops console → Users* (role change
+needs the super-admin).
+
 ## What to try
 
 Listings: the **894 Windsor-Essex businesses** from the directory spreadsheet (all in Canada), across 37 trades.

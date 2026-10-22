@@ -6,9 +6,18 @@ import { PrismaClient } from "@prisma/client";
 import { hash } from "@node-rs/argon2";
 import { CATEGORIES } from "./categories";
 import { importDirectory } from "./import-directory";
+import { TOS_VERSION } from "../src/lib/legal";
 
 const db = new PrismaClient();
-const TOS = "2026-10-01";
+const TOS = TOS_VERSION;
+
+// Local-testing logins. Re-applied on every seed (so every Docker start), so
+// they always work even after a password change, suspension or new Terms.
+const TEST_PASSWORD = "ChangeMe-123456";
+const TEST_LOGINS = [
+  { email: "admin@homeservices.local", name: "Ops Admin", role: "SUPER_ADMIN" as const },
+  { email: "customer@homeservices.local", name: "Casey Customer", role: "CUSTOMER" as const },
+];
 
 async function main() {
   for (const [i, [slug, name, icon]] of CATEGORIES.entries()) {
@@ -28,20 +37,19 @@ async function main() {
   console.log("Directory import:", result);
 
   // Local-testing logins only. Never run this seed against production.
-  const password = await hash("ChangeMe-123456", { memoryCost: 19456, timeCost: 2, parallelism: 1 });
-  await db.user.upsert({
-    where: { email: "admin@homeservices.local" },
-    create: { email: "admin@homeservices.local", name: "Ops Admin", role: "SUPER_ADMIN", passwordHash: password, tosVersion: TOS, tosAcceptedAt: new Date(), emailVerified: new Date() },
-    update: {},
-  });
-  await db.user.upsert({
-    where: { email: "customer@homeservices.local" },
-    create: { email: "customer@homeservices.local", name: "Casey Customer", role: "CUSTOMER", passwordHash: password, tosVersion: TOS, tosAcceptedAt: new Date() },
-    update: {},
-  });
+  const passwordHash = await hash(TEST_PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
+  for (const login of TEST_LOGINS) {
+    const usable = { passwordHash, status: "ACTIVE" as const, deletedAt: null, tosVersion: TOS, tosAcceptedAt: new Date() };
+    await db.user.upsert({
+      where: { email: login.email },
+      create: { ...login, ...usable, emailVerified: new Date() },
+      // The customer keeps a business role if it claimed a listing while testing.
+      update: login.role === "CUSTOMER" ? usable : { ...usable, role: login.role },
+    });
+  }
 
   await db.siteSetting.upsert({ where: { key: "ads.sideBanners.enabled" }, create: { key: "ads.sideBanners.enabled", value: true }, update: {} });
-  console.log("Seeded. Test logins (password ChangeMe-123456): admin@homeservices.local, customer@homeservices.local");
+  console.log(`Seeded. Test logins (password ${TEST_PASSWORD}): ${TEST_LOGINS.map((l) => `${l.email} (${l.role})`).join(", ")}`);
 }
 
 main().finally(() => db.$disconnect());
