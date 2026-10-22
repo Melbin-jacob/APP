@@ -1,0 +1,463 @@
+// HomeServices Direct — primary data model.
+//
+// Conventions
+// - IDs are cuid strings; money is stored as integer minor units (pence/cents).
+// - Geo search uses a PostGIS `geography(Point, 4326)` column on TraderProfile.
+//   Prisma cannot model it natively, so it is declared `Unsupported` and kept in
+//   sync from latitude/longitude by a database trigger (see the init migration).
+// - Anything a user can be held to (ToS acceptance, moderation, admin actions)
+//   leaves a row in AuditLog.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis, citext, pg_trgm]
+}
+
+// ─── Identity ────────────────────────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  TRADER
+  ADMIN // moderation + user management
+  SUPER_ADMIN // everything, incl. site settings and banners
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+  PENDING_DELETION
+}
+
+model User {
+  id             String     @id @default(cuid())
+  email          String     @unique @db.Citext
+  emailVerified  DateTime?
+  name           String?
+  image          String?
+  passwordHash   String? // Argon2id; null for magic-link / OAuth-only accounts
+  role           Role       @default(CUSTOMER)
+  status         UserStatus @default(ACTIVE)
+  tosVersion     String? // version of the Terms the user explicitly accepted
+  tosAcceptedAt  DateTime?
+  marketingOptIn Boolean    @default(false)
+  lastLoginAt    DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  accounts      Account[]
+  trader        TraderProfile?
+  reviews       Review[]
+  reviewReports ReviewReport[]
+  auditLogs     AuditLog[]     @relation("AuditActor")
+
+  @@index([role, status])
+  @@index([createdAt])
+}
+
+// NextAuth adapter tables (OAuth accounts + magic-link tokens). Sessions are
+// stateless JWTs; ban/suspend is enforced through a Redis-cached status check.
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Traders & services ──────────────────────────────────────────────────────
+
+enum TraderStatus {
+  PENDING // awaiting admin approval; not publicly listed
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+model Category {
+  id        String  @id @default(cuid())
+  slug      String  @unique
+  name      String
+  icon      String // icon key resolved by the frontend icon map
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+
+  traders  TraderCategory[]
+  services Service[]
+
+  @@index([name(ops: raw("gin_trgm_ops"))], map: "Category_name_trgm", type: Gin)
+}
+
+model TraderProfile {
+  id               String       @id @default(cuid())
+  userId           String       @unique
+  businessName     String
+  slug             String       @unique
+  phone            String // real number; never rendered directly when masking is on
+  trackingPhone    String? // provider-issued masked/tracking number
+  bio              String?      @db.Text
+  hourlyRatePence  Int?
+  currency         String       @default("GBP") @db.Char(3)
+  logoUrl          String?
+  coverImageUrl    String?
+  addressLine      String?
+  city             String
+  postcode         String
+  country          String       @default("GB") @db.Char(2)
+  latitude         Float
+  longitude        Float
+  // Maintained by trigger `trader_profile_sync_location`; GIST-indexed.
+  location         Unsupported("geography(Point, 4326)")?
+  serviceRadiusKm  Int          @default(25)
+  // { "mon": [{ "open": "08:00", "close": "18:00" }], ... }
+  operatingHours   Json?
+  status           TraderStatus @default(PENDING)
+  verifiedAt       DateTime?
+  ratingAvg        Decimal      @default(0) @db.Decimal(3, 2)
+  ratingCount      Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categories     TraderCategory[]
+  services       Service[]
+  serviceAreas   ServiceArea[]
+  gallery        GalleryImage[]
+  credentials    Credential[]
+  jobs           Job[]
+  reviewRequests ReviewRequest[]
+  reviews        Review[]
+  callEvents     CallEvent[]
+
+  @@index([status, ratingAvg(sort: Desc)])
+  @@index([postcode])
+  @@index([location], map: "TraderProfile_location_gist", type: Gist)
+  @@index([businessName(ops: raw("gin_trgm_ops"))], map: "TraderProfile_businessName_trgm", type: Gin)
+}
+
+model TraderCategory {
+  traderId   String
+  categoryId String
+  isPrimary  Boolean @default(false)
+
+  trader   TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  category Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@id([traderId, categoryId])
+  @@index([categoryId])
+}
+
+model Service {
+  id             String   @id @default(cuid())
+  traderId       String
+  categoryId     String
+  title          String
+  description    String?  @db.Text
+  priceFromPence Int?
+  priceUnit      String? // "hour" | "job" | "sqm" ...
+  createdAt      DateTime @default(now())
+
+  trader   TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  category Category      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([traderId])
+  @@index([categoryId])
+}
+
+// Explicit postcode/zip coverage, in addition to the radius around `location`.
+model ServiceArea {
+  id       String @id @default(cuid())
+  traderId String
+  postcode String // outward code ("SW1A") or full zip
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@unique([traderId, postcode])
+  @@index([postcode])
+}
+
+model GalleryImage {
+  id        String   @id @default(cuid())
+  traderId  String
+  url       String
+  caption   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId, sortOrder])
+}
+
+enum CredentialType {
+  LICENSE
+  CERTIFICATION
+  INSURANCE
+}
+
+enum CredentialStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
+
+model Credential {
+  id           String           @id @default(cuid())
+  traderId     String
+  type         CredentialType
+  name         String
+  issuer       String?
+  number       String?
+  documentUrl  String // private bucket key; served via signed URL to admins only
+  expiresAt    DateTime?
+  status       CredentialStatus @default(PENDING)
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime         @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId])
+  @@index([status])
+}
+
+// Click-to-call tracking. Visitor identity is a salted hash, never raw IP.
+model CallEvent {
+  id          String   @id @default(cuid())
+  traderId    String
+  visitorHash String
+  createdAt   DateTime @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+
+  @@index([traderId, createdAt])
+}
+
+// ─── Jobs & reviews ──────────────────────────────────────────────────────────
+
+enum JobStatus {
+  OPEN
+  COMPLETED
+  CANCELLED
+}
+
+model Job {
+  id            String    @id @default(cuid())
+  traderId      String
+  customerEmail String    @db.Citext
+  customerName  String?
+  title         String
+  status        JobStatus @default(OPEN)
+  completedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  trader        TraderProfile  @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  reviewRequest ReviewRequest?
+
+  @@index([traderId, status])
+}
+
+enum ReviewRequestStatus {
+  PENDING // created, email not yet confirmed sent
+  SENT
+  USED
+  EXPIRED
+  REVOKED
+}
+
+// One single-use review link. Only a SHA-256(pepper + token) hash is stored;
+// the raw token exists solely in the emailed URL.
+model ReviewRequest {
+  id            String              @id @default(cuid())
+  traderId      String
+  jobId         String?             @unique
+  customerEmail String              @db.Citext
+  customerName  String?
+  tokenHash     String              @unique
+  status        ReviewRequestStatus @default(PENDING)
+  expiresAt     DateTime
+  sentAt        DateTime?
+  usedAt        DateTime?
+  createdAt     DateTime            @default(now())
+
+  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  job    Job?          @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  review Review?
+
+  @@index([traderId, createdAt])
+  @@index([customerEmail, traderId])
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  PENDING_MODERATION // tripped spam heuristics or reported past threshold
+  REMOVED
+}
+
+model Review {
+  id              String       @id @default(cuid())
+  traderId        String
+  reviewRequestId String?      @unique
+  authorId        String?
+  authorName      String
+  rating          Int // 1..5, enforced by CHECK constraint
+  comment         String?      @db.Text
+  status          ReviewStatus @default(PUBLISHED)
+  isVerified      Boolean      @default(false) // true when submitted through a ReviewRequest token
+  reportCount     Int          @default(0)
+  removedReason   String?
+  publishedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  trader        TraderProfile  @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  reviewRequest ReviewRequest? @relation(fields: [reviewRequestId], references: [id], onDelete: SetNull)
+  author        User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  reports       ReviewReport[]
+
+  @@index([traderId, status, createdAt(sort: Desc)])
+  @@index([status, reportCount(sort: Desc)])
+}
+
+enum ReportReason {
+  SPAM
+  OFFENSIVE
+  FAKE
+  CONFLICT_OF_INTEREST
+  OTHER
+}
+
+model ReviewReport {
+  id         String       @id @default(cuid())
+  reviewId   String
+  reporterId String?
+  reason     ReportReason
+  details    String?      @db.Text
+  resolvedAt DateTime?
+  resolution String?
+  createdAt  DateTime     @default(now())
+
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reporter User?  @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+
+  @@index([reviewId])
+  @@index([resolvedAt])
+}
+
+// ─── Ads, settings, ops ──────────────────────────────────────────────────────
+
+enum BannerSlot {
+  LEFT
+  RIGHT
+}
+
+enum BannerKind {
+  IMAGE // our own creative + click-through URL
+  SCRIPT // third-party ad tag (e.g. AdSense); rendered in a sandboxed iframe
+}
+
+model Banner {
+  id         String     @id @default(cuid())
+  name       String
+  slot       BannerSlot
+  kind       BannerKind
+  imageUrl   String?
+  targetUrl  String?
+  scriptHtml String?    @db.Text
+  width      Int        @default(160) // 160 or 300 skyscraper
+  height     Int        @default(600)
+  weight     Int        @default(1) // weighted rotation within a slot
+  isActive   Boolean    @default(true)
+  startsAt   DateTime?
+  endsAt     DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  stats BannerStat[]
+
+  @@index([slot, isActive])
+}
+
+// Daily roll-up; raw events are counted in Redis and flushed here.
+model BannerStat {
+  bannerId    String
+  day         DateTime @db.Date
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+
+  banner Banner @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+
+  @@id([bannerId, day])
+}
+
+// Typed key/value feature switches, e.g. "ads.sideBanners.enabled".
+model SiteSetting {
+  key         String   @id
+  value       Json
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String // e.g. "trader.approve", "review.remove", "settings.update"
+  entityType String
+  entityId   String?
+  metadata   Json?
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entityType, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique @db.Citext
+  confirmedAt    DateTime?
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+}
+
+model SearchQuery {
+  id          String   @id @default(cuid())
+  keyword     String?
+  location    String?
+  categoryId  String?
+  resultCount Int
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
