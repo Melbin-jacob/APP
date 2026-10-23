@@ -55,7 +55,7 @@ export function reviewRequestEmail(input: {
   const html = layout(
     subject,
     `<p style="margin:0 0 14px;font-size:16px">${greeting}</p>
-     <p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:#1f2933">Thank you for choosing ${business}.</p>
+     <p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:#1f2933">Thank you for choosing ${business}</p>
      <p style="margin:0 0 22px;font-size:15px;line-height:1.55;color:#3e4c59">We would love to hear how your experience was. It only takes a minute, and your
      feedback helps ${business} keep improving and helps your neighbours choose with confidence.</p>
      <form action="${esc(input.formAction)}" method="post" style="margin:0">
@@ -83,7 +83,7 @@ export function reviewRequestEmail(input: {
 
   const text = `${input.customerName ? `Hi ${input.customerName},` : "Hello,"}
 
-Thank you for choosing ${input.businessName}.
+Thank you for choosing ${input.businessName}
 
 We would love to hear how your experience was. It only takes a minute, and your feedback helps ${input.businessName} keep improving and helps your neighbours choose with confidence.
 
