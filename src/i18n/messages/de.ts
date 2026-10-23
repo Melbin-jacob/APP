@@ -292,6 +292,7 @@ const de: Messages = {
       emailTaken: "Mit dieser E-Mail-Adresse gibt es bereits ein Konto.",
       fix: "Bitte prüfe die markierten Felder.",
     },
+    claimNote: "Erstellen Sie zuerst Ihr Konto. Danach geht es direkt zurück zum Eintrag, um ihn zu beanspruchen – Unternehmensangaben sind hier nicht nötig.",
   },
   account: {
     title: "Dein Konto",

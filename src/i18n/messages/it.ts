@@ -292,6 +292,7 @@ const it: Messages = {
       emailTaken: "Esiste già un account con questa e-mail.",
       fix: "Controlla i campi evidenziati.",
     },
+    claimNote: "Crea prima il tuo account. Tornerai subito alla scheda per rivendicarla, quindi non serve inserire qui i dati della tua attività.",
   },
   account: {
     title: "Il tuo account",

@@ -28,7 +28,10 @@ const PHONE = /^\+?[0-9 ()-]{7,20}$/;
 
 export function RegisterForm({ initialType, categories, next }: { initialType: "customer" | "trader"; categories: Category[]; next?: string }) {
   const { t, locale, country: visitorCountry } = usePrefs();
-  const [type, setType] = useState(initialType);
+  // Coming from "Claim it": they only need an account, then they claim the existing
+  // listing. Registering a business here would create a duplicate listing.
+  const claiming = /^\/traders\/[^/]+\/claim$/.test(next ?? "");
+  const [type, setType] = useState(claiming ? "customer" : initialType);
   const [errors, setErrors] = useState<Errors>({});
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -55,7 +58,7 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
   const validate = (f: FormData): Errors => {
     const str = (k: string) => String(f.get(k) ?? "").trim();
     const e: Record<string, MessageKey> = {};
-    if (!str("name")) e.name = "register.errors.required";
+    if (type === "customer" && !str("name")) e.name = "register.errors.required";
     if (!EMAIL.test(str("email"))) e.email = "register.errors.email";
     const pw = str("password");
     if (pw.length < 12 || !/[a-z]/i.test(pw) || !/\d/.test(pw)) e.password = "register.errors.password";
@@ -81,7 +84,8 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
     }
     const payload: Record<string, unknown> = {
       accountType: type,
-      name: str("name"),
+      // A business account is named after the business (one field, not two).
+      name: type === "trader" ? str("businessName").slice(0, 80) : str("name"),
       email: str("email"),
       password: str("password"),
       acceptTerms: true,
@@ -141,17 +145,24 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
   return (
     <form onSubmit={submit} className="card space-y-5 p-8" noValidate>
       <h1 className="text-xl font-bold">{t("register.title")}</h1>
-      <div className="flex rounded-full bg-ink-100 p-1 text-sm" role="tablist">
+      {claiming && <p className="rounded-md bg-sky-50 p-3 text-sm text-sky-900">{t("register.claimNote")}</p>}
+      {!claiming && <div className="flex rounded-full bg-ink-100 p-1 text-sm" role="tablist">
         {(["customer", "trader"] as const).map((k) => (
           <button key={k} type="button" role="tab" aria-selected={type === k} onClick={() => setType(k)}
             className={`flex-1 rounded-full py-1.5 ${type === k ? "bg-white shadow-card" : "text-ink-500"}`}>
             {k === "customer" ? t("register.customer") : t("register.trader")}
           </button>
         ))}
-      </div>
+      </div>}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="name" label={t("register.name")} error={errors.name}><input id="name" name="name" required className="input" autoComplete="name" /></Field>
+        {type === "trader" ? (
+          <Field id="businessName" label={t("register.businessName")} error={errors.businessName}>
+            <input id="businessName" name="businessName" required minLength={2} maxLength={100} className="input" autoComplete="organization" />
+          </Field>
+        ) : (
+          <Field id="name" label={t("register.name")} error={errors.name}><input id="name" name="name" required className="input" autoComplete="name" /></Field>
+        )}
         <Field id="email" label={t("register.email")} error={errors.email}><input id="email" name="email" type="email" required className="input" autoComplete="email" dir="ltr" /></Field>
         <Field id="password" label={t("register.password")} error={errors.password}>
           <input id="password" name="password" type="password" required minLength={12} className="input" autoComplete="new-password" />
@@ -172,7 +183,6 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
               <input id="city" readOnly tabIndex={-1} value={location ? [location.city, location.region].filter((v, i, a) => v && a.indexOf(v) === i).join(", ") : ""}
                 placeholder={t("register.areaPlaceholder", { label: postalLabel })} className="input bg-ink-100" />
             </Field>
-            <Field id="businessName" label={t("register.businessName")} error={errors.businessName}><input id="businessName" name="businessName" required className="input" /></Field>
             <Field id="phone" label={t("register.phone")} error={errors.phone}><input id="phone" name="phone" type="tel" required className="input" autoComplete="tel" dir="ltr" /></Field>
             <Field id="categoryId" label={t("register.category")} error={errors.categoryId}>
               <select id="categoryId" name="categoryId" required className="input" defaultValue="">

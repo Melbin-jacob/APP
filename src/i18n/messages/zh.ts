@@ -292,6 +292,7 @@ const zh: Messages = {
       emailTaken: "该邮箱已注册账户。",
       fix: "请检查标出的字段。",
     },
+    claimNote: "请先创建账户。完成后会直接返回该页面进行认领，无需在此填写企业信息。",
   },
   account: {
     title: "您的账户",

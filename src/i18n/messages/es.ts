@@ -292,6 +292,7 @@ const es: Messages = {
       emailTaken: "Ya existe una cuenta con este correo.",
       fix: "Revisa los campos marcados.",
     },
+    claimNote: "Primero crea tu cuenta. Volverás directamente a la ficha para reclamarla, así que no hace falta que introduzcas aquí los datos de tu negocio.",
   },
   account: {
     title: "Tu cuenta",

@@ -292,6 +292,7 @@ const pt: Messages = {
       emailTaken: "Já existe uma conta com este e-mail.",
       fix: "Confira os campos destacados.",
     },
+    claimNote: "Primeiro crie sua conta. Você voltará direto ao perfil para reivindicá-lo, então não precisa informar os dados da empresa aqui.",
   },
   account: {
     title: "Sua conta",

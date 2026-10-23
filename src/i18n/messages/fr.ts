@@ -292,6 +292,7 @@ const fr: Messages = {
       emailTaken: "Un compte existe déjà avec cette adresse courriel.",
       fix: "Vérifiez les champs signalés.",
     },
+    claimNote: "Créez d'abord votre compte. Vous reviendrez directement sur la fiche pour la revendiquer : inutile de saisir ici les informations de votre entreprise.",
   },
   account: {
     title: "Votre compte",

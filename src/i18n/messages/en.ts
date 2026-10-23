@@ -292,6 +292,7 @@ const en = {
       emailTaken: "An account with this email already exists.",
       fix: "Please check the highlighted fields.",
     },
+    claimNote: "Create your account first. You'll come straight back to the listing to claim it, so there's no need to enter your business details here.",
   },
   account: {
     title: "Your account",
