@@ -69,15 +69,15 @@ export function PreferencesBar({ outsideMarkets, marketCounts }: { outsideMarket
         </div>
       </div>
       {outsideMarkets && (
-        <p className="bg-accent-500 px-4 py-1.5 text-center text-xs font-medium text-white" role="status" suppressHydrationWarning>
+        <p className="bg-[#f1ece2] px-4 py-1.5 text-center text-xs font-medium text-ink-900" role="status" suppressHydrationWarning>
           {t("prefs.outsideMarkets", { country: countryName(outsideMarkets, locale), market: countryName(country, locale) })}
         </p>
       )}
       {otherMarkets.length > 0 && (
-        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-accent-500 px-4 py-1.5 text-center text-xs font-medium text-white" role="status" suppressHydrationWarning>
+        <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-[#f1ece2] px-4 py-1.5 text-center text-xs font-medium text-ink-900" role="status" suppressHydrationWarning>
           {t("prefs.emptyMarket", { country: countryName(country, locale) })}
           {otherMarkets.map((c) => (
-            <button key={c} type="button" disabled={pending} onClick={() => change("country", c)} className="rounded bg-white px-2 py-0.5 font-semibold text-ink-900 hover:bg-white/90" suppressHydrationWarning>
+            <button key={c} type="button" disabled={pending} onClick={() => change("country", c)} className="rounded bg-ink-900 px-2 py-0.5 font-semibold text-white hover:bg-ink-700" suppressHydrationWarning>
               {flag(c)} {t("prefs.browseMarket", { market: countryName(c, locale) })}
             </button>
           ))}

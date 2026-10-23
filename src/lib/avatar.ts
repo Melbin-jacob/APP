@@ -1,8 +1,17 @@
 // Initials and a stable colour for businesses without a logo.
 
+// Muted, earthy tints (background + darker ink of the same hue): distinct
+// enough to tell listings apart, calm enough for a grid of hundreds.
+// Every pair keeps the initials above 4.5:1 contrast.
 const PALETTE = [
-  "bg-brand-600", "bg-sky-600", "bg-violet-600", "bg-rose-600", "bg-amber-600",
-  "bg-teal-600", "bg-indigo-600", "bg-fuchsia-700", "bg-emerald-700", "bg-orange-600",
+  "bg-[#ece8e1] text-[#6b5d4f]", // sand
+  "bg-[#e3e8e0] text-[#4e6147]", // sage
+  "bg-[#e1e7ec] text-[#475d6f]", // mist blue
+  "bg-[#ebe4e1] text-[#6e5650]", // clay
+  "bg-[#e5e5e8] text-[#55566a]", // slate lilac
+  "bg-[#e0e9e6] text-[#3f6259]", // eucalyptus
+  "bg-[#ede7da] text-[#6a5a36]", // oat
+  "bg-[#e6e3ea] text-[#5b5070]", // heather
 ] as const;
 
 // Words that make poor initials ("The Plumbing Co" → "PC", not "TP").

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="160" height="600" viewBox="0 0 160 600">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f7a1b"/><stop offset="1" stop-color="#4caf2f"/></linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b4636"/><stop offset="1" stop-color="#55634e"/></linearGradient>
   </defs>
   <rect width="160" height="600" rx="8" fill="url(#bg)"/>
   <circle cx="80" cy="96" r="44" fill="#fff" fill-opacity=".14"/>
@@ -11,7 +11,7 @@
     <text x="80" y="190" font-size="13" font-weight="700" letter-spacing="1.5" fill-opacity=".8">FOR BUSINESSES</text>
     <text x="80" y="232" font-size="24" font-weight="700">List your</text>
     <text x="80" y="262" font-size="24" font-weight="700">business</text>
-    <text x="80" y="292" font-size="24" font-weight="700" fill="#ffd166">free</text>
+    <text x="80" y="292" font-size="24" font-weight="700" fill="#cfe3b8">free</text>
     <text x="80" y="338" font-size="13">Reach local</text>
     <text x="80" y="356" font-size="13">homeowners looking</text>
     <text x="80" y="374" font-size="13">for your trade.</text>
@@ -19,7 +19,7 @@
     <text x="80" y="440" font-size="12">✓ Quote requests</text>
     <text x="80" y="460" font-size="12">✓ Verified reviews</text>
   </g>
-  <rect x="20" y="500" width="120" height="40" rx="20" fill="#e8a317"/>
+  <rect x="20" y="500" width="120" height="40" rx="20" fill="#4caf2f"/>
   <text x="80" y="525" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Get started</text>
   <text x="80" y="578" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" fill-opacity=".75" text-anchor="middle">HomeServices Direct</text>
 </svg>

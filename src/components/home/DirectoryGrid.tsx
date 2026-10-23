@@ -37,7 +37,7 @@ export function DirectoryGrid({ tabs, initial }: { tabs: Tab[]; initial: TraderC
             onClick={() => setActive(tab.slug)}
             className={cn(
               "rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wide transition",
-              active === tab.slug ? "bg-brand-500 text-white" : "bg-accent-500 text-white hover:bg-accent-600",
+              active === tab.slug ? "bg-ink-900 text-white" : "bg-white text-ink-700 ring-1 ring-ink-200 hover:bg-ink-100",
             )}
           >
             {tab.slug ? t.maybe(`categories.names.${tab.slug}`, tab.slug) : t("directory.all")}

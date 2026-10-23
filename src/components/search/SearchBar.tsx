@@ -90,7 +90,7 @@ export function SearchBar({ initial }: { initial?: { q?: string; location?: stri
             className="w-full bg-transparent text-sm outline-none placeholder:text-ink-500"
           />
         </label>
-        <button type="submit" aria-label={t("search.submit")} className="m-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent-500 text-white hover:bg-accent-600">
+        <button type="submit" aria-label={t("search.submit")} className="m-1.5 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-600 text-white hover:bg-brand-700">
           <Icon name="search" className="h-5 w-5" />
         </button>
         {open && suggestions.length > 0 && (

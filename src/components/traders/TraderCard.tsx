@@ -22,11 +22,11 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
           <BusinessAvatar name={trader.businessName} logoUrl={trader.logoUrl} className="h-full w-full p-6" textClassName="text-5xl" />
         )}
         {trader.categoryName && (
-          <span className="absolute start-2 top-2 rounded-full bg-accent-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+          <span className="absolute start-2 top-2 rounded-full bg-white/90 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ink-700 shadow-sm backdrop-blur">
             {trader.categorySlug ? t.maybe(`categories.names.${trader.categorySlug}`, trader.categoryName) : trader.categoryName}
           </span>
         )}
-        <span className="absolute -bottom-4 left-1/2 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border-2 border-white bg-brand-500 text-white shadow">
+        <span className="absolute -bottom-4 left-1/2 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-ink-200 bg-white text-ink-700 shadow-sm">
           <Icon name={trader.categoryIcon ?? "tools"} className="h-4 w-4" />
         </span>
       </Link>
@@ -46,8 +46,8 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
           </p>
         )}
         <div className="mt-auto flex w-full gap-2 pt-4">
-          {trader.canCall && <CallButton slug={trader.slug} className="btn-primary flex-1 px-3 py-2 text-xs" />}
-          <Link href={`/traders/${trader.slug}/quote`} className="btn-ghost flex-1 px-3 py-2 text-xs">{t("card.requestQuote")}</Link>
+          {trader.canCall && <CallButton slug={trader.slug} className="btn-primary flex-1 whitespace-nowrap px-2 py-2 text-xs" />}
+          <Link href={`/traders/${trader.slug}/quote`} className="btn-ghost flex-1 whitespace-nowrap px-2 py-2 text-xs">{t("card.requestQuote")}</Link>
         </div>
       </div>
       <LegalDisclaimer variant="compact" />

@@ -13,7 +13,7 @@ export function BusinessAvatar({ name, logoUrl, className = "h-20 w-20 rounded-l
   }
   return (
     <span role={alt ? "img" : undefined} aria-label={alt || undefined} aria-hidden={alt ? undefined : true}
-      className={`${className} ${avatarColour(name)} grid shrink-0 select-none place-items-center font-bold tracking-wide text-white`}>
+      className={`${className} ${avatarColour(name)} grid shrink-0 select-none place-items-center font-semibold tracking-wider`}>
       <span className={textClassName}>{initials(name)}</span>
     </span>
   );
