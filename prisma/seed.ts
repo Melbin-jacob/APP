@@ -90,6 +90,18 @@ async function main() {
     });
   }
 
+  // Our own promos for the side rails, so they're never empty. Only added to a
+  // side with no banners at all: banners an admin created, paused or deleted win.
+  const HOUSE_ADS = [
+    { slot: "LEFT" as const, name: "House ad: list your business", imageUrl: "/images/ads/house-list-business.svg", targetUrl: "/register?type=trader" },
+    { slot: "RIGHT" as const, name: "House ad: get free quotes", imageUrl: "/images/ads/house-get-quotes.svg", targetUrl: "/search" },
+  ];
+  for (const ad of HOUSE_ADS) {
+    if (!(await db.banner.count({ where: { slot: ad.slot } }))) {
+      await db.banner.create({ data: { ...ad, kind: "IMAGE", width: 160, height: 600, weight: 1, isActive: true } });
+    }
+  }
+
   await db.siteSetting.upsert({ where: { key: "ads.sideBanners.enabled" }, create: { key: "ads.sideBanners.enabled", value: true }, update: {} });
   console.log(`Seeded. Test logins (password ${TEST_PASSWORD}): ${TEST_LOGINS.map((l) => `${l.email} (${l.role})`).join(", ")}`);
 }

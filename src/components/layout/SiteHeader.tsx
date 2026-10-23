@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignOutButton } from "@/components/account/AccountSettings";
 import { getI18n } from "@/i18n/server";
 import { getPrincipal } from "@/server/auth";
 import { MobileNav } from "./MobileNav";
@@ -41,9 +42,10 @@ export async function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          <Link href="/register?type=trader" className="btn-accent py-2 text-xs">{t("nav.listBusiness")}</Link>
+          {user && <SignOutButton className="text-sm font-medium text-ink-500 hover:text-rose-700" />}
+          {user?.role !== "TRADER" && <Link href="/register?type=trader" className="btn-accent py-2 text-xs">{t("nav.listBusiness")}</Link>}
         </nav>
-        <MobileNav items={nav} cta={t("nav.listBusiness")} menuLabel={t("nav.menu")} />
+        <MobileNav items={nav} cta={user?.role === "TRADER" ? undefined : t("nav.listBusiness")} menuLabel={t("nav.menu")} signOut={!!user} />
       </div>
     </header>
   );

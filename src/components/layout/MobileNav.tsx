@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { SignOutButton } from "@/components/account/AccountSettings";
 
-export function MobileNav({ items, cta, menuLabel }: { items: { href: string; label: string }[]; cta: string; menuLabel: string }) {
+export function MobileNav({ items, cta, menuLabel, signOut }: { items: { href: string; label: string }[]; cta?: string; menuLabel: string; signOut?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="md:hidden">
@@ -26,9 +27,12 @@ export function MobileNav({ items, cta, menuLabel }: { items: { href: string; la
               {i.label}
             </Link>
           ))}
-          <Link href="/register?type=trader" onClick={() => setOpen(false)} className="btn-accent mt-2 w-full">
-            {cta}
-          </Link>
+          {signOut && <SignOutButton className="block w-full py-2 text-start text-sm font-medium text-rose-700" />}
+          {cta && (
+            <Link href="/register?type=trader" onClick={() => setOpen(false)} className="btn-accent mt-2 w-full">
+              {cta}
+            </Link>
+          )}
         </nav>
       )}
     </div>

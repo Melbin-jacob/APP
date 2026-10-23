@@ -3,7 +3,10 @@ import { db } from "@/lib/db";
 import { cached, redis } from "@/lib/redis";
 import { getSetting } from "../settings";
 
-export type PublicBanner = Pick<Banner, "id" | "slot" | "kind" | "imageUrl" | "scriptHtml" | "width" | "height" | "name">;
+export type PublicBanner = Pick<Banner, "id" | "slot" | "kind" | "imageUrl" | "scriptHtml" | "width" | "height" | "name"> & {
+  /** Links to a page on this site (house ad): opens in the same tab. */
+  internal: boolean;
+};
 
 const today = () => new Date().toISOString().slice(0, 10);
 
@@ -35,7 +38,7 @@ export async function getSideBanners(): Promise<Partial<Record<BannerSlot, Publi
           { OR: [{ endsAt: null }, { endsAt: { gt: now } }] },
         ],
       },
-      select: { id: true, slot: true, kind: true, imageUrl: true, scriptHtml: true, width: true, height: true, name: true, weight: true },
+      select: { id: true, slot: true, kind: true, imageUrl: true, targetUrl: true, scriptHtml: true, width: true, height: true, name: true, weight: true },
     }),
   );
 
@@ -46,6 +49,7 @@ export async function getSideBanners(): Promise<Partial<Record<BannerSlot, Publi
       result[slot] = {
         id: chosen.id, slot: chosen.slot, kind: chosen.kind, imageUrl: chosen.imageUrl,
         scriptHtml: chosen.scriptHtml, width: chosen.width, height: chosen.height, name: chosen.name,
+        internal: !!chosen.targetUrl?.startsWith("/"),
       };
       redis.hincrby(`banner:stats:${today()}`, `${chosen.id}:i`, 1).catch(() => {});
     }

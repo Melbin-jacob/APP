@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Logo } from "@/components/layout/SiteHeader";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { getI18n } from "@/i18n/server";
 import { resolveReviewToken } from "@/server/services/reviews";
@@ -21,9 +21,8 @@ export default async function ReviewPage({ searchParams }: Props) {
   const preset = Number(rating);
 
   return (
-    <div className="min-h-screen bg-ink-100 px-4 py-10">
-      <div className="mx-auto max-w-lg">
-        <div className="mb-6 flex justify-center"><Logo /></div>
+    <SiteShell>
+      <div className="mx-auto max-w-lg py-10">
         <div className="card p-6 sm:p-8">
           {request ? (
             <>
@@ -46,6 +45,6 @@ export default async function ReviewPage({ searchParams }: Props) {
           )}
         </div>
       </div>
-    </div>
+    </SiteShell>
   );
 }

@@ -70,8 +70,8 @@ function NewBannerForm({ onDone }: { onDone: () => void }) {
       <span />
       {kind === "IMAGE" ? (
         <>
-          <input name="imageUrl" type="url" required placeholder="https://… image URL" className="input sm:col-span-2" />
-          <input name="targetUrl" type="url" required placeholder="https://… destination URL" className="input sm:col-span-2" />
+          <input name="imageUrl" type="text" required placeholder="Image: https://… or /images/…" className="input sm:col-span-2" />
+          <input name="targetUrl" type="text" required placeholder="Link: https://… or a page here, e.g. /search" className="input sm:col-span-2" />
         </>
       ) : (
         <textarea name="scriptHtml" required rows={4} placeholder="<script async src=…></script>" className="input font-mono text-xs sm:col-span-4" />

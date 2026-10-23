@@ -80,7 +80,8 @@ then approve it as admin under *Ops console → Traders*.
   with an email you also get a copy.
 - Report a review from a profile page.
 - Subscribe to the newsletter, then click the confirmation link in the test inbox.
-- Side ad banners appear on wide screens (wider than 1280px).
+- Side ad banners (left and right) appear on every page on wide screens (wider than 1280px). Out of the box they're two
+  house ads for the site itself; clicking one opens that page in the same tab.
 
 **Registration and sign-in**
 - `/register`: try submitting without ticking the Terms box (it's blocked).
@@ -128,7 +129,9 @@ then approve it as admin under *Ops console → Traders*.
 - Traders: approve a business you registered, verify a licence, suspend a trader. Imported listings show *Unclaimed (imported listing)* and the spreadsheet notes.
 - Users: suspend or ban a user. They're signed out of everything within a minute.
 - Reviews: reviews containing links, and reported reviews, land in the moderation queue. Publish, remove, or dismiss reports.
-- Ad banners: flip the site-wide switch and reload the home page; create, pause, or delete banners.
+- Ad banners: flip the site-wide switch and reload any page: both rails disappear or come back. Create, pause, or delete
+  banners; links can be an https URL or a page on this site (e.g. `/search`). If a side has no banners at all, the house ad
+  comes back on the next restart.
 - Audit log: every action above is recorded.
 
 **Legal & compliance** (footer section on every page)

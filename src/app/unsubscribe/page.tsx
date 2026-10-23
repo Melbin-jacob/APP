@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Logo } from "@/components/layout/SiteHeader";
+import { SiteShell } from "@/components/layout/SiteShell";
 import { UnsubscribeButton } from "@/components/legal/UnsubscribeButton";
 import { getI18n } from "@/i18n/server";
 import { readUnsubscribeToken } from "@/server/services/email-prefs";
@@ -16,9 +16,8 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
   const [{ t }, target] = [await getI18n(), readUnsubscribeToken(token)];
 
   return (
-    <div className="min-h-screen bg-ink-100 px-4 py-10">
-      <div className="mx-auto max-w-lg">
-        <div className="mb-6 flex justify-center"><Logo /></div>
+    <SiteShell>
+      <div className="mx-auto max-w-lg py-10">
         <div className="card space-y-4 p-8 text-center">
           <h1 className="text-xl font-bold">{t("unsubscribe.title")}</h1>
           {target ? (
@@ -33,6 +32,6 @@ export default async function UnsubscribePage({ searchParams }: { searchParams: 
           )}
         </div>
       </div>
-    </div>
+    </SiteShell>
   );
 }

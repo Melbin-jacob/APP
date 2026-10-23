@@ -11,7 +11,7 @@ export function AdSlot({ banner }: { banner: PublicBanner }) {
   const style = { width: banner.width, height: banner.height };
   if (banner.kind === "IMAGE" && banner.imageUrl) {
     return (
-      <a href={`/api/banners/${banner.id}/click`} rel="sponsored noopener noreferrer" target="_blank" className="block overflow-hidden rounded-md shadow-card" style={style}>
+      <a href={`/api/banners/${banner.id}/click`} rel="sponsored noopener noreferrer" target={banner.internal ? undefined : "_blank"} className="block overflow-hidden rounded-md shadow-card" style={style}>
         {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary advertiser hosts */}
         <img src={banner.imageUrl} alt={banner.name} width={banner.width} height={banner.height} className="h-full w-full object-cover" loading="lazy" />
       </a>

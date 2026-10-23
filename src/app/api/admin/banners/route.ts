@@ -7,7 +7,12 @@ import { requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ipHash, parseJson, route } from "@/server/http";
 
-const httpsUrl = z.string().max(1000).refine((v) => safeUrl(v)?.startsWith("https://"), "Must be an https URL");
+// An https URL, or a path on this site (house ads, e.g. "/search"). Not "//host" or "/\\host",
+// which browsers treat as another site.
+const httpsUrl = z
+  .string()
+  .max(1000)
+  .refine((v) => /^\/(?![/\\])/.test(v) || safeUrl(v)?.startsWith("https://"), "Must be an https URL or a path on this site, e.g. /search");
 
 const bannerInput = z
   .object({

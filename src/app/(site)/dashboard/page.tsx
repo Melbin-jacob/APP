@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { SignOutButton } from "@/components/account/AccountSettings";
 import { QuoteRequests } from "@/components/dashboard/QuoteRequests";
 import { TraderDashboard } from "@/components/dashboard/TraderDashboard";
 import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
@@ -46,6 +47,7 @@ export default async function DashboardPage() {
           <div className="flex flex-wrap gap-2">
             <Link href="/dashboard/profile" className="btn-primary">{t("dashboard.editProfile")}</Link>
             {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">{t("dashboard.viewProfile")}</Link>}
+            <SignOutButton />
           </div>
         </header>
         <Link href="/dashboard/profile" className="card flex flex-wrap items-center justify-between gap-3 p-4 hover:shadow-md">

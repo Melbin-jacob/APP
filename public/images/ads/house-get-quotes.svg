@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="600" viewBox="0 0 160 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1f2933"/><stop offset="1" stop-color="#3e4c59"/></linearGradient>
+  </defs>
+  <rect width="160" height="600" rx="8" fill="url(#bg)"/>
+  <circle cx="80" cy="96" r="44" fill="#e8a317" fill-opacity=".9"/>
+  <g transform="translate(58 74)" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M30 6a8 8 0 0 0-11 11L5 31a4 4 0 0 0 6 6l14-14A8 8 0 0 0 36 12l-5 5-5-1-1-5z"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#fff" text-anchor="middle">
+    <text x="80" y="190" font-size="13" font-weight="700" letter-spacing="1.5" fill-opacity=".8">FOR HOMEOWNERS</text>
+    <text x="80" y="232" font-size="24" font-weight="700">Need a pro?</text>
+    <text x="80" y="268" font-size="22" font-weight="700" fill="#ffd166">Get free</text>
+    <text x="80" y="296" font-size="22" font-weight="700" fill="#ffd166">quotes</text>
+    <text x="80" y="342" font-size="13">Plumbers, electricians,</text>
+    <text x="80" y="360" font-size="13">roofers and 30+ trades</text>
+    <text x="80" y="378" font-size="13">near you.</text>
+    <text x="80" y="424" font-size="12">✓ Compare local pros</text>
+    <text x="80" y="444" font-size="12">✓ Read real reviews</text>
+    <text x="80" y="464" font-size="12">✓ No sign-up needed</text>
+  </g>
+  <rect x="20" y="500" width="120" height="40" rx="20" fill="#4caf2f"/>
+  <text x="80" y="525" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Find a pro</text>
+  <text x="80" y="578" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#fff" fill-opacity=".75" text-anchor="middle">HomeServices Direct</text>
+</svg>

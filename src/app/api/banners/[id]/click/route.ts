@@ -6,5 +6,6 @@ import { recordBannerClick } from "@/server/services/banners";
 // so this can't be abused as an open redirect.
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const target = await recordBannerClick((await params).id);
-  return NextResponse.redirect(target ?? new URL("/", req.nextUrl.origin), 302);
+  // Relative targets (house ads such as "/search") resolve against our own origin.
+  return NextResponse.redirect(new URL(target ?? "/", req.nextUrl.origin), 302);
 }
