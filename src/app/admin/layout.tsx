@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
+import { AdminSignOut } from "@/components/admin/AdminSignOut";
 import { Logo } from "@/components/layout/SiteHeader";
 import { getPrincipal, requireCurrentTerms } from "@/server/auth";
 
@@ -33,11 +34,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             <Link key={n.href} href={n.href} className="block rounded px-3 py-2 text-sm text-ink-700 hover:bg-ink-100">{n.label}</Link>
           ))}
         </nav>
-        <p className="mt-8 text-xs text-ink-500">{user.email}<br /><span className="font-semibold">{user.role}</span></p>
+        <div className="mt-8 space-y-3 border-t border-ink-200 pt-4 text-xs text-ink-500">
+          <p>{user.email}<br /><span className="font-semibold">{user.role}</span></p>
+          <Link href="/" className="block text-brand-700 hover:underline">View website ↗</Link>
+          <AdminSignOut className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-100" />
+        </div>
       </aside>
       <div className="min-w-0 flex-1 p-6">
-        <nav className="mb-4 flex gap-3 overflow-x-auto text-sm md:hidden" aria-label="Admin mobile">
+        <nav className="mb-4 flex flex-wrap gap-x-4 gap-y-2 text-sm md:hidden" aria-label="Admin mobile">
           {nav.map((n) => <Link key={n.href} href={n.href} className="whitespace-nowrap text-brand-700">{n.label}</Link>)}
+          <AdminSignOut className="whitespace-nowrap font-medium text-rose-700" />
         </nav>
         {children}
       </div>

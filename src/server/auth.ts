@@ -7,7 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { verifyPassword } from "@/lib/crypto";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit, resetRateLimit } from "@/lib/rate-limit";
 import { cached, invalidate } from "@/lib/redis";
 import { magicLinkEmail } from "./email/templates";
 import { sendEmail } from "./email/transport";
@@ -48,6 +48,8 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.passwordHash || !valid) return null;
         if (user.status !== "ACTIVE") throw new Error("AccountDisabled");
 
+        // Only failed attempts should count towards the per-account lockout.
+        await resetRateLimit("login", `e:${email}`);
         await db.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
         return { id: user.id, email: user.email, name: user.name, role: user.role };
       },

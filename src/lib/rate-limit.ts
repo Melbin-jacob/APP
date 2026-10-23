@@ -41,6 +41,11 @@ redis.call('PEXPIRE', key, window)
 return {1, count + 1, 0}
 `;
 
+/** Clears a budget, e.g. an account's failed-login count once it signs in successfully. */
+export async function resetRateLimit(policy: keyof typeof RATE_LIMITS, identifier: string) {
+  await redis.del(`rl:${policy}:${identifier}`).catch(() => {});
+}
+
 export async function rateLimit(
   policy: keyof typeof RATE_LIMITS,
   identifier: string,
