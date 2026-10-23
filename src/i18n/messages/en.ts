@@ -325,6 +325,11 @@ const en = {
     deleteReview: "Delete",
     confirmDeleteReview: "Delete this review? This can't be undone.",
     reviewStatus: { PUBLISHED: "Published", PENDING_MODERATION: "Being checked", REMOVED: "Removed" },
+    contact: "Contact details",
+    contactHint: "Optional. Saved here so you don't have to retype them when you ask for a quote.",
+    phone: "Phone number",
+    postcode: "ZIP / postal code",
+    postcodeInvalid: "Enter a valid ZIP code or postal code.",
   },
   dashboard: {
     title: "Business dashboard",
@@ -359,6 +364,8 @@ const en = {
     closeQuote: "Close",
     reopenQuote: "Reopen",
     addLogo: "Add your logo",
+    editTitle: "Your business profile",
+    editHint: "Update your hours, services, rates, logo, trades and contact details.",
   },
   business: {
     title: "Business profile",

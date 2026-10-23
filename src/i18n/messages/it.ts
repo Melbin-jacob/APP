@@ -325,6 +325,11 @@ const it: Messages = {
     deleteReview: "Elimina",
     confirmDeleteReview: "Eliminare questa recensione? L'operazione è irreversibile.",
     reviewStatus: { PUBLISHED: "Pubblicata", PENDING_MODERATION: "In verifica", REMOVED: "Rimossa" },
+    contact: "Recapiti",
+    contactHint: "Facoltativi. Salvati qui per non doverli riscrivere a ogni richiesta di preventivo.",
+    phone: "Numero di telefono",
+    postcode: "CAP / codice postale",
+    postcodeInvalid: "Inserisci un codice postale o ZIP valido.",
   },
   dashboard: {
     title: "Pannello dell'attività",
@@ -359,6 +364,8 @@ const it: Messages = {
     closeQuote: "Chiudi",
     reopenQuote: "Riapri",
     addLogo: "Aggiungi il tuo logo",
+    editTitle: "Il profilo della tua attività",
+    editHint: "Aggiorna orari, servizi, tariffe, logo, mestieri e recapiti.",
   },
   business: {
     title: "Profilo dell'attività",

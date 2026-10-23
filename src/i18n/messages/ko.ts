@@ -325,6 +325,11 @@ const ko: Messages = {
     deleteReview: "삭제",
     confirmDeleteReview: "이 후기를 삭제할까요? 되돌릴 수 없습니다.",
     reviewStatus: { PUBLISHED: "게시됨", PENDING_MODERATION: "검토 중", REMOVED: "삭제됨" },
+    contact: "연락처",
+    contactHint: "선택 사항. 여기에 저장해 두면 견적을 요청할 때 다시 입력하지 않아도 됩니다.",
+    phone: "전화번호",
+    postcode: "우편번호",
+    postcodeInvalid: "올바른 우편번호를 입력하세요.",
   },
   dashboard: {
     title: "업체 대시보드",
@@ -359,6 +364,8 @@ const ko: Messages = {
     closeQuote: "종료",
     reopenQuote: "다시 열기",
     addLogo: "로고 추가",
+    editTitle: "업체 프로필",
+    editHint: "영업시간, 서비스, 요금, 로고, 업종, 연락처를 수정하세요.",
   },
   business: {
     title: "업체 프로필",

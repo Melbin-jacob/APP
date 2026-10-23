@@ -325,6 +325,11 @@ const ar: Messages = {
     deleteReview: "حذف",
     confirmDeleteReview: "هل تريد حذف هذا التقييم؟ لا يمكن التراجع عن ذلك.",
     reviewStatus: { PUBLISHED: "منشور", PENDING_MODERATION: "قيد المراجعة", REMOVED: "محذوف" },
+    contact: "بيانات التواصل",
+    contactHint: "اختياري. تُحفظ هنا حتى لا تعيد كتابتها عند طلب عرض سعر.",
+    phone: "رقم الهاتف",
+    postcode: "الرمز البريدي",
+    postcodeInvalid: "أدخل رمزًا بريديًا صالحًا.",
   },
   dashboard: {
     title: "لوحة النشاط التجاري",
@@ -359,6 +364,8 @@ const ar: Messages = {
     closeQuote: "إغلاق",
     reopenQuote: "إعادة فتح",
     addLogo: "أضف شعارك",
+    editTitle: "ملف نشاطك التجاري",
+    editHint: "حدّث مواعيد العمل والخدمات والأسعار والشعار والتخصصات وبيانات التواصل.",
   },
   business: {
     title: "ملف النشاط التجاري",

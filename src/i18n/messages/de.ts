@@ -325,6 +325,11 @@ const de: Messages = {
     deleteReview: "Löschen",
     confirmDeleteReview: "Diese Bewertung löschen? Das lässt sich nicht rückgängig machen.",
     reviewStatus: { PUBLISHED: "Veröffentlicht", PENDING_MODERATION: "Wird geprüft", REMOVED: "Entfernt" },
+    contact: "Kontaktdaten",
+    contactHint: "Optional. Hier gespeichert, damit Sie sie bei Angebotsanfragen nicht neu eingeben müssen.",
+    phone: "Telefonnummer",
+    postcode: "Postleitzahl / ZIP",
+    postcodeInvalid: "Bitte eine gültige Postleitzahl oder ZIP angeben.",
   },
   dashboard: {
     title: "Betriebs-Dashboard",
@@ -359,6 +364,8 @@ const de: Messages = {
     closeQuote: "Abschließen",
     reopenQuote: "Wieder öffnen",
     addLogo: "Logo hinzufügen",
+    editTitle: "Ihr Unternehmensprofil",
+    editHint: "Öffnungszeiten, Leistungen, Preise, Logo, Gewerke und Kontaktdaten bearbeiten.",
   },
   business: {
     title: "Betriebsprofil",

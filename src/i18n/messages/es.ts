@@ -325,6 +325,11 @@ const es: Messages = {
     deleteReview: "Eliminar",
     confirmDeleteReview: "¿Eliminar esta reseña? No se puede deshacer.",
     reviewStatus: { PUBLISHED: "Publicada", PENDING_MODERATION: "En revisión", REMOVED: "Eliminada" },
+    contact: "Datos de contacto",
+    contactHint: "Opcional. Se guardan aquí para no tener que escribirlos en cada solicitud de presupuesto.",
+    phone: "Teléfono",
+    postcode: "Código postal / ZIP",
+    postcodeInvalid: "Introduce un código postal o ZIP válido.",
   },
   dashboard: {
     title: "Panel del negocio",
@@ -359,6 +364,8 @@ const es: Messages = {
     closeQuote: "Cerrar",
     reopenQuote: "Reabrir",
     addLogo: "Añade tu logotipo",
+    editTitle: "El perfil de tu empresa",
+    editHint: "Actualiza tus horarios, servicios, tarifas, logotipo, oficios y datos de contacto.",
   },
   business: {
     title: "Perfil del negocio",

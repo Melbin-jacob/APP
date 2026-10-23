@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function QuotePage({ params }: Props) {
   const [trader, { t }, principal] = await Promise.all([getPublicTrader((await params).slug), getI18n(), getPrincipal()]);
   if (!trader) notFound();
-  const me = principal ? await db.user.findUnique({ where: { id: principal.id }, select: { name: true, email: true } }) : null;
+  const me = principal ? await db.user.findUnique({ where: { id: principal.id }, select: { name: true, email: true, phone: true, addressLine: true, city: true, postcode: true } }) : null;
 
   return (
     <SiteShell>
@@ -39,7 +39,10 @@ export default async function QuotePage({ params }: Props) {
             businessName={trader.businessName}
             claimed={trader.claimed}
             country={isSupportedCountry(trader.country) ? trader.country : "US"}
-            defaults={{ name: me?.name ?? "", email: me?.email ?? "" }}
+            defaults={{
+              name: me?.name ?? "", email: me?.email ?? "", phone: me?.phone ?? "",
+              addressLine: me?.addressLine ?? "", city: me?.city ?? "", postcode: me?.postcode ?? "",
+            }}
           />
         </div>
         <aside className="space-y-4">

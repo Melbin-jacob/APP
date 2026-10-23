@@ -12,14 +12,14 @@ type Props = {
   businessName: string;
   claimed: boolean;
   country: "US" | "CA" | "GB";
-  defaults: { name: string; email: string };
+  defaults: { name: string; email: string; phone: string; addressLine: string; city: string; postcode: string };
 };
 
 export function QuoteForm({ slug, businessName, claimed, country, defaults }: Props) {
   const { t } = usePrefs();
   const label = t(`register.postalLabels.${country}`);
   const [f, setF] = useState({
-    name: defaults.name, email: defaults.email, phone: "", addressLine: "", city: "", postcode: "", description: "", contactNote: "", website: "",
+    ...defaults, description: "", contactNote: "", website: "",
   });
   const [times, setTimes] = useState<ContactTime[]>([]);
   const [consent, setConsent] = useState(false);

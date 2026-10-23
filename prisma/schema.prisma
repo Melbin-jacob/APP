@@ -47,6 +47,11 @@ model User {
   tosVersion     String? // version of the Terms the user explicitly accepted
   tosAcceptedAt  DateTime?
   marketingOptIn Boolean    @default(false)
+  // Optional contact details the customer keeps on file; used to prefill quote requests.
+  phone          String?
+  addressLine    String?
+  city           String?
+  postcode       String?
   lastLoginAt    DateTime?
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt

@@ -325,6 +325,11 @@ const ja: Messages = {
     deleteReview: "削除",
     confirmDeleteReview: "このレビューを削除しますか？元に戻せません。",
     reviewStatus: { PUBLISHED: "公開中", PENDING_MODERATION: "確認中", REMOVED: "削除済み" },
+    contact: "連絡先",
+    contactHint: "任意。ここに保存しておくと、見積もり依頼のたびに入力する必要がありません。",
+    phone: "電話番号",
+    postcode: "郵便番号",
+    postcodeInvalid: "有効な郵便番号を入力してください。",
   },
   dashboard: {
     title: "事業者ダッシュボード",
@@ -359,6 +364,8 @@ const ja: Messages = {
     closeQuote: "完了にする",
     reopenQuote: "再開",
     addLogo: "ロゴを追加",
+    editTitle: "事業者プロフィール",
+    editHint: "営業時間、サービス、料金、ロゴ、業種、連絡先を更新できます。",
   },
   business: {
     title: "事業者プロフィール",

@@ -325,6 +325,11 @@ const fr: Messages = {
     deleteReview: "Supprimer",
     confirmDeleteReview: "Supprimer cet avis? Cette action est irréversible.",
     reviewStatus: { PUBLISHED: "Publié", PENDING_MODERATION: "En vérification", REMOVED: "Retiré" },
+    contact: "Coordonnées",
+    contactHint: "Facultatif. Enregistrées ici pour ne pas les ressaisir à chaque demande de devis.",
+    phone: "Numéro de téléphone",
+    postcode: "Code postal / ZIP",
+    postcodeInvalid: "Saisissez un code postal ou un code ZIP valide.",
   },
   dashboard: {
     title: "Tableau de bord de l'entreprise",
@@ -359,6 +364,8 @@ const fr: Messages = {
     closeQuote: "Clôturer",
     reopenQuote: "Rouvrir",
     addLogo: "Ajouter votre logo",
+    editTitle: "Votre fiche entreprise",
+    editHint: "Modifiez vos horaires, services, tarifs, logo, métiers et coordonnées.",
   },
   business: {
     title: "Profil de l'entreprise",

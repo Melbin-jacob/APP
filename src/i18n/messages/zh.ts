@@ -325,6 +325,11 @@ const zh: Messages = {
     deleteReview: "删除",
     confirmDeleteReview: "确定删除此评价？此操作无法撤销。",
     reviewStatus: { PUBLISHED: "已发布", PENDING_MODERATION: "审核中", REMOVED: "已移除" },
+    contact: "联系信息",
+    contactHint: "可选。保存在这里，申请报价时无需重新填写。",
+    phone: "电话号码",
+    postcode: "邮政编码",
+    postcodeInvalid: "请输入有效的邮政编码。",
   },
   dashboard: {
     title: "商家后台",
@@ -359,6 +364,8 @@ const zh: Messages = {
     closeQuote: "关闭",
     reopenQuote: "重新打开",
     addLogo: "添加您的标志",
+    editTitle: "您的企业资料",
+    editHint: "更新营业时间、服务、价格、标志、行业和联系方式。",
   },
   business: {
     title: "商家资料",

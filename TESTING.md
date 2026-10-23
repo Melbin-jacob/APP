@@ -34,14 +34,18 @@ Password for all: **`ChangeMe-123456`**
 | Email | Role | Use it to test |
 |---|---|---|
 | `admin@homeservices.local` | Super-admin | Ops console at `/admin` |
-| `customer@homeservices.local` | Customer | Account page, data export / delete |
+| `customer@homeservices.local` | Customer | *My account*: name, phone, address, password, reviews, data export / delete |
+| `business@homeservices.local` | Business (*Demo Business (test account)*) | Business dashboard: hours, services, rates, logo, trades, quote requests |
 
-These two logins are restored every time the app starts with demo data (Docker does this on every start): password back to
+These logins are restored every time the app starts with demo data (Docker does this on every start): password back to
 `ChangeMe-123456`, account active, Terms accepted. So if you changed the password or suspended one while testing, just restart.
 After 5 wrong passwords an account is locked for 15 minutes.
 
-Sign in at http://localhost:3000/login, then use **My account** in the header (it goes to `/admin` for the admin), or open
-http://localhost:3000/admin directly. There's only one admin account; make more from *Ops console → Users* (role change
+Sign in at http://localhost:3000/login: each account lands on its own page (admin → `/admin`, business → `/dashboard`,
+customer → `/account`). **My account** in the header goes to the same place.
+
+The demo business is kept *awaiting approval* so it never appears in public listings. Don't approve it. Its edits are kept
+across restarts. There's only one admin account; make more from *Ops console → Users* (role change
 needs the super-admin).
 
 ## What to try
@@ -88,8 +92,8 @@ then approve it as admin under *Ops console → Traders*.
 - `/login` → **Email me a link**: the magic link arrives in the test inbox.
 - Enter a wrong password 5 times: you'll be rate-limited.
 
-**Your account** (any user: *My account* in the header)
-- Edit your name and email preferences, change your password (or set one if you signed up with an email link),
+**Your account** (as `customer@…`: *My account* in the header)
+- Edit your name, phone number and address (they pre-fill quote requests), email preferences, change your password (or set one if you signed up with an email link),
   see and delete reviews you've written, and **Sign out**.
 
 **Claim a listing** (the owner's side)
@@ -98,7 +102,7 @@ then approve it as admin under *Ops console → Traders*.
 3. Back as the customer: *My account* now leads to the business dashboard (no need to sign in again). Upload a logo in
    *Edit business profile*: it replaces the initials everywhere. New quote requests now appear in the dashboard and by email.
 
-**Business profile** (as a business you registered and approved, or a listing you claimed: *Dashboard → Edit business profile*, or `/dashboard/profile`)
+**Business profile** (as `business@…`, a business you registered, or a listing you claimed: *Dashboard → Edit business profile*, or `/dashboard/profile`)
 - Logo: upload a PNG, JPEG or WebP (up to 5 MB), or remove it to go back to the initials.
 - Business details: name, phone, about, hourly rate, service radius, cover photo link.
 - Business location: enter a new ZIP / postal code; it's looked up like at sign-up.

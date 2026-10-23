@@ -325,6 +325,11 @@ const hi: Messages = {
     deleteReview: "हटाएँ",
     confirmDeleteReview: "यह समीक्षा हटाएँ? इसे वापस नहीं लाया जा सकता।",
     reviewStatus: { PUBLISHED: "प्रकाशित", PENDING_MODERATION: "जाँच जारी", REMOVED: "हटाई गई" },
+    contact: "संपर्क विवरण",
+    contactHint: "वैकल्पिक। यहाँ सहेजे जाते हैं ताकि कोटेशन माँगते समय दोबारा न लिखने पड़ें।",
+    phone: "फ़ोन नंबर",
+    postcode: "ZIP / पोस्टल कोड",
+    postcodeInvalid: "सही ZIP या पोस्टल कोड दर्ज करें।",
   },
   dashboard: {
     title: "व्यवसाय डैशबोर्ड",
@@ -359,6 +364,8 @@ const hi: Messages = {
     closeQuote: "बंद करें",
     reopenQuote: "फिर से खोलें",
     addLogo: "अपना लोगो जोड़ें",
+    editTitle: "आपकी व्यवसाय प्रोफ़ाइल",
+    editHint: "अपना समय, सेवाएँ, दरें, लोगो, काम और संपर्क विवरण अपडेट करें।",
   },
   business: {
     title: "व्यवसाय प्रोफ़ाइल",

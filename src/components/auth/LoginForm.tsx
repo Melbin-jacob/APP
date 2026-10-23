@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { useT } from "@/components/providers/PreferencesProvider";
 
@@ -12,7 +11,6 @@ const errorKey = (code: string) =>
   `login.errors.${(code === "AccessDenied" ? "AccountDisabled" : (KNOWN_ERRORS as readonly string[]).includes(code) ? code : "default") as KnownError | "default"}` as const;
 
 export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?: string; callbackUrl: string }) {
-  const router = useRouter();
   const t = useT();
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [email, setEmail] = useState("");
@@ -40,7 +38,9 @@ export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?:
     const res = await signIn("credentials", { email, password, redirect: false, callbackUrl });
     setBusy(false);
     if (res?.error) setMsg(t(errorKey(res.error)));
-    else router.push(res?.url ?? callbackUrl);
+    // A full page load, not router.push: the client router may hold prefetches made
+    // while signed out (e.g. /account → "please sign in") and would replay them.
+    else window.location.assign(res?.url ?? callbackUrl);
   };
 
   return (

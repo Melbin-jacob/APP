@@ -15,15 +15,21 @@ export function SignOutButton({ className = "btn-ghost" }: { className?: string 
   return <button type="button" className={className} onClick={() => signOut({ callbackUrl: "/" })}>{t("account.signOut")}</button>;
 }
 
-export function ProfileForm({ initial }: { initial: { name: string; email: string; marketingOptIn: boolean } }) {
+type ProfileData = { name: string; email: string; marketingOptIn: boolean; phone: string; addressLine: string; city: string; postcode: string };
+
+export function ProfileForm({ initial }: { initial: ProfileData }) {
   const { t } = usePrefs();
   const router = useRouter();
   const [name, setName] = useState(initial.name);
   const [marketing, setMarketing] = useState(initial.marketingOptIn);
+  const [contact, setContact] = useState({ phone: initial.phone, addressLine: initial.addressLine, city: initial.city, postcode: initial.postcode });
+  const setField = (k: keyof typeof contact) => (e: { target: { value: string } }) => { setContact((c) => ({ ...c, [k]: e.target.value })); m.reset(); };
   const m = useMutation({
-    mutationFn: () => api("/api/me", { method: "PATCH", json: { name, marketingOptIn: marketing } }),
+    mutationFn: () => api("/api/me", { method: "PATCH", json: { name, marketingOptIn: marketing, ...contact } }),
     onSuccess: () => router.refresh(),
   });
+  const fieldError = (path: string) =>
+    m.error instanceof ClientApiError && m.error.issues?.some((i) => i.path === path) ? m.error.issues.find((i) => i.path === path)!.message : "";
   const submit = (e: FormEvent) => {
     e.preventDefault();
     if (name.trim()) m.mutate();
@@ -42,6 +48,30 @@ export function ProfileForm({ initial }: { initial: { name: string; email: strin
           <p className="mt-1 text-xs text-ink-500">{t("account.emailNote")}</p>
         </div>
       </div>
+      <div>
+        <h3 className="text-sm font-semibold">{t("account.contact")}</h3>
+        <p className="mt-0.5 text-xs text-ink-500">{t("account.contactHint")}</p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="acc-phone" className="label">{t("account.phone")}</label>
+          <input id="acc-phone" type="tel" maxLength={20} value={contact.phone} onChange={setField("phone")} className="input" autoComplete="tel" dir="ltr" aria-invalid={!!fieldError("phone")} />
+          {fieldError("phone") && <p className="mt-1 text-xs text-rose-600">{t("register.errors.phone")}</p>}
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="acc-address" className="label">{t("quote.address")}</label>
+          <input id="acc-address" maxLength={200} value={contact.addressLine} onChange={setField("addressLine")} className="input" autoComplete="street-address" />
+        </div>
+        <div>
+          <label htmlFor="acc-city" className="label">{t("quote.city")}</label>
+          <input id="acc-city" maxLength={80} value={contact.city} onChange={setField("city")} className="input" autoComplete="address-level2" />
+        </div>
+        <div>
+          <label htmlFor="acc-postcode" className="label">{t("account.postcode")}</label>
+          <input id="acc-postcode" maxLength={10} value={contact.postcode} onChange={setField("postcode")} className="input uppercase" autoComplete="postal-code" dir="ltr" aria-invalid={!!fieldError("postcode")} />
+          {fieldError("postcode") && <p className="mt-1 text-xs text-rose-600">{t("account.postcodeInvalid")}</p>}
+        </div>
+      </div>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" checked={marketing} onChange={(e) => { setMarketing(e.target.checked); m.reset(); }} />
         {t("account.marketing")}
@@ -49,7 +79,7 @@ export function ProfileForm({ initial }: { initial: { name: string; email: strin
       <div className="flex items-center gap-3">
         <button className="btn-primary" disabled={m.isPending || !name.trim()}>{t("account.save")}</button>
         {m.isSuccess && <span role="status" className="text-sm text-brand-700">✓ {t("account.saved")}</span>}
-        {m.isError && <span role="alert" className="text-sm text-rose-600">{t("common.somethingWrong")}</span>}
+        {m.isError && <span role="alert" className="text-sm text-rose-600">{m.error instanceof ClientApiError && m.error.code === "validation_error" ? t("register.errors.fix") : t("common.somethingWrong")}</span>}
       </div>
     </form>
   );

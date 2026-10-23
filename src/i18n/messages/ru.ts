@@ -325,6 +325,11 @@ const ru: Messages = {
     deleteReview: "Удалить",
     confirmDeleteReview: "Удалить этот отзыв? Это действие нельзя отменить.",
     reviewStatus: { PUBLISHED: "Опубликован", PENDING_MODERATION: "На проверке", REMOVED: "Удалён" },
+    contact: "Контактные данные",
+    contactHint: "Необязательно. Сохраняются здесь, чтобы не вводить их заново при запросе расчёта.",
+    phone: "Телефон",
+    postcode: "Почтовый индекс / ZIP",
+    postcodeInvalid: "Введите правильный почтовый индекс или ZIP.",
   },
   dashboard: {
     title: "Панель компании",
@@ -359,6 +364,8 @@ const ru: Messages = {
     closeQuote: "Закрыть",
     reopenQuote: "Открыть снова",
     addLogo: "Добавьте логотип",
+    editTitle: "Профиль вашей компании",
+    editHint: "Обновите часы работы, услуги, цены, логотип, виды работ и контакты.",
   },
   business: {
     title: "Профиль компании",

@@ -144,6 +144,7 @@ export async function exportUserData(userId: string) {
     select: {
       id: true, email: true, name: true, role: true, status: true, createdAt: true,
       tosVersion: true, tosAcceptedAt: true, marketingOptIn: true, lastLoginAt: true,
+      phone: true, addressLine: true, city: true, postcode: true,
       accounts: { select: { provider: true, providerAccountId: true } },
       reviews: { select: { id: true, traderId: true, rating: true, comment: true, createdAt: true, status: true } },
       reviewReports: { select: { reviewId: true, reason: true, details: true, createdAt: true } },
@@ -193,6 +194,7 @@ export async function deleteAccount(userId: string, ipHash: string) {
       where: { id: userId },
       data: {
         email: tombstone, name: null, image: null, passwordHash: null, marketingOptIn: false,
+        phone: null, addressLine: null, city: null, postcode: null,
         status: "PENDING_DELETION", deletedAt: new Date(),
       },
     });

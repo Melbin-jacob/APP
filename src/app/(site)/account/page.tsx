@@ -16,7 +16,7 @@ export default async function AccountPage() {
   const [principal, { t }] = await Promise.all([getPrincipal(), getI18n()]);
   if (!principal) redirect("/login?callbackUrl=/account");
   const [user, reviews] = await Promise.all([
-    db.user.findUniqueOrThrow({ where: { id: principal.id }, select: { name: true, email: true, marketingOptIn: true, passwordHash: true } }),
+    db.user.findUniqueOrThrow({ where: { id: principal.id }, select: { name: true, email: true, marketingOptIn: true, passwordHash: true, phone: true, addressLine: true, city: true, postcode: true } }),
     db.review.findMany({
       where: { authorId: principal.id },
       orderBy: { createdAt: "desc" },
@@ -43,7 +43,10 @@ export default async function AccountPage() {
             </p>
           )}
         </section>
-        <ProfileForm initial={{ name: user.name ?? "", email: user.email, marketingOptIn: user.marketingOptIn }} />
+        <ProfileForm initial={{
+          name: user.name ?? "", email: user.email, marketingOptIn: user.marketingOptIn,
+          phone: user.phone ?? "", addressLine: user.addressLine ?? "", city: user.city ?? "", postcode: user.postcode ?? "",
+        }} />
         <PasswordForm hasPassword={!!user.passwordHash} />
         <MyReviews reviews={reviews.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />
         <PrivacyControls />

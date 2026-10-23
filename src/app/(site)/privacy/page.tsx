@@ -29,6 +29,7 @@ export default function PrivacyPage() {
           <thead><tr><th>Information</th><th>Source</th><th>Purpose</th><th>CCPA category</th></tr></thead>
           <tbody>
             <tr><td>Name, email, password (stored as a one-way hash)</td><td>You</td><td>Create and secure your account</td><td>Identifiers</td></tr>
+            <tr><td>Optional phone number and address on your account</td><td>You</td><td>Pre-fill your quote requests; you can change or remove them any time</td><td>Identifiers</td></tr>
             <tr><td>Business details: name, phone, postal code, rates, photos, licences and insurance documents</td><td>Businesses</td><td>Publish the listing; verify credentials</td><td>Identifiers; professional information</td></tr>
             <tr><td>Business name, trade, phone, address and website of businesses that haven’t joined</td><td>Publicly available business directories</td><td>Show an “unclaimed” listing so customers can find local trades; the business can claim or remove it</td><td>Identifiers; professional information</td></tr>
             <tr><td>Business location (derived from the postal code)</td><td>Postal-code lookup</td><td>Show listings to nearby customers</td><td>Geolocation (approximate)</td></tr>

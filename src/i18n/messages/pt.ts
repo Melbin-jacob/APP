@@ -325,6 +325,11 @@ const pt: Messages = {
     deleteReview: "Excluir",
     confirmDeleteReview: "Excluir esta avaliação? Não é possível desfazer.",
     reviewStatus: { PUBLISHED: "Publicada", PENDING_MODERATION: "Em análise", REMOVED: "Removida" },
+    contact: "Dados de contato",
+    contactHint: "Opcional. Ficam salvos aqui para você não precisar digitá-los a cada pedido de orçamento.",
+    phone: "Telefone",
+    postcode: "CEP / código postal",
+    postcodeInvalid: "Informe um código postal ou ZIP válido.",
   },
   dashboard: {
     title: "Painel da empresa",
@@ -359,6 +364,8 @@ const pt: Messages = {
     closeQuote: "Encerrar",
     reopenQuote: "Reabrir",
     addLogo: "Adicione seu logotipo",
+    editTitle: "Perfil da sua empresa",
+    editHint: "Atualize horários, serviços, preços, logotipo, áreas de atuação e contatos.",
   },
   business: {
     title: "Perfil da empresa",
