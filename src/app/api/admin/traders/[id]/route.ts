@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { invalidate, invalidatePrefix } from "@/lib/redis";
 import { requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ipHash, notFound, parseJson, route } from "@/server/http";
+import { invalidateTrader } from "@/server/services/traders";
 
 const body = z.object({
   status: z.enum(["APPROVED", "SUSPENDED", "REJECTED"]),
@@ -28,7 +28,6 @@ export const PATCH = route<{ params: Promise<{ id: string }> }>(async (req, { pa
       ipHash: ipHash(req), metadata: { from: trader.status, reason: input.reason },
     }, tx);
   });
-  await invalidate(`trader:${trader.slug}`);
-  await invalidatePrefix("categories:popular:", "traders:featured:");
+  await invalidateTrader(trader.slug);
   return NextResponse.json({ ok: true });
 });

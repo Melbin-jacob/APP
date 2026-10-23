@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api-client";
@@ -68,13 +69,14 @@ export function AdminTradersClient({ initialStatus }: { initialStatus?: string }
           <article key={t.id} className="card p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h2 className="font-semibold">{t.businessName} <Badge tone={statusTone(t.status)}>{t.status}</Badge></h2>
+                <h2 className="font-semibold"><Link href={`/admin/traders/${t.id}`} className="hover:text-brand-700 hover:underline">{t.businessName}</Link> <Badge tone={statusTone(t.status)}>{t.status}</Badge></h2>
                 <p className="text-sm text-ink-500">
                   {t.categories.map((c) => c.category.name).join(", ")} · {t.city} {t.postcode} · {t.user?.email ?? "Unclaimed (imported listing)"} · {t.user ? "joined" : "imported"} {formatDate(t.createdAt)}
                 </p>
                 {t.importNotes && <p className="mt-1 text-xs text-ink-500">Source notes: {t.importNotes}</p>}
               </div>
               <div className="flex gap-2">
+                <Link href={`/admin/traders/${t.id}`} className="btn-ghost px-3 py-1 text-xs">View details</Link>
                 {t.status !== "APPROVED" && <button className="btn-primary px-3 py-1 text-xs" onClick={() => setTrader.mutate({ id: t.id, status: "APPROVED" })}>Approve</button>}
                 {t.status === "APPROVED" && (
                   <button className="btn-ghost px-3 py-1 text-xs" onClick={() => {

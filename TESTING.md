@@ -126,7 +126,9 @@ then approve it as admin under *Ops console → Traders*.
 **Ops console (`/admin`, as admin)**
 - Overview: totals, queues, daily charts, top searches, system health.
 - Listing claims: verify and approve or reject claims. Quote requests: requests sent to unclaimed listings, to pass on by phone.
-- Traders: approve a business you registered, verify a licence, suspend a trader. Imported listings show *Unclaimed (imported listing)* and the spreadsheet notes.
+- Traders: click a business name (or **View details**) to see everything about it before deciding: contact details,
+  address and map, owner account, rate, hours, trades and services, credentials, activity and history. Approve, reject or
+  suspend from there. Approve a business you registered, verify a licence, suspend a trader. Imported listings show *Unclaimed (imported listing)* and the spreadsheet notes.
 - Users: suspend or ban a user. They're signed out of everything within a minute.
 - Reviews: reviews containing links, and reported reviews, land in the moderation queue. Publish, remove, or dismiss reports.
 - Ad banners: flip the site-wide switch and reload any page: both rails disappear or come back. Create, pause, or delete
