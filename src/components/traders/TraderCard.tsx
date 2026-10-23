@@ -26,11 +26,11 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
             {trader.categorySlug ? t.maybe(`categories.names.${trader.categorySlug}`, trader.categoryName) : trader.categoryName}
           </span>
         )}
-        <span className="absolute -bottom-4 left-1/2 grid h-9 w-9 -translate-x-1/2 place-items-center rounded-full border border-ink-200 bg-white text-ink-700 shadow-sm">
-          <Icon name={trader.categoryIcon ?? "tools"} className="h-4 w-4" />
+        <span className="absolute -bottom-5 left-1/2 grid h-10 w-10 -translate-x-1/2 place-items-center rounded-full border border-ink-200 bg-white text-ink-700 shadow-sm">
+          <Icon name={trader.categoryIcon ?? "wrench"} className="h-5 w-5" />
         </span>
       </Link>
-      <div className="flex flex-1 flex-col items-center px-4 pb-4 pt-7 text-center">
+      <div className="flex flex-1 flex-col items-center px-4 pb-4 pt-8 text-center">
         <h3 className="text-sm font-semibold text-ink-900">
           <Link href={`/traders/${trader.slug}`} className="hover:text-brand-600">{trader.businessName}</Link>
         </h3>

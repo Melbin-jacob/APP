@@ -134,6 +134,7 @@ then approve it as admin under *Ops console → Traders*.
 - Ad banners: flip the site-wide switch and reload any page: both rails disappear or come back. Create, pause, or delete
   banners; links can be an https URL or a page on this site (e.g. `/search`). If a side has no banners at all, the house ad
   comes back on the next restart.
+- Homepage picture (super-admin): upload your own background photo for the home page, or go back to the built-in picture.
 - Audit log: every action above is recorded.
 
 **Legal & compliance** (footer section on every page)

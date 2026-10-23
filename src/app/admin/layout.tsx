@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/users", label: "Users", minRole: "ADMIN" },
   { href: "/admin/reviews", label: "Reviews", minRole: "ADMIN" },
   { href: "/admin/banners", label: "Ad banners", minRole: "SUPER_ADMIN" },
+  { href: "/admin/homepage", label: "Homepage picture", minRole: "SUPER_ADMIN" },
   { href: "/admin/audit", label: "Audit log", minRole: "SUPER_ADMIN" },
 ] as const;
 

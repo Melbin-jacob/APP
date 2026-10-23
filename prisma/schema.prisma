@@ -525,18 +525,19 @@ model ListingClaim {
   @@index([status, createdAt])
 }
 
-// Images uploaded by businesses (logos), re-encoded server-side and served
-// from /api/media/:id. Stored in Postgres: small, and no bucket to configure.
+// Uploaded images (business logos; site images such as the home page picture,
+// with no traderId), re-encoded server-side and served from /api/media/:id.
+// Stored in Postgres: small, and no bucket to configure.
 model MediaFile {
   id          String   @id @default(cuid())
-  traderId    String
+  traderId    String?
   contentType String
   bytes       Bytes
   width       Int
   height      Int
   createdAt   DateTime @default(now())
 
-  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  trader TraderProfile? @relation(fields: [traderId], references: [id], onDelete: Cascade)
 
   @@index([traderId])
 }

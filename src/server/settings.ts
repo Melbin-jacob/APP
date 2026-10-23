@@ -7,6 +7,8 @@ export const SETTINGS = {
   "reviews.autoPublish": true as boolean,
   "reviews.reportThreshold": 3 as number,
   "traders.requireApproval": true as boolean,
+  // Home page background: an uploaded image (/api/media/…), or "" for the built-in picture.
+  "home.heroImageUrl": "" as string,
 };
 
 export type SettingKey = keyof typeof SETTINGS;
