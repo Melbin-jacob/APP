@@ -31,6 +31,8 @@ describe("review request email", () => {
     businessName: `Bob's <script>"Pipes"</script>`,
     customerName: "<img>",
     reviewUrl: "https://app.test/review?token=abc",
+    formAction: "https://app.test/api/reviews/email",
+    token: "abc",
     expiresAt: new Date("2026-11-05"),
     unsubscribeUrl: "https://app.test/unsubscribe?t=abc.def",
   });
@@ -45,8 +47,16 @@ describe("review request email", () => {
     expect(mail.text).toContain("https://app.test/unsubscribe?t=abc.def");
     expect(mail.html).toMatch(/HomeServices Direct Inc\./);
   });
-  it("has five star links carrying the rating and a submit CTA", () => {
-    for (let n = 1; n <= 5; n++) expect(mail.html).toContain(`token=abc&amp;rating=${n}`);
-    expect(mail.html).toContain("Submit Review");
+  it("thanks the customer and contains the review form: five star ratings, comment box, submit", () => {
+    expect(mail.html).toContain("Thank you for choosing Bob&#39;s &lt;script&gt;");
+    expect(mail.html).toContain('<form action="https://app.test/api/reviews/email" method="post"');
+    expect(mail.html).toContain('<input type="hidden" name="token" value="abc">');
+    for (let n = 1; n <= 5; n++) expect(mail.html).toContain(`name="rating" value="${n}"`);
+    expect(mail.html).toContain('<textarea name="comment"');
+    expect(mail.html).toContain(">Submit review</button>");
+  });
+  it("links to the same form on the web for mail apps that strip forms", () => {
+    expect(mail.html).toContain('href="https://app.test/review?token=abc"');
+    expect(mail.text).toContain("https://app.test/review?token=abc");
   });
 });

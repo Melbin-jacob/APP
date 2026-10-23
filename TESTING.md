@@ -116,11 +116,12 @@ then approve it as admin under *Ops console → Traders*.
 
 **Review workflow (trader → customer)**
 1. Sign in as a business you registered and approved, and go to `/dashboard`.
-2. Click **Mark completed** on a job, or use **Request a review** with any email.
-3. Open the test inbox. The email subject is "How was your service with <your business name>?"
-4. Click a star or **Submit Review**, write a comment, and submit.
-5. The review appears on the trader's profile marked *Verified customer*.
-6. Click the same email link again: it no longer works (single use).
+2. Click **Mark completed** on a job, or use **Ask a customer for a review** with any email.
+3. Open the test inbox. The email ("How was your service with <your business name>?") thanks the customer and contains the
+   review form: pick the stars, write a comment, and press **Submit review** right in the email. (The test inbox may block
+   forms; then use *Leave your review online*.)
+4. A thank-you page opens, and the review appears on the trader's profile marked *Verified customer*.
+5. Submit the same email form again: it says the invitation is no longer valid (single use).
 7. Put a link (`www.example.com`) in a review comment: it goes to moderation instead of going live.
 
 **Ops console (`/admin`, as admin)**

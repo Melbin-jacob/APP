@@ -202,10 +202,11 @@ SVG and non-images are refused, so no uploaded bytes are ever served as-is.
 1. Trader clicks **Mark completed** (or enters a customer email) → `createReviewRequest`.
    Checks: trader approved, not self-review, no request to that email in 30 days, daily cap.
 2. 256-bit random token; **HMAC-SHA256(pepper, token)** stored, raw token only in the email.
-3. Email (subject *"How was your service with {Business}?"*) shows five star links
-   (`…&rating=N` pre-selects the rating), a comment prompt and a **Submit Review** CTA.
-   Email clients strip forms and JS, so the stars are links and the comment is
-   entered on the landing page.
+3. Email (subject *"How was your service with {Business}?"*) opens with *"Thank you for choosing {Business}"*
+   and contains a real form: five star ratings (radio buttons), a comment box, the name to show, and
+   **Submit review**. It posts (form-encoded, no Origin check; the hidden single-use token is the
+   authorisation) to `POST /api/reviews/email`, which answers with a 303 redirect to `/review/thanks`.
+   Mail apps that strip forms (e.g. Outlook) show a link to the same form on the web (`/review?token=`).
 4. `GET /review?token=` only *validates*. Mail scanners that prefetch links don't burn the token.
 5. `POST /api/reviews` claims the token with a conditional `UPDATE … WHERE usedAt IS NULL AND expiresAt > now()`,
    so exactly one concurrent submit wins. The review is stored with `isVerified=true`, sanitised,

@@ -11,12 +11,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("review.pageTitle"), referrer: "no-referrer", robots: { index: false, follow: false } };
 }
 
-type Props = { searchParams: Promise<{ token?: string; rating?: string }> };
+type Props = { searchParams: Promise<{ token?: string; rating?: string; missing?: string }> };
 
 // Opening this page does NOT consume the token (email security scanners
 // pre-fetch links); only the POST from the form does.
 export default async function ReviewPage({ searchParams }: Props) {
-  const { token = "", rating } = await searchParams;
+  const { token = "", rating, missing } = await searchParams;
   const [request, { t }] = await Promise.all([resolveReviewToken(token), getI18n()]);
   const preset = Number(rating);
 
@@ -28,6 +28,7 @@ export default async function ReviewPage({ searchParams }: Props) {
             <>
               <h1 className="text-xl font-bold">{t("review.title", { name: request.trader.businessName })}</h1>
               <p className="mt-1 text-sm text-ink-500">{t("review.intro")}</p>
+              {missing === "rating" && <p role="alert" className="mt-4 rounded-md bg-[#f1ece2] p-3 text-sm text-ink-900">{t("review.chooseRating")}</p>}
               <ReviewForm
                 token={token}
                 businessName={request.trader.businessName}

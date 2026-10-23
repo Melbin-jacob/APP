@@ -91,6 +91,8 @@ export async function createReviewRequest(
     businessName: trader.businessName,
     customerName: request.customerName,
     reviewUrl,
+    formAction: `${APP_URL}/api/reviews/email`,
+    token,
     expiresAt,
     unsubscribeUrl: unsubscribe.url,
   });

@@ -32,40 +32,62 @@ function layout(title: string, body: string, footer: string) {
 export function reviewRequestEmail(input: {
   businessName: string;
   customerName?: string | null;
-  reviewUrl: string; // contains the single-use token
+  reviewUrl: string; // web version of the form; contains the single-use token
+  formAction: string; // where the in-email form posts
+  token: string;
   expiresAt: Date;
   unsubscribeUrl: string;
 }) {
+  const business = esc(input.businessName);
   const subject = `How was your service with ${input.businessName}?`;
-  const greeting = input.customerName ? `Hi ${esc(input.customerName)},` : "Hi there,";
-  const stars = [1, 2, 3, 4, 5]
-    .map((n) => {
-      const href = `${input.reviewUrl}&rating=${n}`;
-      return `<a href="${esc(href)}" title="${n} star${n > 1 ? "s" : ""}" style="text-decoration:none;font-size:34px;color:${ACCENT};padding:0 4px">&#9733;</a>`;
-    })
-    .join("");
+  const greeting = input.customerName ? `Hi ${esc(input.customerName)},` : "Hello,";
   const expires = input.expiresAt.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const options = [
+    [5, "Excellent"], [4, "Very good"], [3, "Good"], [2, "Fair"], [1, "Poor"],
+  ] as const;
+  const stars = (n: number) =>
+    `<span style="color:${ACCENT};font-size:20px;letter-spacing:2px">${"&#9733;".repeat(n)}</span><span style="color:#cbd2d9;font-size:20px;letter-spacing:2px">${"&#9734;".repeat(5 - n)}</span>`;
+  const field = "width:100%;box-sizing:border-box;border:1px solid #d9dee3;border-radius:6px;padding:10px 12px;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#1f2933";
 
+  // A real form, so the customer can rate and comment without leaving their
+  // inbox (Apple Mail, iOS, Gmail and most others). Clients that strip forms
+  // (e.g. Outlook) still get the link to the same form on the web below.
   const html = layout(
     subject,
-    `<p style="margin:0 0 12px;font-size:16px">${greeting}</p>
-     <p style="margin:0 0 20px;font-size:15px;line-height:1.5"><strong>${esc(input.businessName)}</strong> recently completed a job for you.
-     Your honest feedback helps neighbours choose the right professional.</p>
-     <p style="margin:0 0 6px;font-size:14px;color:#3e4c59">Tap a star to rate:</p>
-     <div style="margin:0 0 20px">${stars}</div>
-     <p style="margin:0 0 8px;font-size:14px;color:#3e4c59">Add a comment:</p>
-     <div style="border:1px solid #e4e7eb;border-radius:6px;padding:12px;color:#7b8794;font-size:14px;margin:0 0 20px">
-       Tell others about the quality, punctuality and value&hellip;</div>
-     <a href="${esc(input.reviewUrl)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Submit Review</a>
-     <p style="margin:20px 0 0;font-size:12px;color:#7b8794">This link is personal to you, works once, and expires on ${esc(expires)}.</p>`,
-    `You received this because ${esc(input.businessName)} listed you as a customer on HomeServices Direct.
+    `<p style="margin:0 0 14px;font-size:16px">${greeting}</p>
+     <p style="margin:0 0 8px;font-size:20px;font-weight:bold;color:#1f2933">Thank you for choosing ${business}.</p>
+     <p style="margin:0 0 22px;font-size:15px;line-height:1.55;color:#3e4c59">We would love to hear how your experience was. It only takes a minute, and your
+     feedback helps ${business} keep improving and helps your neighbours choose with confidence.</p>
+     <form action="${esc(input.formAction)}" method="post" style="margin:0">
+       <input type="hidden" name="token" value="${esc(input.token)}">
+       <p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#1f2933">How would you rate your experience?</p>
+       <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px">
+         ${options.map(([n, label]) => `<tr><td style="padding:4px 10px 4px 0;vertical-align:middle"><input type="radio" name="rating" value="${n}" id="r${n}" required></td>
+           <td style="padding:4px 12px 4px 0;vertical-align:middle"><label for="r${n}">${stars(n)}</label></td>
+           <td style="padding:4px 0;vertical-align:middle;font-size:14px;color:#3e4c59"><label for="r${n}">${label}</label></td></tr>`).join("")}
+       </table>
+       <p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:#1f2933">Share a few words about your experience <span style="font-weight:normal;color:#7b8794">(optional)</span></p>
+       <textarea name="comment" rows="5" maxlength="2000" placeholder="Quality of work, communication, punctuality, value for money…" style="${field};margin:0 0 16px;resize:vertical"></textarea>
+       <p style="margin:0 0 6px;font-size:14px;font-weight:bold;color:#1f2933">Name to show with your review</p>
+       <input type="text" name="authorName" maxlength="60" value="${esc(input.customerName ?? "")}" placeholder="e.g. Sarah K." style="${field};margin:0 0 22px">
+       <button type="submit" style="display:inline-block;background:${BRAND};color:#ffffff;border:0;border-radius:999px;padding:13px 30px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;cursor:pointer">Submit review</button>
+     </form>
+     <p style="margin:22px 0 0;font-size:13px;line-height:1.5;color:#7b8794">Can't see the form or the button doesn't work in your email app?
+       <a href="${esc(input.reviewUrl)}" style="color:${BRAND}">Leave your review online</a> instead.</p>
+     <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:#7b8794">This review invitation is personal to you, can be used once, and expires on ${esc(expires)}.
+       Your review will appear on ${business}'s profile as a verified customer review.</p>`,
+    `You received this email because ${business} recorded a completed job for you on HomeServices Direct.
      HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.<br><br>
      <a href="${esc(input.unsubscribeUrl)}" style="color:#7b8794">Unsubscribe from review requests</a> · ${senderLine()}`,
   );
 
-  const text = `${input.customerName ? `Hi ${input.customerName},` : "Hi there,"}
+  const text = `${input.customerName ? `Hi ${input.customerName},` : "Hello,"}
 
-${input.businessName} recently completed a job for you. Leave a rating and comment here (single use, expires ${expires}):
+Thank you for choosing ${input.businessName}.
+
+We would love to hear how your experience was. It only takes a minute, and your feedback helps ${input.businessName} keep improving and helps your neighbours choose with confidence.
+
+Rate your experience and leave a comment here (personal to you, works once, expires ${expires}):
 ${input.reviewUrl}
 
 HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.
