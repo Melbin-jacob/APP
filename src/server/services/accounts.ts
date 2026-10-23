@@ -144,7 +144,8 @@ export async function exportUserData(userId: string) {
     select: {
       id: true, email: true, name: true, role: true, status: true, createdAt: true,
       tosVersion: true, tosAcceptedAt: true, marketingOptIn: true, lastLoginAt: true,
-      phone: true, addressLine: true, city: true, postcode: true,
+      phone: true, addressLine: true, city: true, postcode: true, mfaEnabledAt: true,
+      consents: { select: { policyVersion: true, analytics: true, ads: true, gpc: true, createdAt: true } },
       accounts: { select: { provider: true, providerAccountId: true } },
       reviews: { select: { id: true, traderId: true, rating: true, comment: true, createdAt: true, status: true } },
       reviewReports: { select: { reviewId: true, reason: true, details: true, createdAt: true } },

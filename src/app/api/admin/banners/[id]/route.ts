@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { invalidate } from "@/lib/redis";
-import { requireRole } from "@/server/auth";
+import { requireRecentAuth, requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ipHash, notFound, parseJson, route } from "@/server/http";
 
@@ -19,6 +19,7 @@ type Ctx = { params: Promise<{ id: string }> };
 // PATCH /api/admin/banners/:id — toggle / reschedule / reweight.
 export const PATCH = route<Ctx>(async (req, { params }) => {
   const admin = await requireRole("SUPER_ADMIN");
+  await requireRecentAuth(admin); // ad code runs on every page: re-confirm identity first
   const { id } = await params;
   const input = await parseJson(req, patch);
   if (!(await db.banner.findUnique({ where: { id }, select: { id: true } }))) throw notFound("Banner");
@@ -31,6 +32,7 @@ export const PATCH = route<Ctx>(async (req, { params }) => {
 // DELETE /api/admin/banners/:id
 export const DELETE = route<Ctx>(async (req, { params }) => {
   const admin = await requireRole("SUPER_ADMIN");
+  await requireRecentAuth(admin); // ad code runs on every page: re-confirm identity first
   const { id } = await params;
   await db.banner.delete({ where: { id } }).catch(() => { throw notFound("Banner"); });
   await audit({ actorId: admin.id, action: "banner.delete", entityType: "Banner", entityId: id, ipHash: ipHash(req) });

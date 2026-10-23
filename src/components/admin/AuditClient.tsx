@@ -1,6 +1,6 @@
 "use client";
 
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "@/lib/api-client";
 import { PageTitle } from "./ui";
@@ -17,10 +17,26 @@ export function AdminAuditClient() {
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
   const logs = q.data?.pages.flatMap((p) => p.logs) ?? [];
+  const verify = useMutation({
+    mutationFn: () => api<{ ok: boolean; checked: number; brokenAt?: { seq: string; createdAt: string; reason: string } }>("/api/admin/audit-logs/verify", { method: "POST" }),
+  });
 
   return (
     <>
-      <PageTitle actions={<input value={action} onChange={(e) => setAction(e.target.value)} placeholder="Filter by action prefix, e.g. review." className="input w-72" />}>Audit log</PageTitle>
+      <PageTitle actions={
+        <div className="flex flex-wrap items-center gap-2">
+          <input value={action} onChange={(e) => setAction(e.target.value)} placeholder="Filter by action prefix, e.g. review." className="input w-72" />
+          <button className="btn-ghost" disabled={verify.isPending} onClick={() => verify.mutate()}>{verify.isPending ? "Checking…" : "Verify integrity"}</button>
+        </div>
+      }>Audit log</PageTitle>
+      {verify.data && (
+        <p role="status" className={`mb-4 rounded-md p-3 text-sm ${verify.data.ok ? "bg-brand-50 text-brand-700" : "bg-rose-50 text-rose-700"}`}>
+          {verify.data.ok
+            ? `✓ Intact: all ${verify.data.checked} chained entries match their hashes.`
+            : `✗ Tampering detected at entry #${verify.data.brokenAt?.seq} (${new Date(verify.data.brokenAt!.createdAt).toLocaleString("en-GB")}): ${verify.data.brokenAt?.reason}. The security contact has been alerted.`}
+        </p>
+      )}
+      <p className="mb-4 text-xs text-ink-500">Entries are append-only and hash-chained: the database refuses edits, and any change or removal shows up in the integrity check.</p>
       <div className="card overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead className="bg-ink-100 uppercase text-ink-500">

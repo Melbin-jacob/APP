@@ -1,0 +1,27 @@
+# DAST: OWASP ZAP baseline scan against the staging site (passive checks:
+# headers, cookies, information leaks, common misconfigurations). Set the
+# repository variable STAGING_URL once staging exists; until then this skips.
+name: DAST
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 7 * * 2"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  zap:
+    name: OWASP ZAP baseline
+    if: vars.STAGING_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ vars.STAGING_URL }}
+          rules_file_name: .zap/rules.tsv
+          cmd_options: "-a"
+          allow_issue_writing: true

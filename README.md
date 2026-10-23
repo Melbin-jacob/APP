@@ -61,6 +61,7 @@ server log instead of being sent. This setting is refused when `NODE_ENV=product
 | `npm run smoke` | Every public page renders (HTTP 200) on a running app; set `BASE_URL` to test another environment |
 | `npm run db:migrate` / `db:deploy` / `db:seed` / `db:studio` | Prisma |
 | `npm run db:import-directory` | Load or refresh the business directory from `prisma/data` |
+| `npm run mfa:reset -- <email> "<how you verified them>"` | Turn off someone's two-step sign-in after they lost their phone and recovery codes (audited) |
 
 ## Layout
 
@@ -75,6 +76,12 @@ tests/             Vitest unit tests
 ```
 
 ## Production checklist
+
+Security: the app refuses to start in production with weak or test secrets, a missing `MFA_ENCRYPTION_KEY`, an
+`http://` APP_URL or admin two-step sign-in turned off. Infrastructure items (network segmentation, KMS, WAF, central
+logs, secret rotation) are in [docs/security/HOSTING_CHECKLIST.md](docs/security/HOSTING_CHECKLIST.md). See also the
+[threat model](docs/security/THREAT_MODEL.md), [data classification](docs/security/DATA_CLASSIFICATION.md) and
+[incident response playbook](docs/security/INCIDENT_RESPONSE.md).
 
 - Set `EMAIL_TRANSPORT=ses`, verify the sending domain, and configure SPF, DKIM and DMARC.
 - Add an SES configuration set for bounces and complaints.

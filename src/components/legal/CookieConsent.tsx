@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useT } from "@/components/providers/PreferencesProvider";
+import { COOKIE_POLICY_VERSION } from "@/lib/legal";
 
 const COOKIE = "hsd_consent";
 const OPEN_EVENT = "open-cookie-settings";
 
-export type Consent = { necessary: true; analytics: boolean; ads: boolean; gpc?: boolean; v: 1 };
+/** id: random, per browser; links this choice to its server-side consent record. */
+export type Consent = { necessary: true; analytics: boolean; ads: boolean; gpc?: boolean; v: 1; id?: string; pv?: string };
 
 /** Global Privacy Control: a legally binding opt-out of sale/sharing in California and other US states. */
 export const gpcEnabled = () =>
@@ -25,10 +27,19 @@ export function readConsent(): Consent | null {
   }
 }
 
-export function writeConsent(consent: Consent) {
+export function writeConsent(input: Consent) {
+  const consent: Consent = { ...input, id: input.id ?? readConsent()?.id ?? crypto.randomUUID(), pv: COOKIE_POLICY_VERSION };
   const secure = location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `${COOKIE}=${encodeURIComponent(JSON.stringify(consent))}; Max-Age=${60 * 60 * 24 * 180}; Path=/; SameSite=Lax${secure}`;
   window.dispatchEvent(new CustomEvent("consent-change", { detail: consent }));
+  // Proof of consent (GDPR Art. 7(1)): record the choice server-side. Best effort;
+  // the cookie alone already controls what loads.
+  fetch("/api/consent", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ subjectId: consent.id, analytics: consent.analytics, ads: consent.ads, gpc: !!consent.gpc, policyVersion: consent.pv }),
+    keepalive: true,
+  }).catch(() => {});
 }
 
 /**

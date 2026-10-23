@@ -1,0 +1,18 @@
+# Secret scanning config. Extends the default rules; the allow-list covers only
+# the public, clearly labelled test values used for local Docker and CI, which
+# production refuses to start with (src/server/startup-checks.ts).
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Known local/CI test values"
+paths = [
+  '''docker-compose\.yml''',
+  '''\.github/workflows/ci\.yml''',
+  '''tests/.*\.test\.ts''',
+  '''\.env\.example''',
+]
+regexes = [
+  '''local-test-[a-z-]+-change-me''',
+  '''ci-only-[a-z]+-[0-9a-f]+''',
+]

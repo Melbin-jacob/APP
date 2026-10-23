@@ -35,6 +35,7 @@ export default async function AccountPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {principal.role === "TRADER" && <Link href="/dashboard/profile" className="btn-primary">{t("account.manageBusiness")}</Link>}
+            <Link href="/account/security" className="btn-ghost">{t("security.title")}</Link>
             <SignOutButton />
           </div>
           {needsTerms(principal) && (

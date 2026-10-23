@@ -36,32 +36,40 @@ enum UserStatus {
 }
 
 model User {
-  id             String     @id @default(cuid())
-  email          String     @unique @db.Citext
-  emailVerified  DateTime?
-  name           String?
-  image          String?
-  passwordHash   String? // Argon2id; null for magic-link / OAuth-only accounts
-  role           Role       @default(CUSTOMER)
-  status         UserStatus @default(ACTIVE)
-  tosVersion     String? // version of the Terms the user explicitly accepted
-  tosAcceptedAt  DateTime?
-  marketingOptIn Boolean    @default(false)
+  id               String     @id @default(cuid())
+  email            String     @unique @db.Citext
+  emailVerified    DateTime?
+  name             String?
+  image            String?
+  passwordHash     String? // Argon2id; null for magic-link / OAuth-only accounts
+  role             Role       @default(CUSTOMER)
+  status           UserStatus @default(ACTIVE)
+  tosVersion       String? // version of the Terms the user explicitly accepted
+  tosAcceptedAt    DateTime?
+  marketingOptIn   Boolean    @default(false)
   // Optional contact details the customer keeps on file; used to prefill quote requests.
-  phone          String?
-  addressLine    String?
-  city           String?
-  postcode       String?
-  lastLoginAt    DateTime?
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  deletedAt      DateTime?
+  phone            String?
+  addressLine      String?
+  city             String?
+  postcode         String?
+  // Two-step sign-in (TOTP). The secret is AES-256-GCM encrypted (src/lib/secret-box.ts);
+  // recovery codes are stored as hashes; mfaLastStep stops a code being replayed.
+  mfaSecret        String?
+  mfaEnabledAt     DateTime?
+  mfaRecoveryCodes String[]   @default([])
+  mfaLastStep      Int?
+  // Bumped to sign the user out everywhere (password change, MFA change, admin action).
+  sessionVersion   Int        @default(0)
+  lastLoginAt      DateTime?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
 
   accounts      Account[]
   trader        TraderProfile?
   reviews       Review[]
   reviewReports ReviewReport[]
-  auditLogs     AuditLog[]     @relation("AuditActor")
+  consents      ConsentRecord[]
   claims        ListingClaim[]
   quoteRequests QuoteRequest[]
 
@@ -444,6 +452,11 @@ model SiteSetting {
   updatedAt   DateTime @updatedAt
 }
 
+// Append-only and tamper-evident: each row stores the SHA-256 of the previous
+// row's hash plus its own content (src/server/audit.ts), and database triggers
+// refuse UPDATE, and DELETE of anything younger than the retention period.
+// actorId is an opaque user id with no foreign key, so deleting an account
+// never rewrites the log.
 model AuditLog {
   id         String   @id @default(cuid())
   actorId    String?
@@ -453,8 +466,9 @@ model AuditLog {
   metadata   Json?
   ipHash     String?
   createdAt  DateTime @default(now())
-
-  actor User? @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  seq        BigInt   @unique @default(autoincrement())
+  prevHash   String?
+  hash       String?
 
   @@index([entityType, entityId])
   @@index([actorId, createdAt])
@@ -573,4 +587,56 @@ model QuoteRequest {
   @@index([traderId, createdAt])
   @@index([status, createdAt])
   @@index([customerId])
+}
+
+// Proof of cookie consent (GDPR Art. 7(1), Quebec Law 25): what was chosen,
+// under which policy version, when. subjectId is a random id kept in the
+// visitor's consent cookie; userId is set when they were signed in.
+model ConsentRecord {
+  id            String   @id @default(cuid())
+  subjectId     String
+  userId        String?
+  policyVersion String
+  analytics     Boolean
+  ads           Boolean
+  gpc           Boolean  @default(false)
+  ipHash        String?
+  createdAt     DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([subjectId, createdAt])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum IncidentStatus {
+  OPEN
+  CONTAINED
+  CLOSED
+}
+
+// Security incident and breach register. PIPEDA s.10.3 requires a record of
+// every breach of security safeguards for 24 months, reported or not.
+model SecurityIncident {
+  id                    String         @id @default(cuid())
+  title                 String
+  description           String         @db.Text
+  detectedAt            DateTime
+  occurredAt            DateTime?
+  status                IncidentStatus @default(OPEN)
+  personalData          Boolean        @default(false) // did it involve personal information?
+  dataTypes             String? // e.g. "names, emails, phone numbers"
+  affectedCount         Int?
+  jurisdictions         String? // e.g. "CA-ON, CA-QC, US-CA"
+  riskOfSignificantHarm Boolean? // PIPEDA RROSH assessment; null = not assessed yet
+  riskAssessment        String?        @db.Text
+  containment           String?        @db.Text
+  regulatorNotifiedAt   DateTime?
+  individualsNotifiedAt DateTime?
+  createdById           String?
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  @@index([status, detectedAt])
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireRole } from "@/server/auth";
+import { requireRecentAuth, requireRole } from "@/server/auth";
+import { securityAlert } from "@/server/services/security-alerts";
 import { audit } from "@/server/audit";
 import { ipHash, parseJson, route } from "@/server/http";
 import { getAllSettings, setSetting } from "@/server/settings";
@@ -23,8 +24,10 @@ export const GET = route(async () => {
 export const PUT = route(async (req) => {
   const admin = await requireRole("SUPER_ADMIN");
   const input = await parseJson(req, body);
+  await requireRecentAuth(admin);
   // Narrowed per-key by the discriminated union above.
   await setSetting(input.key, input.value as never, admin.id);
   await audit({ actorId: admin.id, action: "settings.update", entityType: "SiteSetting", entityId: input.key, ipHash: ipHash(req), metadata: { value: input.value } });
+  void securityAlert("settings_changed", `Site setting changed: ${input.key}`, { key: input.key, value: JSON.stringify(input.value), by: admin.id }, { key: input.key, throttleSeconds: 300 });
   return NextResponse.json({ ok: true });
 });

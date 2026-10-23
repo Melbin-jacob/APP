@@ -16,6 +16,12 @@ const schema = z.object({
   REVIEW_TOKEN_PEPPER: z.string().min(32),
   REVIEW_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(14),
   CRON_SECRET: z.string().min(32),
+  // 32 random bytes, base64 (openssl rand -base64 32). Encrypts two-step sign-in secrets.
+  // Required in production; in development it's derived from NEXTAUTH_SECRET.
+  MFA_ENCRYPTION_KEY: z.string().optional(),
+  // Only for the local Docker stack, which runs NODE_ENV=production with the
+  // well-known test secrets in docker-compose.yml. Refused for any non-local APP_URL.
+  ALLOW_INSECURE_LOCAL_SECRETS: z.enum(["true", "false"]).optional(),
 });
 
 export type Env = z.infer<typeof schema>;

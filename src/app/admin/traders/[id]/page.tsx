@@ -5,6 +5,7 @@ import { CredentialActions, TraderStatusActions } from "@/components/admin/Trade
 import { Badge, statusTone } from "@/components/admin/ui";
 import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
 import { db } from "@/lib/db";
+import { withActors } from "@/server/audit";
 import { formatDate, formatMoney } from "@/lib/format";
 
 export const metadata = { title: "Business details · Ops console" };
@@ -52,12 +53,11 @@ export default async function AdminTraderPage({ params }: { params: Promise<{ id
     },
   });
   if (!t) notFound();
-  const history = await db.auditLog.findMany({
+  const history = await withActors(await db.auditLog.findMany({
     where: { entityType: "TraderProfile", entityId: id },
     orderBy: { createdAt: "desc" },
     take: 20,
-    include: { actor: { select: { email: true } } },
-  });
+  }));
   const hours = (t.operatingHours ?? {}) as Hours;
   const money = (minor: number | null) => (minor == null ? null : formatMoney(minor, t.currency, "en-CA"));
   const mapUrl = `https://www.openstreetmap.org/?mlat=${t.latitude}&mlon=${t.longitude}#map=14/${t.latitude}/${t.longitude}`;

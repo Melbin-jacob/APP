@@ -25,6 +25,8 @@ services:
       SMTP_URL: smtp://mailpit:1025
       EMAIL_FROM: HomeServices Direct <no-reply@homeservices.test>
       SEED_DEMO_DATA: "true"
+      # The secrets above are public test values: allowed only because APP_URL is localhost.
+      ALLOW_INSECURE_LOCAL_SECRETS: "true"
 
   db:
     image: postgis/postgis:16-3.4

@@ -215,6 +215,17 @@ SVG and non-images are refused, so no uploaded bytes are ever served as-is.
 
 ## 7. Security & compliance mapping
 
+Detailed: [STRIDE threat model](security/THREAT_MODEL.md) · [data classification](security/DATA_CLASSIFICATION.md) ·
+[incident response](security/INCIDENT_RESPONSE.md) · [hosting checklist](security/HOSTING_CHECKLIST.md).
+
+Highlights added in the security hardening pass: mandatory TOTP two-step sign-in for staff (optional for others,
+AES-256-GCM-encrypted seeds, hashed single-use recovery codes, replay protection); 12-hour staff sessions; session
+versioning (sign out everywhere; automatic on password/MFA/role change); step-up re-confirmation for sensitive admin
+actions; hash-chained append-only audit log with DB triggers and an integrity check; structured JSON security logs and
+email alerts (login-failure spikes, lockouts, export spikes, role changes, new staff networks, audit tampering);
+server-side consent records; breach register; boot-time production config checks; CI with CodeQL, npm audit,
+dependency review, gitleaks, Dependabot and an OWASP ZAP baseline against staging.
+
 | Requirement | Implementation |
 |---|---|
 | Injection (A03) | Prisma parameterised queries; raw geo SQL only via `Prisma.sql` tagged templates; LIKE wildcards escaped; Zod on every input. |

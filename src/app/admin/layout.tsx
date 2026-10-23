@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { AdminSignOut } from "@/components/admin/AdminSignOut";
 import { Logo } from "@/components/layout/SiteHeader";
-import { getPrincipal, requireCurrentTerms } from "@/server/auth";
+import { adminMfaRequired, getPrincipal, requireCurrentTerms } from "@/server/auth";
 
 const NAV = [
   { href: "/admin", label: "Overview", minRole: "ADMIN" },
@@ -15,14 +15,18 @@ const NAV = [
   { href: "/admin/banners", label: "Ad banners", minRole: "SUPER_ADMIN" },
   { href: "/admin/homepage", label: "Homepage picture", minRole: "SUPER_ADMIN" },
   { href: "/admin/audit", label: "Audit log", minRole: "SUPER_ADMIN" },
+  { href: "/admin/incidents", label: "Security incidents", minRole: "SUPER_ADMIN" },
 ] as const;
 
 // Second RBAC gate after middleware: re-checks role + ban status from the DB.
 // Non-admins get a 404, not a 403, so the console's existence isn't advertised.
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const user = await getPrincipal();
-  if (!user || (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN")) notFound();
+  // No valid session (signed out elsewhere, or the 12-hour staff limit passed): sign in again.
+  if (!user) redirect("/login?callbackUrl=/admin&notice=expired");
+  if (user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") notFound();
   requireCurrentTerms(user, "/admin");
+  if (!user.mfaEnabled && adminMfaRequired()) redirect("/account/security?required=1");
   const nav = NAV.filter((n) => n.minRole === "ADMIN" || user.role === "SUPER_ADMIN");
 
   return (
@@ -37,6 +41,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </nav>
         <div className="mt-8 space-y-3 border-t border-ink-200 pt-4 text-xs text-ink-500">
           <p>{user.email}<br /><span className="font-semibold">{user.role}</span></p>
+          <Link href="/account/security" className="block text-brand-700 hover:underline">Sign-in security</Link>
           <Link href="/" className="block text-brand-700 hover:underline">View website ↗</Link>
           <AdminSignOut className="w-full rounded-md border border-ink-200 px-3 py-2 text-sm font-medium text-ink-700 hover:bg-ink-100" />
         </div>

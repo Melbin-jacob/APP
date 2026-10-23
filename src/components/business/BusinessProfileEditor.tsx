@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
-import { api, ClientApiError } from "@/lib/api-client";
+import { api, apiForm, ClientApiError } from "@/lib/api-client";
 import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
 import { formatMoney } from "@/lib/format";
 
@@ -97,11 +97,7 @@ function LogoSection({ data }: { data: EditorData }) {
     mutationFn: async (file: File) => {
       const body = new FormData();
       body.set("file", file);
-      // Not api(): that helper sends JSON. Same-origin fetch, so the CSRF Origin check passes.
-      const res = await fetch("/api/trader/logo", { method: "POST", body });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new ClientApiError(res.status, json?.error?.code ?? "error", json?.error?.message ?? "Upload failed");
-      return json as { logoUrl: string };
+      return apiForm<{ logoUrl: string }>("/api/trader/logo", body);
     },
     onSuccess: (r) => { setLogo(r.logoUrl); router.refresh(); },
   });

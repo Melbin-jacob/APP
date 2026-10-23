@@ -1,0 +1,84 @@
+# Build, lint, type-check and test every push and pull request, then run the
+# app against real Postgres/Redis and check every page renders.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Lint, types, unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  app:
+    name: Build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: checks
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: homeservices
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U postgres -d homeservices"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      # Throwaway CI-only values; production refuses anything like them (src/server/startup-checks.ts).
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/homeservices?schema=public
+      REDIS_URL: redis://localhost:6379
+      APP_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-secret-0123456789abcdef0123456789
+      REVIEW_TOKEN_PEPPER: ci-only-pepper-0123456789abcdef0123456789
+      CRON_SECRET: ci-only-cron-0123456789abcdef0123456789ab
+      EMAIL_TRANSPORT: smtp
+      SMTP_URL: smtp://localhost:1025
+      EMAIL_FROM: CI <ci@example.com>
+      ALLOW_INSECURE_LOCAL_SECRETS: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+      - run: npx tsx prisma/seed.ts
+      - run: npm run build
+      - name: Start the app
+        run: |
+          npx next start -p 3000 > app.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3000/api/health && exit 0; sleep 2; done
+          cat app.log; exit 1
+      - run: npm run smoke
+      - name: App log on failure
+        if: failure()
+        run: cat app.log || true

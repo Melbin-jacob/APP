@@ -1,0 +1,8 @@
+# ZAP baseline rule overrides: <rule id>\t<IGNORE|INFO|WARN|FAIL>\t<reason>
+# Fail the scan on the findings that matter most for this app.
+10202	IGNORE	Anti-CSRF tokens: by design we use same-origin Origin checks + SameSite cookies (src/server/http.ts)
+10038	FAIL	Content Security Policy header not set
+10035	FAIL	Strict-Transport-Security header not set
+10020	FAIL	Anti-clickjacking header missing
+10010	FAIL	Cookie without HttpOnly flag
+10011	FAIL	Cookie without Secure flag

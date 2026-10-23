@@ -18,6 +18,7 @@ export const RATE_LIMITS = {
   quoteRequest: { limit: 5, windowSeconds: 60 * 60 }, // per IP
   listingClaim: { limit: 5, windowSeconds: 60 * 60 * 24 }, // per user
   upload: { limit: 20, windowSeconds: 60 * 60 }, // per user
+  consent: { limit: 30, windowSeconds: 60 * 60 }, // per IP
 } satisfies Record<string, RateLimitRule>;
 
 export type RateLimitResult = { ok: boolean; remaining: number; retryAfterSeconds: number };

@@ -93,7 +93,8 @@ export function PasswordForm({ hasPassword }: { hasPassword: boolean }) {
   const weak = next.length > 0 && (next.length < 12 || !/[a-z]/i.test(next) || !/\d/.test(next));
   const m = useMutation({
     mutationFn: () => api("/api/me/password", { method: "POST", json: { currentPassword: has ? current : undefined, newPassword: next } }),
-    onSuccess: () => { setCurrent(""); setNext(""); setHas(true); },
+    // The server signs the account out everywhere; sign in again with the new password.
+    onSuccess: () => { setCurrent(""); setNext(""); setHas(true); void signOut({ callbackUrl: "/login?notice=password_changed" }); },
   });
   const error = m.error instanceof ClientApiError
     ? m.error.code === "wrong_password" ? t("account.passwordWrong")

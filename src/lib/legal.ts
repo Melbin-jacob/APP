@@ -3,6 +3,9 @@
 // server/auth.ts and /legal/accept-terms).
 export const TOS_VERSION = "2026-10-01";
 
+// Bump when the Cookie Policy changes; consent records store the version agreed to.
+export const COOKIE_POLICY_VERSION = "2026-10-01";
+
 /** Shown as "Last updated" on every legal page. */
 export const LEGAL_UPDATED = "October 22, 2026";
 

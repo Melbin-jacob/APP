@@ -5,18 +5,22 @@ import { signIn } from "next-auth/react";
 import { useState, type FormEvent } from "react";
 import { useT } from "@/components/providers/PreferencesProvider";
 
-const KNOWN_ERRORS = ["CredentialsSignin", "RateLimited", "AccountDisabled", "EmailSignin"] as const;
+const KNOWN_ERRORS = ["CredentialsSignin", "RateLimited", "AccountDisabled", "EmailSignin", "MfaInvalid", "UsePassword"] as const;
+const NOTICES = ["mfa_on", "mfa_off", "signed_out_everywhere", "password_changed", "expired"] as const;
 type KnownError = (typeof KNOWN_ERRORS)[number];
 const errorKey = (code: string) =>
   `login.errors.${(code === "AccessDenied" ? "AccountDisabled" : (KNOWN_ERRORS as readonly string[]).includes(code) ? code : "default") as KnownError | "default"}` as const;
 
-export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?: string; callbackUrl: string }) {
+export function LoginForm({ sent, error, callbackUrl, notice }: { sent: boolean; error?: string; callbackUrl: string; notice?: string }) {
   const t = useT();
   const [mode, setMode] = useState<"password" | "magic">("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState(error ? t(errorKey(error)) : "");
   const [busy, setBusy] = useState(false);
+  // Second step for accounts with two-step sign-in.
+  const [needOtp, setNeedOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   if (sent) {
     return (
@@ -35,9 +39,12 @@ export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?:
       await signIn("email", { email, callbackUrl });
       return;
     }
-    const res = await signIn("credentials", { email, password, redirect: false, callbackUrl });
+    const res = await signIn("credentials", { email, password, otp: needOtp ? otp : "", redirect: false, callbackUrl });
     setBusy(false);
-    if (res?.error) setMsg(t(errorKey(res.error)));
+    if (res?.error === "MfaRequired") {
+      setNeedOtp(true);
+      setOtp("");
+    } else if (res?.error) setMsg(t(errorKey(res.error)));
     // A full page load, not router.push: the client router may hold prefetches made
     // while signed out (e.g. /account → "please sign in") and would replay them.
     else window.location.assign(res?.url ?? callbackUrl);
@@ -46,6 +53,9 @@ export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?:
   return (
     <form onSubmit={submit} className="card space-y-4 p-8">
       <h1 className="text-xl font-bold">{t("login.title")}</h1>
+      {notice && (NOTICES as readonly string[]).includes(notice) && (
+        <p role="status" className="rounded-md bg-brand-50 p-3 text-sm text-brand-700">{t(`security.notices.${notice as (typeof NOTICES)[number]}`)}</p>
+      )}
       <div className="flex rounded-full bg-ink-100 p-1 text-sm" role="tablist">
         {(["password", "magic"] as const).map((m) => (
           <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
@@ -62,6 +72,13 @@ export function LoginForm({ sent, error, callbackUrl }: { sent: boolean; error?:
         <div>
           <label htmlFor="password" className="label">{t("login.password")}</label>
           <input id="password" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" />
+        </div>
+      )}
+      {needOtp && mode === "password" && (
+        <div className="rounded-md bg-ink-100 p-4">
+          <label htmlFor="otp" className="label">{t("security.codeLabel")}</label>
+          <p className="mb-2 text-xs text-ink-500">{t("security.loginCodeHint")}</p>
+          <input id="otp" required autoFocus inputMode="text" autoComplete="one-time-code" value={otp} onChange={(e) => setOtp(e.target.value)} className="input tracking-widest" dir="ltr" />
         </div>
       )}
       {msg && <p role="alert" className="text-sm text-rose-600">{msg}</p>}

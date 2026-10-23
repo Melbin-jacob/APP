@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireRole } from "@/server/auth";
+import { requireRecentAuth, requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ApiError, badRequest, enforceRateLimit, ipHash, route } from "@/server/http";
 import { MAX_SITE_IMAGE_BYTES, processHeroImage, removeSiteImage, replaceSiteImage } from "@/server/services/media";
@@ -10,6 +10,7 @@ const tooBig = () => new ApiError(413, "payload_too_large", "Images can be up to
 // POST /api/admin/homepage — multipart `file`: new home page background picture.
 export const POST = route(async (req) => {
   const admin = await requireRole("SUPER_ADMIN");
+  await requireRecentAuth(admin);
   await enforceRateLimit("upload", admin.id);
   if (Number(req.headers.get("content-length") ?? 0) > MAX_SITE_IMAGE_BYTES + 64 * 1024) throw tooBig();
   let file: FormDataEntryValue | null;
@@ -31,6 +32,7 @@ export const POST = route(async (req) => {
 // DELETE /api/admin/homepage — back to the built-in picture.
 export const DELETE = route(async (req) => {
   const admin = await requireRole("SUPER_ADMIN");
+  await requireRecentAuth(admin);
   await removeSiteImage((await getSetting("home.heroImageUrl")) || null);
   await setSetting("home.heroImageUrl", "", admin.id);
   await audit({ actorId: admin.id, action: "settings.hero_image", entityType: "SiteSetting", entityId: "home.heroImageUrl", ipHash: ipHash(req), metadata: { url: null } });

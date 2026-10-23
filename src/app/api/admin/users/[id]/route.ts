@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { invalidatePrincipal, requireRole } from "@/server/auth";
+import { invalidatePrincipal, requireRecentAuth, requireRole } from "@/server/auth";
+import { securityAlert } from "@/server/services/security-alerts";
 import { audit } from "@/server/audit";
 import { forbidden, ipHash, notFound, parseJson, route } from "@/server/http";
 
@@ -23,9 +24,12 @@ export const PATCH = route<{ params: Promise<{ id: string }> }>(async (req, { pa
   if (target.id === admin.id) throw forbidden();
   const touchesAdmins = ["ADMIN", "SUPER_ADMIN"].includes(target.role) || (input.role && ["ADMIN", "SUPER_ADMIN"].includes(input.role));
   if (touchesAdmins && admin.role !== "SUPER_ADMIN") throw forbidden();
+  await requireRecentAuth(admin);
+  const roleChanged = !!input.role && input.role !== target.role;
 
   await db.$transaction(async (tx) => {
-    await tx.user.update({ where: { id }, data: { status: input.status, role: input.role } });
+    // Any role or status change ends the person's existing sessions.
+    await tx.user.update({ where: { id }, data: { status: input.status, role: input.role, sessionVersion: { increment: 1 } } });
     if (input.status && input.status !== "ACTIVE") {
       await tx.traderProfile.updateMany({ where: { userId: id, status: "APPROVED" }, data: { status: "SUSPENDED" } });
     }
@@ -35,5 +39,8 @@ export const PATCH = route<{ params: Promise<{ id: string }> }>(async (req, { pa
     }, tx);
   });
   await invalidatePrincipal(id);
+  if (roleChanged && (touchesAdmins || input.role === "TRADER")) {
+    void securityAlert("admin_role_change", `Role changed: ${target.role} → ${input.role}`, { userId: id, by: admin.id, reason: input.reason });
+  }
   return NextResponse.json({ ok: true });
 });

@@ -76,6 +76,7 @@ export default function PrivacyPage() {
             <tr><td>Search history (not linked to your account)</td><td>{months(RETENTION_DAYS.searchQueries)}</td></tr>
             <tr><td>Quote requests</td><td>{months(RETENTION_DAYS.quoteRequests)}, or until you delete your account</td></tr>
             <tr><td>Listing claims</td><td>{months(RETENTION_DAYS.decidedClaims)} after we decide them</td></tr>
+            <tr><td>Cookie consent records (your choice, policy version and time, linked to a random id)</td><td>{months(RETENTION_DAYS.consentRecords)}</td></tr>
             <tr><td>Call-button click statistics</td><td>{months(RETENTION_DAYS.callEvents)}</td></tr>
             <tr><td>Security and admin audit logs</td><td>{months(RETENTION_DAYS.auditLogs)}</td></tr>
             <tr><td>Unused review links</td><td>{months(RETENTION_DAYS.expiredReviewLinks)} after they expire</td></tr>

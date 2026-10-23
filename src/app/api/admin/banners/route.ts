@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { invalidate } from "@/lib/redis";
 import { safeUrl } from "@/lib/sanitize";
-import { requireRole } from "@/server/auth";
+import { requireRecentAuth, requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { ipHash, parseJson, route } from "@/server/http";
 
@@ -58,6 +58,7 @@ export const GET = route(async () => {
 // POST /api/admin/banners
 export const POST = route(async (req) => {
   const admin = await requireRole("SUPER_ADMIN");
+  await requireRecentAuth(admin); // ad code runs on every page: re-confirm identity first
   const input = await parseJson(req, bannerInput);
   const banner = await db.banner.create({ data: input });
   await audit({ actorId: admin.id, action: "banner.create", entityType: "Banner", entityId: banner.id, ipHash: ipHash(req) });

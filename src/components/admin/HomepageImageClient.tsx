@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { api, ClientApiError } from "@/lib/api-client";
+import { api, apiForm, ClientApiError } from "@/lib/api-client";
 
 const MAX = 12 * 1024 * 1024;
 
@@ -14,10 +14,7 @@ export function HomepageImageClient({ current, fallback }: { current: string; fa
     mutationFn: async (file: File) => {
       const body = new FormData();
       body.set("file", file);
-      const res = await fetch("/api/admin/homepage", { method: "POST", body });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new ClientApiError(res.status, json?.error?.code ?? "error", json?.error?.message ?? "Upload failed");
-      return json;
+      return apiForm<{ url: string }>("/api/admin/homepage", body);
     },
     onSuccess: () => router.refresh(),
   });

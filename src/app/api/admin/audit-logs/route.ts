@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireRole } from "@/server/auth";
+import { withActors } from "@/server/audit";
 import { route } from "@/server/http";
 
 const query = z.object({
@@ -21,7 +22,6 @@ export const GET = route(async (req) => {
     orderBy: { createdAt: "desc" },
     take: 101,
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-    include: { actor: { select: { email: true } } },
   });
-  return NextResponse.json({ logs: logs.slice(0, 100), nextCursor: logs[100]?.id ?? null });
+  return NextResponse.json({ logs: await withActors(logs.slice(0, 100)), nextCursor: logs[100]?.id ?? null });
 });

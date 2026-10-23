@@ -47,6 +47,7 @@ export default async function DashboardPage() {
           <div className="flex flex-wrap gap-2">
             <Link href="/dashboard/profile" className="btn-primary">{t("dashboard.editProfile")}</Link>
             {profile.status === "APPROVED" && <Link href={`/traders/${profile.slug}`} className="btn-ghost">{t("dashboard.viewProfile")}</Link>}
+            <Link href="/account/security" className="btn-ghost">{t("security.title")}</Link>
             <SignOutButton />
           </div>
         </header>

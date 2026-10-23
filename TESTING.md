@@ -41,6 +41,11 @@ These logins are restored every time the app starts with demo data (Docker does 
 `ChangeMe-123456`, account active, Terms accepted. So if you changed the password or suspended one while testing, just restart.
 After 5 wrong passwords an account is locked for 15 minutes.
 
+**Two-step sign-in for the admin:** the first time you sign in as `admin@…` you'll be asked to set up two-step sign-in.
+Install an authenticator app on your phone (Google Authenticator, Microsoft Authenticator, 1Password…), scan the QR code,
+enter the code, and save the recovery codes. From then on, sign in with the password plus the 6-digit code. Lost it? Run
+`docker compose exec app npm run mfa:reset -- admin@homeservices.local "local testing"` and set it up again.
+
 Sign in at http://localhost:3000/login: each account lands on its own page (admin → `/admin`, business → `/dashboard`,
 customer → `/account`). **My account** in the header goes to the same place.
 
@@ -147,6 +152,15 @@ then approve it as admin under *Ops console → Traders*.
   Requesting another review for that email is then refused.
 - **Terms gate:** an account that hasn't accepted the current Terms (e.g. someone who signed up with an email link) is sent to
   an "accept the Terms" page before using the dashboard or admin console. Exporting or deleting data never requires it.
+
+**Security** (see docs/security for the full picture)
+- *Sign-in & security* (account page, dashboard, or the admin sidebar): turn on two-step sign-in, download recovery codes,
+  sign out everywhere. Sign in with a recovery code instead of the app code: it works once.
+- As admin, wait 15 minutes after signing in, then flip the ad switch or change a user's role: you're asked to confirm with
+  your password and a code first.
+- Ops console → Audit log → **Verify integrity**: every entry is hash-chained; the database refuses edits.
+- Ops console → **Security incidents**: the breach register, with notification deadlines.
+- Six wrong passwords on one account lock it for 15 minutes and email a security alert to `SECURITY_EMAIL` (test inbox).
 
 **Privacy**
 - Sign in as `customer@…` → `/account`: export your data (JSON) or delete the account.

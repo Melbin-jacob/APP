@@ -1,17 +1,19 @@
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
 import { redis } from "@/lib/redis";
 
 type DailyPoint = { day: string; count: number };
 
-const daily = (table: "User" | "SearchQuery" | "Review", days: number) =>
-  // Table name is from a fixed union, never user input.
-  db.$queryRawUnsafe<DailyPoint[]>(
-    `SELECT to_char(d, 'YYYY-MM-DD') AS day, COUNT(x."id")::int AS count
-     FROM generate_series(current_date - ($1::int - 1), current_date, '1 day') d
-     LEFT JOIN "${table}" x ON x."createdAt"::date = d
-     GROUP BY d ORDER BY d`,
-    days,
-  );
+// Table identifiers can't be query parameters, so each is a fixed SQL fragment;
+// nothing user-supplied ever reaches the SQL text.
+const TABLES = { User: Prisma.raw('"User"'), SearchQuery: Prisma.raw('"SearchQuery"'), Review: Prisma.raw('"Review"') } as const;
+
+const daily = (table: keyof typeof TABLES, days: number) =>
+  db.$queryRaw<DailyPoint[]>`
+    SELECT to_char(d, 'YYYY-MM-DD') AS day, COUNT(x."id")::int AS count
+    FROM generate_series(current_date - (${days}::int - 1), current_date, '1 day') d
+    LEFT JOIN ${TABLES[table]} x ON x."createdAt"::date = d
+    GROUP BY d ORDER BY d`;
 
 export async function getDashboard(days = 30) {
   const started = Date.now();
