@@ -19,6 +19,7 @@ export const RATE_LIMITS = {
   listingClaim: { limit: 5, windowSeconds: 60 * 60 * 24 }, // per user
   upload: { limit: 20, windowSeconds: 60 * 60 }, // per user
   consent: { limit: 30, windowSeconds: 60 * 60 }, // per IP
+  visit: { limit: 600, windowSeconds: 60 * 60 }, // per IP; beyond this, page views just aren't counted
 } satisfies Record<string, RateLimitRule>;
 
 export type RateLimitResult = { ok: boolean; remaining: number; retryAfterSeconds: number };

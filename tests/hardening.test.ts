@@ -91,3 +91,18 @@ describe("production startup checks", () => {
     expect(productionConfigProblems({ ...local, APP_URL: "https://homeservices.direct" }).errors.length).toBe(1);
   });
 });
+
+describe("visitor counting", async () => {
+  const { countablePath, statDay } = await import("@/server/services/visits");
+  it("counts public pages only, without query strings", () => {
+    expect(countablePath("/traders/appliance-medic?x=1")).toBe("/traders/appliance-medic");
+    expect(countablePath("/")).toBe("/");
+    expect(countablePath("/search/")).toBe("/search");
+    for (const p of ["/admin", "/admin/users", "/api/visit", "/account", "/dashboard/profile", "/review", "//evil.com", "x"]) expect(countablePath(p)).toBeNull();
+  });
+  it("uses the business's calendar day (America/Toronto)", () => {
+    // 02:00 UTC on Oct 25 is still Oct 24 in Windsor.
+    expect(statDay(new Date("2026-10-25T02:00:00Z"))).toBe("2026-10-24");
+    expect(statDay(new Date("2026-10-25T14:00:00Z"))).toBe("2026-10-25");
+  });
+});

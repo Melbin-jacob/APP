@@ -130,7 +130,9 @@ then approve it as admin under *Ops console → Traders*.
 7. Put a link (`www.example.com`) in a review comment: it goes to moderation instead of going live.
 
 **Ops console (`/admin`, as admin)**
-- Overview: totals, queues, daily charts, top searches, system health.
+- Overview: **visitors today**, page views, yesterday and the 30-day average, a visitors-per-day chart, today's top pages and
+  visitors by country; then totals, queues, daily charts, top searches, system health. Visits are counted without cookies;
+  ops-console pages and bots aren't counted. (Days follow Windsor time; set `STATS_TIMEZONE` to change.)
 - Listing claims: verify and approve or reject claims. Quote requests: requests sent to unclaimed listings, to pass on by phone.
 - Traders: click a business name (or **View details**) to see everything about it before deciding: contact details,
   address and map, owner account, rate, hours, trades and services, credentials, activity and history. Approve, reject or

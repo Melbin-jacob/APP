@@ -85,7 +85,7 @@ logs, secret rotation) are in [docs/security/HOSTING_CHECKLIST.md](docs/security
 
 - Set `EMAIL_TRANSPORT=ses`, verify the sending domain, and configure SPF, DKIM and DMARC.
 - Add an SES configuration set for bounces and complaints.
-- Schedule `POST /api/cron/flush-banner-stats` every 5 minutes and `POST /api/cron/retention` daily,
+- Schedule `POST /api/cron/flush-banner-stats` every 5 minutes (it also saves the daily visitor totals) and `POST /api/cron/retention` daily,
   both with `Authorization: Bearer $CRON_SECRET`. The retention job enforces the periods published in the Privacy Policy.
 - Set the legal-entity variables (`LEGAL_ENTITY_NAME`, `LEGAL_ADDRESS`, `LEGAL_JURISDICTION`, `PRIVACY_OFFICER`, `*_EMAIL`)
   and make sure the privacy and security mailboxes exist and are monitored.

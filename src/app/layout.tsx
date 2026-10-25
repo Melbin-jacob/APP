@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers/Providers";
 import { getI18n } from "@/i18n/server";
 import { getRates } from "@/server/services/fx";
 import "./globals.css";
+import { VisitTracker } from "@/components/analytics/VisitTracker";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -31,6 +32,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <Providers>
             {children}
             <CookieConsent />
+            <VisitTracker />
           </Providers>
         </PreferencesProvider>
       </body>

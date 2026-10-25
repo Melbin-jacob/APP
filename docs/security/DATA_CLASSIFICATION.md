@@ -25,6 +25,7 @@
 | Consent records | Confidential (pseudonymous) | `ConsentRecord` | Random subject id, hashed IP | 24 months |
 | Audit log | Internal | `AuditLog` | Append-only, hash-chained; opaque ids and hashed IPs | 24 months |
 | Security incidents | Internal | `SecurityIncident` | Super-admins only | 36 months after closing |
+| Daily visitor totals | Internal (aggregate) | `DailyVisitorStat`; Redis counters | No cookies; daily-rotating hash key, discarded after 2 days; only counts stored | Totals kept; Redis sketches 40 days |
 | Search/call analytics | Internal | `SearchQuery`, `CallEvent` | Hashed visitor ids | 13 / 24 months |
 | Business listings, services, prices, published reviews | Public | `TraderProfile`, `Service`, `Review` | Moderation; integrity via audit | Life of listing |
 | Imported directory notes | Internal | `TraderProfile.importNotes` | Never shown publicly | Until claimed/removed |

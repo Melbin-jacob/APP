@@ -640,3 +640,13 @@ model SecurityIncident {
 
   @@index([status, detectedAt])
 }
+
+// Daily visitor totals for the ops console. Counted without cookies: each
+// visit is reduced to a one-way hash with a key that changes daily and is then
+// discarded (src/server/services/visits.ts), so only these totals are kept.
+model DailyVisitorStat {
+  day       DateTime @id @db.Date
+  visitors  Int
+  pageViews Int
+  updatedAt DateTime @updatedAt
+}
