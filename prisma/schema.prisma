@@ -1,4 +1,4 @@
-// HomeServices Direct — primary data model.
+// GetTradePros — primary data model.
 //
 // Conventions
 // - IDs are cuid strings; money is stored as integer minor units (pence/cents).

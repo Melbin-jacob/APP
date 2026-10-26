@@ -13,7 +13,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage title="Privacy Policy" current="/privacy">
       <p>
-        This policy explains how {COMPANY.name} (“we”) collects, uses and protects personal information when you use HomeServices Direct.
+        This policy explains how {COMPANY.name} (“we”) collects, uses and protects personal information when you use GetTradePros.
         It is also our notice at collection under the California Consumer Privacy Act.
       </p>
 

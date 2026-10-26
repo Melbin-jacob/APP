@@ -7,7 +7,7 @@ const ar: Messages = {
     advertisement: "إعلان",
     sponsored: "إعلان ممول",
   },
-  brand: { tagline: "ابحث. قارن. وظّف.", home: "الصفحة الرئيسية لـ HomeServices Direct" },
+  brand: { tagline: "نصلك بحِرفيين موثوقين", home: "الصفحة الرئيسية لـ GetTradePros" },
   nav: {
     home: "الرئيسية",
     categories: "الفئات",
@@ -27,7 +27,7 @@ const ar: Messages = {
     browseMarket: "عرض المحترفين في {market}",
   },
   meta: {
-    title: "HomeServices Direct: اعثر على خبراء محليين بالقرب منك",
+    title: "GetTradePros: اعثر على خبراء محليين بالقرب منك",
     description: "اعثر على سباكين وكهربائيين وفنيي صيانة موثوقين وغيرهم. قارن الأسعار وتصفح أعمالهم واقرأ تقييمات موثّقة.",
   },
   hero: {
@@ -132,7 +132,7 @@ const ar: Messages = {
     terms: "شروط الخدمة",
     privacy: "الخصوصية وملفات تعريف الارتباط",
     yourData: "بياناتك",
-    rights: "© {year} HomeServices Direct. جميع الحقوق محفوظة.",
+    rights: "© {year} GetTradePros. جميع الحقوق محفوظة.",
     explore: "استكشف",
     legalTitle: "الشؤون القانونية والامتثال",
     legalCentre: "المركز القانوني",
@@ -151,7 +151,7 @@ const ar: Messages = {
     important: "هام",
     disclaimer:
       "تعمل هذه المنصة حصريًا كدليل/سوق يربط المستخدمين بمقاولين مستقلين. لا تتحمل المنصة أي مسؤولية أو ضمان أو التزام فيما يتعلق بجودة الأعمال المنفذة أو سلامتها أو قانونيتها أو نتائجها. جميع العقود والنزاعات تكون حصريًا بين العميل ومقدم الخدمة.",
-    disclaimerShort: "مقاول مستقل. HomeServices Direct مجرد دليل وليس طرفًا في أي اتفاق أو عمل منفذ.",
+    disclaimerShort: "مقاول مستقل. GetTradePros مجرد دليل وليس طرفًا في أي اتفاق أو عمل منفذ.",
     translationNote: "الترجمة مقدمة للتسهيل فقط. النسخة الإنجليزية هي الملزمة قانونًا.",
     englishOnly: "هذه الصفحة متاحة حاليًا باللغة الإنجليزية فقط.",
   },
@@ -547,7 +547,7 @@ const ar: Messages = {
   },
   unsubscribe: {
     title: "إلغاء الاشتراك",
-    reviewRequests: "هل تريد إيقاف رسائل طلب التقييم إلى {email}؟ لن تتمكن الأنشطة التجارية بعد ذلك من دعوتك للتقييم عبر HomeServices Direct.",
+    reviewRequests: "هل تريد إيقاف رسائل طلب التقييم إلى {email}؟ لن تتمكن الأنشطة التجارية بعد ذلك من دعوتك للتقييم عبر GetTradePros.",
     newsletter: "هل تريد إيقاف النشرة البريدية إلى {email}؟",
     confirm: "إلغاء الاشتراك",
     done: "تم. لن تصلك هذه الرسائل بعد الآن.",

@@ -7,7 +7,7 @@ const ko: Messages = {
     advertisement: "광고",
     sponsored: "스폰서",
   },
-  brand: { tagline: "찾고, 비교하고, 맡기세요", home: "HomeServices Direct 홈" },
+  brand: { tagline: "믿을 수 있는 기술자와 연결해 드립니다", home: "GetTradePros 홈" },
   nav: {
     home: "홈",
     categories: "카테고리",
@@ -27,7 +27,7 @@ const ko: Messages = {
     browseMarket: "{market}의 전문가 보기",
   },
   meta: {
-    title: "HomeServices Direct: 내 주변 전문가 찾기",
+    title: "GetTradePros: 내 주변 전문가 찾기",
     description: "믿을 수 있는 배관공, 전기 기술자, 수리 기사 등을 찾아보세요. 요금을 비교하고 작업 사례와 인증된 후기를 확인하세요.",
   },
   hero: {
@@ -132,7 +132,7 @@ const ko: Messages = {
     terms: "서비스 약관",
     privacy: "개인정보 및 쿠키",
     yourData: "내 데이터",
-    rights: "© {year} HomeServices Direct. All rights reserved.",
+    rights: "© {year} GetTradePros. All rights reserved.",
     explore: "둘러보기",
     legalTitle: "법률 및 규정 준수",
     legalCentre: "법률 센터",
@@ -151,7 +151,7 @@ const ko: Messages = {
     important: "중요",
     disclaimer:
       "이 플랫폼은 사용자와 독립 계약자를 연결하는 디렉터리/마켓플레이스 역할만 합니다. 플랫폼은 수행된 작업의 품질, 안전성, 적법성 또는 결과에 대해 어떠한 책임, 보증, 의무도 지지 않습니다. 모든 계약과 분쟁은 전적으로 고객과 서비스 제공자 사이의 문제입니다.",
-    disclaimerShort: "독립 계약자입니다. HomeServices Direct는 디렉터리일 뿐이며 어떠한 계약이나 작업의 당사자도 아닙니다.",
+    disclaimerShort: "독립 계약자입니다. GetTradePros는 디렉터리일 뿐이며 어떠한 계약이나 작업의 당사자도 아닙니다.",
     translationNote: "편의를 위한 번역입니다. 법적 효력은 영어 원문에 있습니다.",
     englishOnly: "이 페이지는 현재 영어로만 제공됩니다.",
   },
@@ -547,7 +547,7 @@ const ko: Messages = {
   },
   unsubscribe: {
     title: "수신 거부",
-    reviewRequests: "{email}(으)로 후기 요청 이메일을 그만 받으시겠어요? 업체가 더 이상 HomeServices Direct를 통해 후기를 요청할 수 없습니다.",
+    reviewRequests: "{email}(으)로 후기 요청 이메일을 그만 받으시겠어요? 업체가 더 이상 GetTradePros를 통해 후기를 요청할 수 없습니다.",
     newsletter: "{email}(으)로 뉴스레터를 그만 받으시겠어요?",
     confirm: "수신 거부",
     done: "완료되었습니다. 더 이상 이 이메일을 받지 않습니다.",

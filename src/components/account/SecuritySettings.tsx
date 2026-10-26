@@ -14,8 +14,8 @@ function RecoveryCodes({ codes }: { codes: string[] }) {
   const text = codes.join("\n");
   const download = () => {
     const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([`HomeServices Direct recovery codes\n\n${text}\n\nEach code works once.\n`], { type: "text/plain" }));
-    a.download = "homeservices-recovery-codes.txt";
+    a.href = URL.createObjectURL(new Blob([`GetTradePros recovery codes\n\n${text}\n\nEach code works once.\n`], { type: "text/plain" }));
+    a.download = "gettradepros-recovery-codes.txt";
     a.click();
     URL.revokeObjectURL(a.href);
   };

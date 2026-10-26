@@ -7,7 +7,7 @@ const ja: Messages = {
     advertisement: "広告",
     sponsored: "スポンサー",
   },
-  brand: { tagline: "探す・比べる・依頼する", home: "HomeServices Direct ホーム" },
+  brand: { tagline: "信頼できる職人とあなたをつなぎます", home: "GetTradePros ホーム" },
   nav: {
     home: "ホーム",
     categories: "カテゴリー",
@@ -27,7 +27,7 @@ const ja: Messages = {
     browseMarket: "{market} の専門家を見る",
   },
   meta: {
-    title: "HomeServices Direct：近くの専門家を見つけよう",
+    title: "GetTradePros：近くの専門家を見つけよう",
     description: "配管工、電気工事士、便利屋などを探せます。料金を比較し、施工例や確認済みのレビューをチェックしましょう。",
   },
   hero: {
@@ -132,7 +132,7 @@ const ja: Messages = {
     terms: "利用規約",
     privacy: "プライバシーと Cookie",
     yourData: "あなたのデータ",
-    rights: "© {year} HomeServices Direct. All rights reserved.",
+    rights: "© {year} GetTradePros. All rights reserved.",
     explore: "探す",
     legalTitle: "法務・コンプライアンス",
     legalCentre: "リーガルセンター",
@@ -151,7 +151,7 @@ const ja: Messages = {
     important: "重要",
     disclaimer:
       "本プラットフォームは、ユーザーと独立した請負業者をつなぐディレクトリ／マーケットプレイスとしてのみ機能します。本プラットフォームは、実施された作業の品質、安全性、合法性、結果について一切の責任、保証、義務を負いません。すべての契約および紛争は、お客様とサービス提供者の間でのみ扱われます。",
-    disclaimerShort: "独立した請負業者です。HomeServices Direct はディレクトリにすぎず、いかなる契約や作業の当事者でもありません。",
+    disclaimerShort: "独立した請負業者です。GetTradePros はディレクトリにすぎず、いかなる契約や作業の当事者でもありません。",
     translationNote: "便宜上の翻訳です。法的に有効なのは英語版です。",
     englishOnly: "このページは現在英語でのみ提供しています。",
   },
@@ -547,7 +547,7 @@ const ja: Messages = {
   },
   unsubscribe: {
     title: "配信停止",
-    reviewRequests: "{email} へのレビュー依頼メールを停止しますか？事業者は HomeServices Direct を通じてレビューを依頼できなくなります。",
+    reviewRequests: "{email} へのレビュー依頼メールを停止しますか？事業者は GetTradePros を通じてレビューを依頼できなくなります。",
     newsletter: "{email} へのニュースレターを停止しますか？",
     confirm: "配信を停止する",
     done: "完了しました。今後このメールは届きません。",

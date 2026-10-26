@@ -7,7 +7,7 @@ const pt: Messages = {
     advertisement: "Publicidade",
     sponsored: "Patrocinado",
   },
-  brand: { tagline: "Encontre. Compare. Contrate.", home: "Página inicial da HomeServices Direct" },
+  brand: { tagline: "Conectando você a profissionais de confiança", home: "Página inicial da GetTradePros" },
   nav: {
     home: "Início",
     categories: "Categorias",
@@ -27,7 +27,7 @@ const pt: Messages = {
     browseMarket: "Ver profissionais de: {market}",
   },
   meta: {
-    title: "HomeServices Direct: encontre especialistas perto de você",
+    title: "GetTradePros: encontre especialistas perto de você",
     description: "Encontre encanadores, eletricistas, faz-tudo e muito mais. Compare preços, veja trabalhos anteriores e leia avaliações verificadas.",
   },
   hero: {
@@ -132,7 +132,7 @@ const pt: Messages = {
     terms: "Termos de serviço",
     privacy: "Privacidade e cookies",
     yourData: "Seus dados",
-    rights: "© {year} HomeServices Direct. Todos os direitos reservados.",
+    rights: "© {year} GetTradePros. Todos os direitos reservados.",
     explore: "Explorar",
     legalTitle: "Jurídico e conformidade",
     legalCentre: "Central jurídica",
@@ -151,7 +151,7 @@ const pt: Messages = {
     important: "Importante",
     disclaimer:
       "Esta plataforma atua apenas como diretório/marketplace que conecta usuários a prestadores independentes. A plataforma não assume nenhuma responsabilidade, garantia ou obrigação quanto à qualidade, segurança, legalidade ou resultado dos serviços realizados. Todos os contratos e disputas são exclusivamente entre o Cliente e o Prestador de serviços.",
-    disclaimerShort: "Prestador independente. A HomeServices Direct é apenas um diretório e não faz parte de nenhum acordo ou serviço realizado.",
+    disclaimerShort: "Prestador independente. A GetTradePros é apenas um diretório e não faz parte de nenhum acordo ou serviço realizado.",
     translationNote: "Tradução fornecida por conveniência. A versão em inglês é a juridicamente válida.",
     englishOnly: "No momento, esta página está disponível apenas em inglês.",
   },
@@ -547,7 +547,7 @@ const pt: Messages = {
   },
   unsubscribe: {
     title: "Cancelar inscrição",
-    reviewRequests: "Parar de receber pedidos de avaliação em {email}? As empresas não poderão mais enviar convites de avaliação pela HomeServices Direct.",
+    reviewRequests: "Parar de receber pedidos de avaliação em {email}? As empresas não poderão mais enviar convites de avaliação pela GetTradePros.",
     newsletter: "Parar de receber a newsletter em {email}?",
     confirm: "Cancelar inscrição",
     done: "Pronto. Você não receberá mais esses e-mails.",

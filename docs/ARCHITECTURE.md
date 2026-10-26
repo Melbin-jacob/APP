@@ -1,4 +1,4 @@
-# HomeServices Direct — Architecture
+# GetTradePros — Architecture
 
 ## 1. System overview
 

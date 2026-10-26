@@ -1,6 +1,6 @@
 # Threat model (STRIDE)
 
-Scope: the HomeServices Direct web app (Next.js), its PostgreSQL database, Redis,
+Scope: the GetTradePros web app (Next.js), its PostgreSQL database, Redis,
 outbound email, the ops console, and the third parties it talks to. Reviewed
 2026-10-23. Re-review when a component is added, a trust boundary moves, or
 after any incident.

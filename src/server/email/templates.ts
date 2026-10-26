@@ -23,7 +23,7 @@ function layout(title: string, body: string, footer: string) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f5f7fa;padding:24px 0">
 <tr><td align="center">
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden">
-<tr><td style="background:${BRAND};padding:16px 24px;color:#fff;font-size:18px;font-weight:bold">HomeServices Direct</td></tr>
+<tr><td style="background:${BRAND};padding:16px 24px;color:#fff;font-size:18px;font-weight:bold">GetTradePros</td></tr>
 <tr><td style="padding:28px 24px">${body}</td></tr>
 <tr><td style="padding:16px 24px;background:#f5f7fa;color:#7b8794;font-size:12px;line-height:1.5">${footer}</td></tr>
 </table></td></tr></table></body></html>`;
@@ -76,8 +76,8 @@ export function reviewRequestEmail(input: {
        <a href="${esc(input.reviewUrl)}" style="color:${BRAND}">Leave your review online</a> instead.</p>
      <p style="margin:10px 0 0;font-size:12px;line-height:1.5;color:#7b8794">This review invitation is personal to you, can be used once, and expires on ${esc(expires)}.
        Your review will appear on ${business}'s profile as a verified customer review.</p>`,
-    `You received this email because ${business} recorded a completed job for you on HomeServices Direct.
-     HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.<br><br>
+    `You received this email because ${business} recorded a completed job for you on GetTradePros.
+     GetTradePros is a directory only and is not party to any agreement between you and the service provider.<br><br>
      <a href="${esc(input.unsubscribeUrl)}" style="color:#7b8794">Unsubscribe from review requests</a> · ${senderLine()}`,
   );
 
@@ -90,7 +90,7 @@ We would love to hear how your experience was. It only takes a minute, and your 
 Rate your experience and leave a comment here (personal to you, works once, expires ${expires}):
 ${input.reviewUrl}
 
-HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.
+GetTradePros is a directory only and is not party to any agreement between you and the service provider.
 
 Unsubscribe from review requests: ${input.unsubscribeUrl}
 ${COMPANY.name} · ${COMPANY.address}`;
@@ -99,21 +99,21 @@ ${COMPANY.name} · ${COMPANY.address}`;
 }
 
 export function magicLinkEmail(url: string) {
-  const subject = "Your HomeServices Direct sign-in link";
+  const subject = "Your GetTradePros sign-in link";
   const html = layout(
     subject,
     `<p style="font-size:15px;line-height:1.5">Click the button below to sign in. The link expires in 10 minutes and can only be used once.</p>
      <a href="${esc(url)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Sign in</a>`,
     "If you didn't request this, you can safely ignore this email.",
   );
-  return { subject, html, text: `Sign in to HomeServices Direct: ${url}\n\nIf you didn't request this, ignore this email.` };
+  return { subject, html, text: `Sign in to GetTradePros: ${url}\n\nIf you didn't request this, ignore this email.` };
 }
 
 export function newsletterConfirmEmail(url: string) {
   const subject = "Confirm your subscription";
   const html = layout(
     subject,
-    `<p style="font-size:15px;line-height:1.5">Please confirm you'd like to receive updates from HomeServices Direct.</p>
+    `<p style="font-size:15px;line-height:1.5">Please confirm you'd like to receive updates from GetTradePros.</p>
      <a href="${esc(url)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Confirm</a>`,
     "You can unsubscribe at any time from any email we send.",
   );
@@ -172,14 +172,14 @@ export function quoteRequestEmail(q: QuoteDetails & { forOps: boolean; dashboard
   const intro = q.forOps
     ? `<p style="margin:0 0 16px;font-size:15px;line-height:1.5"><strong>${esc(q.businessName)}</strong> hasn't claimed its listing, so this request came to us.
        Please pass it on by phone${q.listingPhone ? ` (<a href="tel:${esc(q.listingPhone.replace(/[^+\d]/g, ""))}">${esc(q.listingPhone)}</a>)` : ""}, invite them to claim the listing, then mark it handled.</p>`
-    : `<p style="margin:0 0 16px;font-size:15px;line-height:1.5">A customer asked <strong>${esc(q.businessName)}</strong> for a quote on HomeServices Direct. Please get in touch with them directly.</p>`;
+    : `<p style="margin:0 0 16px;font-size:15px;line-height:1.5">A customer asked <strong>${esc(q.businessName)}</strong> for a quote on GetTradePros. Please get in touch with them directly.</p>`;
   const link = q.forOps ? q.adminUrl : q.dashboardUrl;
   const html = layout(
     subject,
     `${intro}${quoteTable(q)}
      <a href="${esc(link)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">${q.forOps ? "Open in ops console" : "View in your dashboard"}</a>`,
     `The customer agreed to share these details with ${esc(q.businessName)} for this quote only. Don't use them for marketing.
-     HomeServices Direct is a directory only and is not party to any agreement between you and the customer.<br><br>${senderLine()}`,
+     GetTradePros is a directory only and is not party to any agreement between you and the customer.<br><br>${senderLine()}`,
   );
   const text = `${q.forOps ? `${q.businessName} hasn't claimed its listing. Pass this request on by phone${q.listingPhone ? ` (${q.listingPhone})` : ""}.` : `New quote request for ${q.businessName}.`}
 
@@ -203,7 +203,7 @@ export function quoteReceiptEmail(q: QuoteDetails & { claimed: boolean; profileU
     `<p style="margin:0 0 16px;font-size:15px;line-height:1.5">Thanks, ${esc(q.name)}. ${next}</p>
      ${quoteTable(q)}
      <a href="${esc(q.profileUrl)}" style="color:${BRAND}">View ${esc(q.businessName)}'s profile</a>`,
-    `HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.
+    `GetTradePros is a directory only and is not party to any agreement between you and the service provider.
      Agree the price and scope with the business before work starts.<br><br>${senderLine()}`,
   );
   const text = `Thanks, ${q.name}. ${q.claimed ? `We've sent your request to ${q.businessName}.` : `${q.businessName} hasn't set up its account with us yet, so our team will pass your request on by phone.`} They'll contact you directly.
@@ -212,13 +212,13 @@ ${quoteText(q)}
 
 ${q.profileUrl}
 
-HomeServices Direct is a directory only and is not party to any agreement between you and the service provider.
+GetTradePros is a directory only and is not party to any agreement between you and the service provider.
 ${COMPANY.name} · ${COMPANY.address}`;
   return { subject, html, text };
 }
 
 export function claimDecisionEmail(input: { businessName: string; approved: boolean; dashboardUrl: string; note?: string | null }) {
-  const subject = input.approved ? `You now manage ${input.businessName} on HomeServices Direct` : `About your claim for ${input.businessName}`;
+  const subject = input.approved ? `You now manage ${input.businessName} on GetTradePros` : `About your claim for ${input.businessName}`;
   const body = input.approved
     ? `<p style="font-size:15px;line-height:1.5">Your claim for <strong>${esc(input.businessName)}</strong> is approved. You can now upload your logo, update your details and services, and receive quote requests.</p>
        <a href="${esc(input.dashboardUrl)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Open your business dashboard</a>`

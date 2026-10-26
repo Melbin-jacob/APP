@@ -2,7 +2,7 @@
 // commercial email (CAN-SPAM and CASL both require a physical mailing
 // address and a way to reach the sender). Set these per deployment.
 export const COMPANY = {
-  name: process.env.LEGAL_ENTITY_NAME ?? "HomeServices Direct Inc.",
+  name: process.env.LEGAL_ENTITY_NAME ?? "GetTradePros Inc.",
   address: process.env.LEGAL_ADDRESS ?? "[Registered mailing address — set LEGAL_ADDRESS]",
   privacyEmail: process.env.PRIVACY_EMAIL ?? "privacy@homeservices.direct",
   securityEmail: process.env.SECURITY_EMAIL ?? "security@homeservices.direct",

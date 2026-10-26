@@ -7,7 +7,7 @@ const de: Messages = {
     advertisement: "Anzeige",
     sponsored: "Gesponsert",
   },
-  brand: { tagline: "Finden. Vergleichen. Beauftragen.", home: "HomeServices Direct Startseite" },
+  brand: { tagline: "Wir verbinden Sie mit vertrauenswürdigen Handwerkern", home: "GetTradePros Startseite" },
   nav: {
     home: "Startseite",
     categories: "Kategorien",
@@ -27,7 +27,7 @@ const de: Messages = {
     browseMarket: "Fachleute anzeigen: {market}",
   },
   meta: {
-    title: "HomeServices Direct: Fachleute in deiner Nähe finden",
+    title: "GetTradePros: Fachleute in deiner Nähe finden",
     description: "Finde Installateure, Elektriker, Handwerker und mehr. Vergleiche Preise, sieh dir ihre Arbeiten an und lies verifizierte Bewertungen.",
   },
   hero: {
@@ -132,7 +132,7 @@ const de: Messages = {
     terms: "Nutzungsbedingungen",
     privacy: "Datenschutz & Cookies",
     yourData: "Deine Daten",
-    rights: "© {year} HomeServices Direct. Alle Rechte vorbehalten.",
+    rights: "© {year} GetTradePros. Alle Rechte vorbehalten.",
     explore: "Entdecken",
     legalTitle: "Rechtliches & Compliance",
     legalCentre: "Rechtliches im Überblick",
@@ -151,7 +151,7 @@ const de: Messages = {
     important: "Wichtig",
     disclaimer:
       "Diese Plattform dient ausschließlich als Verzeichnis/Marktplatz, der Nutzer mit unabhängigen Auftragnehmern verbindet. Die Plattform übernimmt keinerlei Haftung, Gewährleistung oder Verpflichtung für Qualität, Sicherheit, Rechtmäßigkeit oder Ergebnis der ausgeführten Arbeiten. Alle Verträge und Streitigkeiten bestehen ausschließlich zwischen Kunde und Dienstleister.",
-    disclaimerShort: "Unabhängiger Auftragnehmer. HomeServices Direct ist nur ein Verzeichnis und nicht Partei von Vereinbarungen oder ausgeführten Arbeiten.",
+    disclaimerShort: "Unabhängiger Auftragnehmer. GetTradePros ist nur ein Verzeichnis und nicht Partei von Vereinbarungen oder ausgeführten Arbeiten.",
     translationNote: "Übersetzung zur Orientierung. Rechtlich verbindlich ist die englische Fassung.",
     englishOnly: "Diese Seite ist derzeit nur auf Englisch verfügbar.",
   },
@@ -547,7 +547,7 @@ const de: Messages = {
   },
   unsubscribe: {
     title: "Abmelden",
-    reviewRequests: "Keine Bewertungsanfragen mehr an {email}? Betriebe können dir dann über HomeServices Direct keine Bewertungseinladungen mehr senden.",
+    reviewRequests: "Keine Bewertungsanfragen mehr an {email}? Betriebe können dir dann über GetTradePros keine Bewertungseinladungen mehr senden.",
     newsletter: "Keinen Newsletter mehr an {email}?",
     confirm: "Abmelden",
     done: "Erledigt. Du erhältst diese E-Mails nicht mehr.",

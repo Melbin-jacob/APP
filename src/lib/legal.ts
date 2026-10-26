@@ -15,4 +15,4 @@ export const LIABILITY_DISCLAIMER =
   "All contracts and disputes are strictly between the Customer and the Service Provider.";
 
 export const PROFILE_DISCLAIMER_SHORT =
-  "Independent contractor. HomeServices Direct is a directory only and is not party to any agreement or work performed.";
+  "Independent contractor. GetTradePros is a directory only and is not party to any agreement or work performed.";

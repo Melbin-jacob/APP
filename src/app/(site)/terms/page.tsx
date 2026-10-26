@@ -10,7 +10,7 @@ export default function TermsPage() {
   return (
     <LegalPage title="Terms of Service" current="/terms">
       <p className="text-xs text-ink-500">Version {TOS_VERSION}</p>
-      <p>These terms are an agreement between you and {COMPANY.name}. By creating an account or using HomeServices Direct you accept them.</p>
+      <p>These terms are an agreement between you and {COMPANY.name}. By creating an account or using GetTradePros you accept them.</p>
 
       <h2>1. Nature of the platform</h2>
       <p className="rounded border border-accent-400/40 bg-accent-400/10 p-4 font-medium text-ink-900">{LIABILITY_DISCLAIMER}</p>

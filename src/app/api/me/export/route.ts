@@ -18,7 +18,7 @@ export const GET = route(async (req) => {
   return new NextResponse(JSON.stringify(data, null, 2), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="homeservices-export-${user.id}.json"`,
+      "Content-Disposition": `attachment; filename="gettradepros-export-${user.id}.json"`,
       "Cache-Control": "no-store",
     },
   });

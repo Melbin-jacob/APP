@@ -45,7 +45,7 @@ describe("review request email", () => {
   it("carries an unsubscribe link and the sender's mailing address (CAN-SPAM / CASL)", () => {
     expect(mail.html).toContain("https://app.test/unsubscribe?t=abc.def");
     expect(mail.text).toContain("https://app.test/unsubscribe?t=abc.def");
-    expect(mail.html).toMatch(/HomeServices Direct Inc\./);
+    expect(mail.html).toMatch(/GetTradePros Inc\./);
   });
   it("thanks the customer and contains the review form: five star ratings, comment box, submit", () => {
     expect(mail.html).toContain("Thank you for choosing Bob&#39;s &lt;script&gt;");

@@ -7,7 +7,7 @@ const fr: Messages = {
     advertisement: "Publicité",
     sponsored: "Sponsorisé",
   },
-  brand: { tagline: "Trouvez. Comparez. Embauchez.", home: "Accueil HomeServices Direct" },
+  brand: { tagline: "Des gens de métier de confiance, près de chez vous", home: "Accueil GetTradePros" },
   nav: {
     home: "Accueil",
     categories: "Catégories",
@@ -27,7 +27,7 @@ const fr: Messages = {
     browseMarket: "Voir les professionnels : {market}",
   },
   meta: {
-    title: "HomeServices Direct : trouvez des experts près de chez vous",
+    title: "GetTradePros : trouvez des experts près de chez vous",
     description: "Trouvez des plombiers, électriciens, bricoleurs et plus encore. Comparez les tarifs, consultez leurs réalisations et lisez des avis vérifiés.",
   },
   hero: {
@@ -132,7 +132,7 @@ const fr: Messages = {
     terms: "Conditions d'utilisation",
     privacy: "Confidentialité et témoins",
     yourData: "Vos données",
-    rights: "© {year} HomeServices Direct. Tous droits réservés.",
+    rights: "© {year} GetTradePros. Tous droits réservés.",
     explore: "Explorer",
     legalTitle: "Mentions légales et conformité",
     legalCentre: "Centre juridique",
@@ -151,7 +151,7 @@ const fr: Messages = {
     important: "Important",
     disclaimer:
       "Cette plateforme agit uniquement comme un annuaire/une place de marché mettant en relation des utilisateurs et des entrepreneurs indépendants. La plateforme n'assume aucune responsabilité, garantie ou obligation quant à la qualité, la sécurité, la légalité ou le résultat des travaux effectués. Tous les contrats et litiges concernent exclusivement le Client et le Prestataire de services.",
-    disclaimerShort: "Entrepreneur indépendant. HomeServices Direct est uniquement un annuaire et n'est partie à aucun accord ni à aucun travail effectué.",
+    disclaimerShort: "Entrepreneur indépendant. GetTradePros est uniquement un annuaire et n'est partie à aucun accord ni à aucun travail effectué.",
     translationNote: "Traduction fournie à titre indicatif. Seule la version anglaise a valeur juridique.",
     englishOnly: "Cette page est pour l'instant disponible en anglais seulement.",
   },
@@ -547,7 +547,7 @@ const fr: Messages = {
   },
   unsubscribe: {
     title: "Se désabonner",
-    reviewRequests: "Ne plus recevoir de demandes d'avis à {email} ? Les entreprises ne pourront plus vous inviter à laisser un avis par HomeServices Direct.",
+    reviewRequests: "Ne plus recevoir de demandes d'avis à {email} ? Les entreprises ne pourront plus vous inviter à laisser un avis par GetTradePros.",
     newsletter: "Ne plus recevoir l'infolettre à {email} ?",
     confirm: "Se désabonner",
     done: "C'est fait. Vous ne recevrez plus ces courriels.",

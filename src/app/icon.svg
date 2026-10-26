@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 30 680 640" role="img" aria-label="GetTradePros">
+  <g fill="none" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="32">
+    <g stroke="#1b3449">
+      <!-- roof, rising into the growth arrow -->
+      <path d="M150 288 H40 L355 52 L508 160 L590 102"/>
+      <!-- chimney -->
+      <path d="M142 232 V92 H208 V150"/>
+      <!-- right eave and walls, closing to a point -->
+      <path d="M540 205 L680 290 H576"/>
+      <path d="M576 274 V318"/>
+      <path d="M576 402 V512 L355 640 L134 512 V272"/>
+      <!-- G -->
+      <path d="M330 344 H206 V480 L290 562 H362 V420 H280"/>
+    </g>
+    <!-- arrow head -->
+    <path d="M540 76 L644 30 L622 140 Z" fill="#1b3449" stroke="none"/>
+    <g stroke="#b07c52">
+      <!-- inner roof and T -->
+      <path d="M190 290 L355 158 L520 290"/>
+      <path d="M346 176 V372"/>
+      <path d="M330 356 H596"/>
+      <path d="M426 356 V552"/>
+    </g>
+  </g>
+</svg>

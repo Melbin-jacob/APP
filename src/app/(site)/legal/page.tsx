@@ -5,7 +5,7 @@ import { COMPANY } from "@/lib/company";
 export const metadata = { title: "Legal centre" };
 
 const SUMMARIES: Record<string, string> = {
-  "/terms": "The rules for using HomeServices Direct, including that we are a directory and not a party to any work.",
+  "/terms": "The rules for using GetTradePros, including that we are a directory and not a party to any work.",
   "/privacy": "What personal information we collect, why, who we share it with, how long we keep it and your rights.",
   "/legal/cookies": "Every cookie we set, what it does, and how to change your choices.",
   "/legal/privacy-choices": "Opt out of the sale or sharing of personal information for targeted advertising.",
@@ -19,7 +19,7 @@ export default function LegalCentre() {
   return (
     <LegalPage title="Legal centre" current="/legal">
       <p>
-        {COMPANY.name} operates HomeServices Direct, a directory connecting customers with independent home-service professionals
+        {COMPANY.name} operates GetTradePros, a directory connecting customers with independent home-service professionals
         in the United States and Canada. This page collects our legal documents and compliance information.
       </p>
       <ul className="!list-none !ps-0 grid gap-3 sm:grid-cols-2">

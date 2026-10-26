@@ -7,7 +7,7 @@ const en = {
     advertisement: "Advertisement",
     sponsored: "Sponsored",
   },
-  brand: { tagline: "Find. Compare. Hire.", home: "HomeServices Direct home" },
+  brand: { tagline: "Connecting you with trusted tradespeople", home: "GetTradePros home" },
   nav: {
     home: "Home",
     categories: "Categories",
@@ -27,7 +27,7 @@ const en = {
     browseMarket: "See professionals in {market}",
   },
   meta: {
-    title: "HomeServices Direct: Discover Local Experts Near You",
+    title: "GetTradePros: Discover Local Experts Near You",
     description: "Find trusted local plumbers, electricians, handymen and more. Compare rates, browse work galleries and read verified reviews.",
   },
   hero: {
@@ -132,7 +132,7 @@ const en = {
     terms: "Terms of Service",
     privacy: "Privacy & Cookies",
     yourData: "Your data",
-    rights: "© {year} HomeServices Direct. All rights reserved.",
+    rights: "© {year} GetTradePros. All rights reserved.",
     explore: "Explore",
     legalTitle: "Legal & compliance",
     legalCentre: "Legal centre",
@@ -151,7 +151,7 @@ const en = {
     important: "Important",
     disclaimer:
       "This platform acts solely as a directory/marketplace connecting users with independent contractors. The platform holds zero liability, warranty, or obligation regarding the quality, safety, legality, or outcome of work performed. All contracts and disputes are strictly between the Customer and the Service Provider.",
-    disclaimerShort: "Independent contractor. HomeServices Direct is a directory only and is not party to any agreement or work performed.",
+    disclaimerShort: "Independent contractor. GetTradePros is a directory only and is not party to any agreement or work performed.",
     translationNote: "Translated for convenience. The English version is legally binding.",
     englishOnly: "This page is currently available in English only.",
   },
@@ -547,7 +547,7 @@ const en = {
   },
   unsubscribe: {
     title: "Unsubscribe",
-    reviewRequests: "Stop review request emails to {email}? Businesses will no longer be able to send you review invitations through HomeServices Direct.",
+    reviewRequests: "Stop review request emails to {email}? Businesses will no longer be able to send you review invitations through GetTradePros.",
     newsletter: "Stop newsletter emails to {email}?",
     confirm: "Unsubscribe",
     done: "Done. You won't receive these emails any more.",

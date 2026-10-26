@@ -7,7 +7,7 @@ const zh: Messages = {
     advertisement: "广告",
     sponsored: "赞助",
   },
-  brand: { tagline: "查找 · 比较 · 雇用", home: "HomeServices Direct 首页" },
+  brand: { tagline: "为您对接值得信赖的专业师傅", home: "GetTradePros 首页" },
   nav: {
     home: "首页",
     categories: "分类",
@@ -27,7 +27,7 @@ const zh: Messages = {
     browseMarket: "查看 {market} 的专业人士",
   },
   meta: {
-    title: "HomeServices Direct：发现您身边的本地专家",
+    title: "GetTradePros：发现您身边的本地专家",
     description: "查找可靠的水管工、电工、维修工等。比较价格、浏览作品并阅读经过验证的评价。",
   },
   hero: {
@@ -132,7 +132,7 @@ const zh: Messages = {
     terms: "服务条款",
     privacy: "隐私与 Cookie",
     yourData: "您的数据",
-    rights: "© {year} HomeServices Direct。保留所有权利。",
+    rights: "© {year} GetTradePros。保留所有权利。",
     explore: "浏览",
     legalTitle: "法律与合规",
     legalCentre: "法律中心",
@@ -151,7 +151,7 @@ const zh: Messages = {
     important: "重要提示",
     disclaimer:
       "本平台仅作为连接用户与独立承包商的目录/市场。对于所完成工作的质量、安全性、合法性或结果，本平台不承担任何责任、保证或义务。所有合同及纠纷仅存在于客户与服务提供者之间。",
-    disclaimerShort: "独立承包商。HomeServices Direct 仅为目录平台，不是任何协议或工作的当事方。",
+    disclaimerShort: "独立承包商。GetTradePros 仅为目录平台，不是任何协议或工作的当事方。",
     translationNote: "译文仅供参考，具有法律效力的是英文版本。",
     englishOnly: "此页面目前仅提供英文版本。",
   },
@@ -547,7 +547,7 @@ const zh: Messages = {
   },
   unsubscribe: {
     title: "退订",
-    reviewRequests: "停止向 {email} 发送评价邀请邮件？商家将无法再通过 HomeServices Direct 邀请您发表评价。",
+    reviewRequests: "停止向 {email} 发送评价邀请邮件？商家将无法再通过 GetTradePros 邀请您发表评价。",
     newsletter: "停止向 {email} 发送订阅邮件？",
     confirm: "退订",
     done: "已完成。您将不再收到这些邮件。",

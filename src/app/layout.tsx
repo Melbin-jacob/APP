@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
   return {
     metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
-    title: { default: t("meta.title"), template: "%s · HomeServices Direct" },
+    title: { default: t("meta.title"), template: "%s · GetTradePros" },
     description: t("meta.description"),
   };
 }

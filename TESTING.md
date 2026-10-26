@@ -1,4 +1,4 @@
-# Testing HomeServices Direct in your browser
+# Testing GetTradePros in your browser
 
 ## Option A — GitHub Codespaces (nothing to install)
 

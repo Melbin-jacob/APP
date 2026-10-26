@@ -1,4 +1,4 @@
-# HomeServices Direct
+# GetTradePros
 
 A marketplace that connects homeowners with independent local home-service professionals.
 It covers geo search, trader profiles, verified review emails with single-use links, and an

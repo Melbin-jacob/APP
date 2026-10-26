@@ -7,15 +7,14 @@ import { MobileNav } from "./MobileNav";
 export async function Logo() {
   const { t } = await getI18n();
   return (
-    <Link href="/" className="flex items-center gap-2" aria-label={t("brand.home")}>
-      <span className="grid h-9 w-9 place-items-center rounded-md bg-gradient-to-br from-accent-400 to-brand-500 text-lg font-black text-white">
-        H
-      </span>
-      <span className="leading-tight">
-        <span className="block text-base font-extrabold text-ink-900" dir="ltr">
-          HomeServices<span className="text-brand-500">Direct</span>
+    <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={t("brand.home")}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- static SVG mark */}
+      <img src="/brand/gettradepros-mark.svg" alt="" width={44} height={42} className="h-10 w-10 shrink-0 sm:h-11 sm:w-11" />
+      <span className="min-w-0 leading-tight">
+        <span className="block text-lg font-extrabold uppercase tracking-wide text-[#1b3449]" dir="ltr">
+          GetTradePros
         </span>
-        <span className="block text-[10px] uppercase tracking-widest text-ink-500">{t("brand.tagline")}</span>
+        <span className="block truncate text-[9px] font-medium uppercase tracking-wider text-[#1b3449]/75 sm:text-[10px]">{t("brand.tagline")}</span>
       </span>
     </Link>
   );
