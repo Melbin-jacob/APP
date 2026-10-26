@@ -9,12 +9,12 @@ export async function Logo() {
   return (
     <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={t("brand.home")}>
       {/* eslint-disable-next-line @next/next/no-img-element -- static SVG mark */}
-      <img src="/brand/gettradepros-mark.svg" alt="" width={44} height={42} className="h-10 w-10 shrink-0 sm:h-11 sm:w-11" />
+      <img src="/brand/gettradepros-mark.svg" alt="" width={44} height={43} className="h-10 w-10 shrink-0 sm:h-11 sm:w-11" />
       <span className="min-w-0 leading-tight">
-        <span className="block text-lg font-extrabold uppercase tracking-wide text-[#1b3449]" dir="ltr">
+        <span className="block font-brand text-lg font-bold uppercase tracking-[0.08em] text-[#0B2545]" dir="ltr">
           GetTradePros
         </span>
-        <span className="block truncate text-[9px] font-medium uppercase tracking-wider text-[#1b3449]/75 sm:text-[10px]">{t("brand.tagline")}</span>
+        <span className="block truncate font-brand text-[8px] font-medium uppercase tracking-[0.04em] sm:tracking-[0.12em] text-[#0B2545]/80 sm:text-[9.5px]">{t("brand.tagline")}</span>
       </span>
     </Link>
   );

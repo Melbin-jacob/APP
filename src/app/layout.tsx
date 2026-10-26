@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 import { CookieConsent } from "@/components/legal/CookieConsent";
 import { PreferencesProvider } from "@/components/providers/PreferencesProvider";
@@ -7,6 +8,14 @@ import { getI18n } from "@/i18n/server";
 import { getRates } from "@/server/services/fx";
 import "./globals.css";
 import { VisitTracker } from "@/components/analytics/VisitTracker";
+
+// Brand typeface for the GetTradePros wordmark (self-hosted, no Google request).
+const brandFont = localFont({
+  src: "../../node_modules/@fontsource-variable/montserrat/files/montserrat-latin-wght-normal.woff2",
+  weight: "100 900",
+  variable: "--font-brand",
+  display: "swap",
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n();
@@ -17,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const viewport: Viewport = { themeColor: "#4caf2f", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#0B2545", width: "device-width", initialScale: 1 };
 
 // Root layout: document shell + client providers only. Visual chrome (header,
 // ad rails, footer) lives in the (site) route group so the admin console and
@@ -26,7 +35,7 @@ export const viewport: Viewport = { themeColor: "#4caf2f", width: "device-width"
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const [{ messages, visitor }, rates] = await Promise.all([getI18n(), getRates()]);
   return (
-    <html lang={visitor.locale} dir={visitor.dir}>
+    <html lang={visitor.locale} dir={visitor.dir} className={brandFont.variable}>
       <body className="min-h-screen font-sans">
         <PreferencesProvider locale={visitor.locale} currency={visitor.currency} country={visitor.country} rates={rates} messages={messages}>
           <Providers>
