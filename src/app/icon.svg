@@ -1,25 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="20 30 680 640" role="img" aria-label="GetTradePros">
-  <g fill="none" stroke-linecap="butt" stroke-linejoin="miter" stroke-width="32">
+  <g fill="none" stroke-linecap="butt" stroke-linejoin="miter" stroke-miterlimit="10" stroke-width="32">
     <g stroke="#1b3449">
-      <!-- roof, rising into the growth arrow -->
-      <path d="M150 288 H40 L355 52 L508 160 L590 102"/>
+      <!-- roof (left eave, ridge) rising into the growth arrow -->
+      <path d="M150 282 H80 L355 64 L506 168 L572 120"/>
       <!-- chimney -->
-      <path d="M142 232 V92 H208 V150"/>
-      <!-- right eave and walls, closing to a point -->
-      <path d="M540 205 L680 290 H576"/>
-      <path d="M576 274 V318"/>
-      <path d="M576 402 V512 L355 640 L134 512 V272"/>
+      <path d="M140 230 V96 H206 V150"/>
+      <!-- right eave -->
+      <path d="M546 204 L648 286 H560"/>
+      <path d="M576 272 V316"/>
+      <!-- walls closing to a point -->
+      <path d="M576 404 V514 L355 648 L134 514 V270"/>
       <!-- G -->
-      <path d="M330 344 H206 V480 L290 562 H362 V420 H280"/>
+      <path d="M332 346 H208 V480 L296 564 H360 V422 H282"/>
     </g>
     <!-- arrow head -->
-    <path d="M540 76 L644 30 L622 140 Z" fill="#1b3449" stroke="none"/>
+    <path d="M514 86 L630 40 L604 150 Z" fill="#1b3449"/>
     <g stroke="#b07c52">
-      <!-- inner roof and T -->
-      <path d="M190 290 L355 158 L520 290"/>
-      <path d="M346 176 V372"/>
-      <path d="M330 356 H596"/>
-      <path d="M426 356 V552"/>
+      <!-- inner roof -->
+      <path d="M192 292 L355 154 L518 292"/>
+      <!-- T: upright from the inner ridge, cross bar, stem -->
+      <path d="M356 168 V372"/>
+      <path d="M340 356 H596"/>
+      <path d="M426 340 V552"/>
     </g>
   </g>
 </svg>
