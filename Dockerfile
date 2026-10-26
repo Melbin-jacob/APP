@@ -1,6 +1,6 @@
 # Self-contained image for local testing and simple deployments.
 # Keeps dev dependencies so the container can run migrations and the seed.
-FROM node:20-bookworm-slim
+FROM node:26-bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends openssl ca-certificates \
   && rm -rf /var/lib/apt/lists/*
