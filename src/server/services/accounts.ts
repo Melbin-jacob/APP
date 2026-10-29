@@ -149,7 +149,7 @@ export async function exportUserData(userId: string) {
       accounts: { select: { provider: true, providerAccountId: true } },
       reviews: { select: { id: true, traderId: true, rating: true, comment: true, createdAt: true, status: true } },
       reviewReports: { select: { reviewId: true, reason: true, details: true, createdAt: true } },
-      claims: { select: { traderId: true, status: true, contactName: true, jobTitle: true, phone: true, message: true, createdAt: true, decidedAt: true } },
+      claims: { select: { traderId: true, status: true, contactName: true, jobTitle: true, phone: true, message: true, createdAt: true, decidedAt: true, documentsChecked: true, documentsDeletedAt: true, documents: { select: { kind: true, fileName: true, createdAt: true } } } },
       trader: {
         include: {
           categories: true, services: true, serviceAreas: true, gallery: true, credentials: true,

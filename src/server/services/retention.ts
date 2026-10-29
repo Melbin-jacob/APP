@@ -8,6 +8,8 @@ export const RETENTION_DAYS = {
   callEvents: 730, // 24 months of click-to-call stats for businesses
   quoteRequests: 730, // 24 months: the business's record of who asked for what
   decidedClaims: 730, // listing claims, 24 months after the decision
+  // Claim proof documents (registration, photo ID) are deleted the moment the
+  // claim is decided; this sweep only catches any left behind.
   consentRecords: 730, // proof of cookie consent (the cookie itself lasts 6 months)
   closedIncidents: 1095, // breach register: PIPEDA requires 24 months; we keep 36
   auditLogs: 730, // 24 months of security / admin audit trail
@@ -21,7 +23,8 @@ const ago = (days: number) => new Date(Date.now() - days * 86_400_000);
 /** Deletes data past its retention period. Safe to run repeatedly. */
 export async function applyRetention() {
   const now = new Date();
-  const [searches, calls, audits, tokens, links, newsletter, accounts, quotes, claims, consents, incidents] = await db.$transaction([
+  const [claimDocs, searches, calls, audits, tokens, links, newsletter, accounts, quotes, claims, consents, incidents] = await db.$transaction([
+    db.claimDocument.deleteMany({ where: { claim: { status: { not: "PENDING" } } } }),
     db.searchQuery.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.searchQueries) } } }),
     db.callEvent.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.callEvents) } } }),
     db.auditLog.deleteMany({ where: { createdAt: { lt: ago(RETENTION_DAYS.auditLogs) } } }),
@@ -39,7 +42,7 @@ export async function applyRetention() {
     db.securityIncident.deleteMany({ where: { status: "CLOSED", updatedAt: { lt: ago(RETENTION_DAYS.closedIncidents) } } }),
   ]);
   return {
-    searchQueries: searches.count, callEvents: calls.count, auditLogs: audits.count, verificationTokens: tokens.count,
+    claimDocuments: claimDocs.count, searchQueries: searches.count, callEvents: calls.count, auditLogs: audits.count, verificationTokens: tokens.count,
     reviewLinks: links.count, unconfirmedNewsletter: newsletter.count, deletedAccounts: accounts.count,
     quoteRequests: quotes.count, decidedClaims: claims.count, consentRecords: consents.count, closedIncidents: incidents.count,
   };

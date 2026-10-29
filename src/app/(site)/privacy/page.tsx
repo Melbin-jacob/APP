@@ -35,7 +35,7 @@ export default function PrivacyPage() {
             <tr><td>Business location (derived from the postal code)</td><td>Postal-code lookup</td><td>Show listings to nearby customers</td><td>Geolocation (approximate)</td></tr>
             <tr><td>Customer email and name entered by a business to request a review</td><td>The business</td><td>Send one review invitation</td><td>Identifiers</td></tr>
             <tr><td>Quote requests: your name, phone, address, optional email, the job description and when to contact you</td><td>You</td><td>Pass your request to the business you chose (or, if it hasn’t joined yet, have our team pass it on by phone)</td><td>Identifiers; commercial information</td></tr>
-            <tr><td>Listing claims: name, role, phone and notes from someone claiming a business</td><td>You</td><td>Verify that you represent the business before giving you control of its listing</td><td>Identifiers; professional information</td></tr>
+            <tr><td>Listing claims: name, role, phone and notes from someone claiming a business, plus a company registration document and a government photo ID</td><td>You</td><td>Verify that you own or represent the business before giving you control of its listing</td><td>Identifiers; professional information; government identification (sensitive)</td></tr>
             <tr><td>Reviews, ratings and reports</td><td>You</td><td>Publish reviews; moderate abuse</td><td>Commercial information</td></tr>
             <tr><td>Visit counts: which page was viewed, and a count of daily visitors. No cookies are used; your connection and browser are turned into a one-way code with a key that changes every day and is then deleted, so only daily totals are kept</td><td>Your use of the site</td><td>Understand how many people use the site (aggregate statistics only)</td><td>Internet activity (de-identified)</td></tr>
             <tr><td>Searches, call-button clicks</td><td>Your use of the site</td><td>Show results; give businesses aggregate stats; improve the service</td><td>Internet activity</td></tr>
@@ -44,7 +44,11 @@ export default function PrivacyPage() {
           </tbody>
         </table>
       </div>
-      <p>We do not collect sensitive personal information as defined by the CPRA, and the service is not directed to children under 16.</p>
+      <p>
+        The only sensitive personal information we collect is the photo ID you upload when claiming a business listing. We use it
+        solely to confirm that you represent the business, never to infer anything about you. It is encrypted, only our verification
+        team can open it, and it is deleted as soon as your claim has been approved or rejected. The service is not directed to children under 16.
+      </p>
 
       <h2>3. Legal bases and consent</h2>
       <p>
@@ -76,6 +80,7 @@ export default function PrivacyPage() {
             <tr><td>Deleted accounts</td><td>Personal details erased immediately; the de-identified record is removed after {months(RETENTION_DAYS.deletedAccounts)}</td></tr>
             <tr><td>Search history (not linked to your account)</td><td>{months(RETENTION_DAYS.searchQueries)}</td></tr>
             <tr><td>Quote requests</td><td>{months(RETENTION_DAYS.quoteRequests)}, or until you delete your account</td></tr>
+            <tr><td>Claim documents (company registration, photo ID)</td><td>Deleted as soon as we approve or reject the claim</td></tr>
             <tr><td>Listing claims</td><td>{months(RETENTION_DAYS.decidedClaims)} after we decide them</td></tr>
             <tr><td>Cookie consent records (your choice, policy version and time, linked to a random id)</td><td>{months(RETENTION_DAYS.consentRecords)}</td></tr>
             <tr><td>Call-button click statistics</td><td>{months(RETENTION_DAYS.callEvents)}</td></tr>

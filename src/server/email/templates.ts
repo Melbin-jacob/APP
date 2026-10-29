@@ -231,14 +231,15 @@ export function claimDecisionEmail(input: { businessName: string; approved: bool
   return { subject, html: layout(subject, body, senderLine()), text };
 }
 
-export function claimReceivedEmail(input: { businessName: string; claimant: string; email: string; phone: string; jobTitle: string; message: string | null; adminUrl: string; listingPhone: string }) {
+export function claimReceivedEmail(input: { businessName: string; claimant: string; email: string; phone: string; jobTitle: string; message: string | null; adminUrl: string; listingPhone: string; hasDocuments?: boolean }) {
   const subject = `Listing claim to verify: ${input.businessName}`;
   const html = layout(
     subject,
     `<p style="font-size:15px;line-height:1.5"><strong>${esc(input.claimant)}</strong> (${esc(input.jobTitle)}, ${esc(input.email)}, ${esc(input.phone)})
      says they represent <strong>${esc(input.businessName)}</strong>.</p>
      ${input.message ? `<div style="border:1px solid #e4e7eb;border-radius:6px;padding:12px;font-size:14px;white-space:pre-wrap;margin:0 0 16px">${esc(input.message)}</div>` : ""}
-     <p style="font-size:14px;line-height:1.5">Verify before approving, e.g. call the number on the listing (${esc(input.listingPhone || "none on file")}) and ask for them by name.</p>
+     ${input.hasDocuments ? `<p style="font-size:14px;line-height:1.5">They uploaded a company registration document and photo ID. For privacy these are only in the ops console, not in this email, and are deleted once you decide.</p>` : ""}
+     <p style="font-size:14px;line-height:1.5">Verify before approving: check the registration matches the business and the ID matches the claimant, and call the number on the listing (${esc(input.listingPhone || "none on file")}) to ask for them by name.</p>
      <a href="${esc(input.adminUrl)}" style="display:inline-block;background:${BRAND};color:#fff;text-decoration:none;font-weight:bold;padding:12px 24px;border-radius:999px">Review claim</a>`,
     senderLine(),
   );

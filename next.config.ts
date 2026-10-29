@@ -33,9 +33,9 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       { source: NOT_AD_FRAME, headers: [{ key: "X-Frame-Options", value: "DENY" }] },
       // JSON APIs never render HTML; lock them down completely. (Pages get a
-      // per-request nonce CSP from middleware.)
+      // per-request nonce CSP from middleware; claim documents set their own.)
       {
-        source: "/api/((?!banners/[^/]+/frame).*)",
+        source: "/api/((?!banners/[^/]+/frame|admin/claims/[^/]+/documents/).*)",
         headers: [{ key: "Content-Security-Policy", value: "default-src 'none'; frame-ancestors 'none'; base-uri 'none'" }],
       },
     ];

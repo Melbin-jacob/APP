@@ -103,8 +103,12 @@ then approve it as admin under *Ops console → Traders*.
   see and delete reviews you've written, and **Sign out**.
 
 **Claim a listing** (the owner's side)
-1. Sign in as `customer@…`, open a listing and click *Is this your business? Claim it*. Fill in your role and phone and submit.
-2. As admin: *Ops console → Listing claims* → **Approve**.
+1. Sign in as `customer@…`, open a listing and click *Is this your business? Claim it*. Fill in your role and phone, and
+   under *Proof of ownership* upload a company registration document and a photo ID (PDF, JPEG, PNG or WebP, up to 10 MB;
+   any test PDF or photo will do). Submit.
+2. As admin: *Ops console → Listing claims*. Open *Company registration* and *Photo ID* (each view is recorded in the
+   audit log), then **Approve** (or **Reject**). Both files are deleted at that moment; the card then reads
+   "Photo ID and Company registration checked; deleted (date)". Approve stays greyed out on a claim without both files.
 3. Back as the customer: *My account* now leads to the business dashboard (no need to sign in again). Upload a logo in
    *Edit business profile*: it replaces the initials everywhere. New quote requests now appear in the dashboard and by email.
 

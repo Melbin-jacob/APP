@@ -1,8 +1,8 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { env } from "./env";
 
-// AES-256-GCM for small secrets we must be able to read back (two-step
-// sign-in seeds). Format: v1.<iv>.<tag>.<ciphertext>, base64url.
+// AES-256-GCM for secrets we must be able to read back (two-step sign-in
+// seeds, claim documents). Format: v1.<iv>.<tag>.<ciphertext>, base64url.
 function key(): Buffer {
   const { MFA_ENCRYPTION_KEY, NEXTAUTH_SECRET } = env();
   if (MFA_ENCRYPTION_KEY) {
@@ -27,4 +27,19 @@ export function open(sealed: string): string {
   const decipher = createDecipheriv("aes-256-gcm", key(), Buffer.from(iv, "base64url"));
   decipher.setAuthTag(Buffer.from(tag, "base64url"));
   return Buffer.concat([decipher.update(Buffer.from(ct, "base64url")), decipher.final()]).toString("utf8");
+}
+
+/** Binary variant for files (claim documents): iv(12) | tag(16) | ciphertext. */
+export function sealBytes(plain: Buffer): Buffer {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", key(), iv);
+  const ct = Buffer.concat([cipher.update(plain), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), ct]);
+}
+
+export function openBytes(sealed: Buffer): Buffer {
+  if (sealed.length < 28) throw new Error("Sealed value too short");
+  const decipher = createDecipheriv("aes-256-gcm", key(), sealed.subarray(0, 12));
+  decipher.setAuthTag(sealed.subarray(12, 28));
+  return Buffer.concat([decipher.update(sealed.subarray(28)), decipher.final()]);
 }

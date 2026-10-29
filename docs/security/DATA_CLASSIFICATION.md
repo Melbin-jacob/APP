@@ -12,6 +12,7 @@
 | Data | Class | Where | Protection | Retention |
 |---|---|---|---|---|
 | Password hashes | Restricted | `User.passwordHash` | Argon2id (m=19 MiB, t=2) | Life of account |
+| Claim proof documents (company registration, photo ID) | Restricted | `ClaimDocument.sealed` | AES-256-GCM (`MFA_ENCRYPTION_KEY`); images re-encoded (metadata stripped), PDFs with scripts/attachments refused; staff-only viewer, every view audited | Deleted the moment the claim is approved or rejected (retention sweep as backstop) |
 | Two-step sign-in seeds | Restricted | `User.mfaSecret` | AES-256-GCM (`MFA_ENCRYPTION_KEY`) | Until turned off |
 | Recovery codes | Restricted | `User.mfaRecoveryCodes` | Argon2id hashes, single use | Until used/regenerated |
 | Review / unsubscribe tokens | Restricted | `ReviewRequest.tokenHash`; signed links | HMAC-SHA256 with pepper; raw token only in the email | 90 days after expiry |

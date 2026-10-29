@@ -15,6 +15,7 @@ export const GET = route(async (req) => {
     include: {
       trader: { select: { businessName: true, slug: true, city: true, phone: true, website: true, userId: true } },
       user: { select: { email: true, name: true, createdAt: true } },
+      documents: { select: { id: true, kind: true, fileName: true, contentType: true, size: true }, orderBy: { kind: "asc" } },
     },
   });
   return NextResponse.json({ claims });

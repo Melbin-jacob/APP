@@ -3,17 +3,43 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
-import { api, ClientApiError } from "@/lib/api-client";
+import { apiForm, ClientApiError } from "@/lib/api-client";
 import { PHONE_PATTERN } from "@/lib/quotes";
+
+const MAX_FILE_BYTES = 10 * 1024 * 1024;
+const ACCEPT = "application/pdf,image/jpeg,image/png,image/webp";
+const DOCS = [
+  { kind: "REGISTRATION", label: "claim.registrationDoc", hint: "claim.registrationHint" },
+  { kind: "ID_PROOF", label: "claim.idDoc", hint: "claim.idHint" },
+] as const;
+type DocKind = (typeof DOCS)[number]["kind"];
+
+/** Client-side check so people see a clear message before uploading; the server re-checks. */
+function fileProblem(file: File | undefined) {
+  if (!file) return "claim.fileMissing" as const;
+  if (file.size > MAX_FILE_BYTES) return "claim.fileTooBig" as const;
+  if (file.type && !ACCEPT.split(",").includes(file.type)) return "claim.fileType" as const;
+  return null;
+}
 
 export function ClaimForm({ slug, businessName, defaultName }: { slug: string; businessName: string; defaultName: string }) {
   const { t } = usePrefs();
   const [f, setF] = useState({ contactName: defaultName, jobTitle: "", phone: "", message: "" });
   const [authorised, setAuthorised] = useState(false);
+  const [files, setFiles] = useState<Partial<Record<DocKind, File>>>({});
+  const [showFileErrors, setShowFileErrors] = useState(false);
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => { setF((v) => ({ ...v, [k]: e.target.value })); m.reset(); };
   const m = useMutation({
-    mutationFn: () => api(`/api/traders/${slug}/claim`, { method: "POST", json: { ...f, message: f.message.trim() || undefined, authorised: true } }),
+    mutationFn: () => {
+      const body = new FormData();
+      for (const [k, v] of Object.entries(f)) body.set(k, v.trim());
+      body.set("authorised", "true");
+      for (const { kind } of DOCS) body.set(kind, files[kind]!);
+      return apiForm(`/api/traders/${slug}/claim`, body);
+    },
   });
+  const fileErrors = Object.fromEntries(DOCS.map(({ kind }) => [kind, fileProblem(files[kind])])) as Record<DocKind, ReturnType<typeof fileProblem>>;
+  const filesOk = DOCS.every(({ kind }) => !fileErrors[kind]);
   const badPhone = f.phone.trim() !== "" && !PHONE_PATTERN.test(f.phone.trim());
 
   if (m.isSuccess) {
@@ -25,12 +51,11 @@ export function ClaimForm({ slug, businessName, defaultName }: { slug: string; b
     );
   }
   // Business-rule refusals (already claimed, pending…) come from the server.
-  const err = m.error instanceof ClientApiError && m.error.status === 409 ? m.error.message
-    : m.error instanceof ClientApiError && m.error.status === 429 ? m.error.message
+  const err = m.error instanceof ClientApiError && [400, 409, 413, 415, 429].includes(m.error.status) ? m.error.message
     : m.error ? t("common.somethingWrong") : "";
 
   return (
-    <form onSubmit={(e: FormEvent) => { e.preventDefault(); if (!badPhone && authorised) m.mutate(); }} className="card space-y-4 p-6">
+    <form onSubmit={(e: FormEvent) => { e.preventDefault(); setShowFileErrors(true); if (!badPhone && authorised && filesOk) m.mutate(); }} className="card space-y-4 p-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="c-name" className="label">{t("claim.contactName")}</label>
@@ -50,12 +75,30 @@ export function ClaimForm({ slug, businessName, defaultName }: { slug: string; b
         <label htmlFor="c-msg" className="label">{t("claim.message")}</label>
         <textarea id="c-msg" rows={3} maxLength={1000} value={f.message} onChange={set("message")} className="input" />
       </div>
+      <fieldset className="space-y-3 rounded-lg border border-ink-200 p-4">
+        <legend className="px-1 font-semibold">{t("claim.docsTitle")}</legend>
+        <p className="text-sm text-ink-700">🔒 {t("claim.docsIntro")}</p>
+        {DOCS.map(({ kind, label, hint }) => {
+          const problem = showFileErrors || files[kind] ? fileErrors[kind] : null;
+          const id = `c-doc-${kind}`;
+          return (
+            <div key={kind}>
+              <label htmlFor={id} className="label">{t(label)}</label>
+              <input id={id} name={kind} type="file" accept={ACCEPT} required aria-invalid={!!problem} aria-describedby={`${id}-hint`}
+                onChange={(e) => { setFiles((v) => ({ ...v, [kind]: e.target.files?.[0] })); m.reset(); }}
+                className="block w-full text-sm text-ink-700 file:me-3 file:rounded-md file:border-0 file:bg-ink-100 file:px-3 file:py-2 file:text-sm file:font-medium hover:file:bg-ink-200" />
+              <p id={`${id}-hint`} className={`mt-1 text-xs ${problem ? "text-rose-600" : "text-ink-500"}`}>{problem ? t(problem) : t(hint)}</p>
+            </div>
+          );
+        })}
+        <p className="text-xs text-ink-500">{t("claim.fileFormats")}</p>
+      </fieldset>
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" required checked={authorised} onChange={(e) => setAuthorised(e.target.checked)} className="mt-1" />
         <span>{t("claim.authorised", { name: businessName })}</span>
       </label>
       <div className="flex flex-wrap items-center gap-3">
-        <button className="btn-primary" disabled={m.isPending || !authorised}>{t("claim.submit")}</button>
+        <button className="btn-primary" disabled={m.isPending || !authorised}>{m.isPending ? t("claim.uploading") : t("claim.submit")}</button>
         {err && <span role="alert" className="text-sm text-rose-600">{err}</span>}
       </div>
     </form>

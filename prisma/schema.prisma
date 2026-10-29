@@ -520,23 +520,51 @@ enum ClaimStatus {
 // A signed-in user asking to take over an unclaimed (imported) listing.
 // Ops verify it (e.g. by calling the listed number) before attaching it.
 model ListingClaim {
-  id          String      @id @default(cuid())
-  traderId    String
-  userId      String
-  status      ClaimStatus @default(PENDING)
-  contactName String
-  jobTitle    String // the claimant's role at the business
-  phone       String
-  message     String?     @db.Text
-  decidedAt   DateTime?
-  decidedById String?
-  createdAt   DateTime    @default(now())
+  id                 String      @id @default(cuid())
+  traderId           String
+  userId             String
+  status             ClaimStatus @default(PENDING)
+  contactName        String
+  jobTitle           String // the claimant's role at the business
+  phone              String
+  message            String?     @db.Text
+  decidedAt          DateTime?
+  decidedById        String?
+  // Proof documents are deleted as soon as the claim is decided; this keeps a
+  // record of what was checked (e.g. "REGISTRATION,ID_PROOF") and when.
+  documentsChecked   String?
+  documentsDeletedAt DateTime?
+  createdAt          DateTime    @default(now())
 
-  trader TraderProfile @relation(fields: [traderId], references: [id], onDelete: Cascade)
-  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trader    TraderProfile   @relation(fields: [traderId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents ClaimDocument[]
 
   @@unique([traderId, userId])
   @@index([status, createdAt])
+}
+
+enum ClaimDocumentKind {
+  REGISTRATION // company registration / business licence
+  ID_PROOF // government photo ID of the claimant
+}
+
+// Proof of ownership uploaded with a listing claim. Restricted data (photo ID):
+// encrypted at rest (AES-256-GCM, see lib/secret-box), readable only by staff
+// through an audited endpoint, and deleted as soon as the claim is decided.
+model ClaimDocument {
+  id          String            @id @default(cuid())
+  claimId     String
+  kind        ClaimDocumentKind
+  fileName    String
+  contentType String // image/jpeg or application/pdf, after server-side checks
+  size        Int
+  sealed      Bytes // iv + tag + ciphertext
+  createdAt   DateTime          @default(now())
+
+  claim ListingClaim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+
+  @@unique([claimId, kind])
 }
 
 // Uploaded images (business logos; site images such as the home page picture,
