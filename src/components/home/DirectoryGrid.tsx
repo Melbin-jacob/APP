@@ -1,7 +1,8 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { withFeedAd } from "@/components/ads/withFeedAd";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
 import { TraderCard } from "@/components/traders/TraderCard";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -12,7 +13,8 @@ import type { TraderCard as TraderCardData } from "@/server/services/search";
 type Tab = { slug: string };
 
 /** "Explore Directory Category": pill filter tabs over a 4-up card grid. */
-export function DirectoryGrid({ tabs, initial }: { tabs: Tab[]; initial: TraderCardData[] }) {
+/** `ad`: the in-listing banner, rendered on the server and slotted between cards. */
+export function DirectoryGrid({ tabs, initial, ad }: { tabs: Tab[]; initial: TraderCardData[]; ad?: ReactNode }) {
   const { t, country } = usePrefs();
   const [active, setActive] = useState("");
   const { data, isFetching } = useQuery({
@@ -45,7 +47,7 @@ export function DirectoryGrid({ tabs, initial }: { tabs: Tab[]; initial: TraderC
         ))}
       </div>
       <div role="tabpanel" aria-busy={isFetching} className={cn("grid gap-5 sm:grid-cols-2 lg:grid-cols-4", isFetching && "opacity-60")}>
-        {(data ?? []).map((trader) => <TraderCard key={trader.id} trader={trader} />)}
+        {withFeedAd((data ?? []).map((trader) => <TraderCard key={trader.id} trader={trader} />), ad)}
         {data && data.length === 0 && (
           <p className="col-span-full py-10 text-center text-sm text-ink-500">{t("directory.empty")}</p>
         )}

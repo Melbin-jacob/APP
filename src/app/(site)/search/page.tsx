@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FeedAd } from "@/components/ads/AdBanner";
+import { withFeedAd } from "@/components/ads/withFeedAd";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SearchBar } from "@/components/search/SearchBar";
 import { TraderCard } from "@/components/traders/TraderCard";
 import { db } from "@/lib/db";
 import { getI18n } from "@/i18n/server";
+import { getBanners } from "@/server/services/banners";
 import { searchQuerySchema, searchTraders } from "@/server/services/search";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,7 +19,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const parsed = searchQuerySchema.safeParse(raw);
   const query = parsed.success ? parsed.data : searchQuerySchema.parse({});
   const { t, visitor } = await getI18n();
-  const { items, total } = await searchTraders(query, visitor.country);
+  const [{ items, total }, banners] = await Promise.all([searchTraders(query, visitor.country), getBanners().catch(() => ({}))]);
   if (query.q || query.location) {
     db.searchQuery.create({ data: { keyword: query.q, location: query.location, resultCount: total } }).catch(() => {});
   }
@@ -33,7 +36,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </p>
         {total === 0 && <p className="mt-6 rounded-md bg-white p-6 text-center text-sm text-ink-500 shadow-card">{t("search.noResults")}</p>}
         <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((trader) => <TraderCard key={trader.id} trader={trader} />)}
+          {withFeedAd(items.map((trader) => <TraderCard key={trader.id} trader={trader} />), <FeedAd banners={banners} label={t("common.advertisement")} />)}
         </div>
         {pages > 1 && (
           <nav aria-label="Pagination" className="mt-8 flex justify-center gap-2">

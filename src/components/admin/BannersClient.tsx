@@ -16,8 +16,8 @@ type Slot = "LEFT" | "RIGHT" | "LEADERBOARD" | "MOBILE";
 const SLOTS: Record<Slot, { label: string; sizes: [number, number][] }> = {
   LEFT: { label: "Left rail (wide desktops)", sizes: [[160, 600], [300, 600], [300, 250]] },
   RIGHT: { label: "Right rail (wide desktops)", sizes: [[160, 600], [300, 600], [300, 250]] },
-  LEADERBOARD: { label: "Top banner (tablets & laptops)", sizes: [[728, 90]] },
-  MOBILE: { label: "Top banner (phones)", sizes: [[320, 100], [320, 50]] },
+  LEADERBOARD: { label: "Tablet & laptop banners (top + in listings)", sizes: [[728, 90]] },
+  MOBILE: { label: "Phone banners (top + in listings)", sizes: [[320, 100], [320, 50]] },
 };
 
 function GlobalSwitch() {
@@ -35,7 +35,7 @@ function GlobalSwitch() {
         <h2 className="font-semibold">Ad banners — site-wide</h2>
         <p className="text-sm text-ink-500">
           Instantly shows or hides every banner on every public page: the left &amp; right rails on wide desktops, and the
-          top banner on laptops, tablets and phones.
+          banners at the top of the page and among listings on laptops, tablets and phones.
         </p>
       </div>
       <button

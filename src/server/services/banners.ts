@@ -1,4 +1,5 @@
 import type { Banner, BannerSlot } from "@prisma/client";
+import { cache } from "react";
 import { db } from "@/lib/db";
 import { cached, redis } from "@/lib/redis";
 import { getSetting } from "../settings";
@@ -27,7 +28,21 @@ export const BANNER_SLOTS = ["LEFT", "RIGHT", "LEADERBOARD", "MOBILE"] as const;
  * The switch is checked on every render so an admin toggle takes effect
  * site-wide within the settings cache TTL (seconds).
  */
-export async function getBanners(): Promise<Partial<Record<BannerSlot, PublicBanner>>> {
+export type BannerSet = Partial<Record<BannerSlot, PublicBanner>> & {
+  /** Second phone / tablet banner, shown among listings; a different ad from the top one when the slot has several. */
+  feed?: { MOBILE?: PublicBanner; LEADERBOARD?: PublicBanner };
+};
+
+const toPublic = (b: { id: string; slot: BannerSlot; kind: Banner["kind"]; imageUrl: string | null; scriptHtml: string | null; width: number; height: number; name: string; targetUrl: string | null }): PublicBanner => ({
+  id: b.id, slot: b.slot, kind: b.kind, imageUrl: b.imageUrl, scriptHtml: b.scriptHtml, width: b.width, height: b.height, name: b.name,
+  internal: !!b.targetUrl?.startsWith("/"),
+});
+
+// Once per request (React cache), so the page shell and the listings agree on
+// which banners are showing and the in-listing banner can differ from the top one.
+export const getBanners = cache(loadBanners);
+
+async function loadBanners(): Promise<BannerSet> {
   if (!(await getSetting("ads.sideBanners.enabled"))) return {};
 
   const now = new Date();
@@ -44,15 +59,15 @@ export async function getBanners(): Promise<Partial<Record<BannerSlot, PublicBan
     }),
   );
 
-  const result: Partial<Record<BannerSlot, PublicBanner>> = {};
+  const result: BannerSet = { feed: {} };
   for (const slot of BANNER_SLOTS) {
-    const chosen = pickWeighted(active.filter((b) => b.slot === slot));
-    if (chosen) {
-      result[slot] = {
-        id: chosen.id, slot: chosen.slot, kind: chosen.kind, imageUrl: chosen.imageUrl,
-        scriptHtml: chosen.scriptHtml, width: chosen.width, height: chosen.height, name: chosen.name,
-        internal: !!chosen.targetUrl?.startsWith("/"),
-      };
+    const candidates = active.filter((b) => b.slot === slot);
+    const chosen = pickWeighted(candidates);
+    if (!chosen) continue;
+    result[slot] = toPublic(chosen);
+    if (slot === "MOBILE" || slot === "LEADERBOARD") {
+      const others = candidates.filter((b) => b.id !== chosen.id);
+      result.feed![slot] = toPublic(others.length ? pickWeighted(others)! : chosen);
     }
   }
   return result;
