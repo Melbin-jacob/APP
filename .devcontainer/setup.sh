@@ -21,7 +21,7 @@ REVIEW_TOKEN_TTL_DAYS="14"
 CRON_SECRET="$(openssl rand -hex 32)"
 EMAIL_TRANSPORT="smtp"
 SMTP_URL="smtp://mailpit:1025"
-EMAIL_FROM="HomeServices Direct <no-reply@homeservices.test>"
+EMAIL_FROM="GetTradePros <no-reply@gettradepros.test>"
 ENV
 
 npm ci

@@ -29,7 +29,7 @@ npm run db:seed                 # categories, the business directory, settings, 
 npm run dev
 ```
 
-Seeded logins (dev only): `admin@` and `customer@homeservices.local`, both with password `ChangeMe-123456`.
+Seeded logins (dev only): `admin@` and `customer@gettradepros.local`, both with password `ChangeMe-123456`.
 There are no fake businesses: listings come from the business directory (below) or from real sign-ups.
 
 ### Business directory

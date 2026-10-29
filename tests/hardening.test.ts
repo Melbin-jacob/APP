@@ -68,7 +68,7 @@ describe("audit hash chain", () => {
 
 describe("production startup checks", () => {
   const good = {
-    NODE_ENV: "production", APP_URL: "https://homeservices.direct",
+    NODE_ENV: "production", APP_URL: "https://gettradepros.com",
     NEXTAUTH_SECRET: "q8Zr3vT1pLx9WmB2nK7cY4dF6gH0jS5aE", REVIEW_TOKEN_PEPPER: "Vb6Nm2Qw8Er4Ty0Ui7Op3As5Df1Gh9JkL",
     CRON_SECRET: "Zx3Cv5Bn7Mq9Wp1Ol2Ik4Uj6Yh8Tg0RfE", MFA_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
     DATABASE_URL: "postgresql://app:S0me-Strong-Pass@db.internal:5432/hsd?sslmode=require", EMAIL_TRANSPORT: "ses",
@@ -80,7 +80,7 @@ describe("production startup checks", () => {
     ["a short secret", { CRON_SECRET: "short" }],
     ["reused secrets", { REVIEW_TOKEN_PEPPER: "q8Zr3vT1pLx9WmB2nK7cY4dF6gH0jS5aE" }],
     ["no MFA key", { MFA_ENCRYPTION_KEY: undefined }],
-    ["http APP_URL", { APP_URL: "http://homeservices.direct" }],
+    ["http APP_URL", { APP_URL: "http://gettradepros.com" }],
     ["default DB password", { DATABASE_URL: "postgresql://postgres:postgres@db:5432/hsd" }],
     ["admin MFA off", { REQUIRE_ADMIN_MFA: "false" }],
     ["console email", { EMAIL_TRANSPORT: "console" }],
@@ -88,7 +88,7 @@ describe("production startup checks", () => {
   it("allows the local Docker stack only on localhost", () => {
     const local = { NODE_ENV: "production", ALLOW_INSECURE_LOCAL_SECRETS: "true", NEXTAUTH_SECRET: "local-test-secret-change-me" };
     expect(productionConfigProblems({ ...local, APP_URL: "http://localhost:3000" }).errors).toEqual([]);
-    expect(productionConfigProblems({ ...local, APP_URL: "https://homeservices.direct" }).errors.length).toBe(1);
+    expect(productionConfigProblems({ ...local, APP_URL: "https://gettradepros.com" }).errors.length).toBe(1);
   });
 });
 

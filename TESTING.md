@@ -33,9 +33,9 @@ Password for all: **`ChangeMe-123456`**
 
 | Email | Role | Use it to test |
 |---|---|---|
-| `admin@homeservices.local` | Super-admin | Ops console at `/admin` |
-| `customer@homeservices.local` | Customer | *My account*: name, phone, address, password, reviews, data export / delete |
-| `business@homeservices.local` | Business (*Demo Business (test account)*) | Business dashboard: hours, services, rates, logo, trades, quote requests |
+| `admin@gettradepros.local` | Super-admin | Ops console at `/admin` |
+| `customer@gettradepros.local` | Customer | *My account*: name, phone, address, password, reviews, data export / delete |
+| `business@gettradepros.local` | Business (*Demo Business (test account)*) | Business dashboard: hours, services, rates, logo, trades, quote requests |
 
 These logins are restored every time the app starts with demo data (Docker does this on every start): password back to
 `ChangeMe-123456`, account active, Terms accepted. So if you changed the password or suspended one while testing, just restart.
@@ -44,7 +44,7 @@ After 5 wrong passwords an account is locked for 15 minutes.
 **Two-step sign-in for the admin:** the first time you sign in as `admin@…` you'll be asked to set up two-step sign-in.
 Install an authenticator app on your phone (Google Authenticator, Microsoft Authenticator, 1Password…), scan the QR code,
 enter the code, and save the recovery codes. From then on, sign in with the password plus the 6-digit code. Lost it? Run
-`docker compose exec app npm run mfa:reset -- admin@homeservices.local "local testing"` and set it up again.
+`docker compose exec app npm run mfa:reset -- admin@gettradepros.local "local testing"` and set it up again.
 
 Sign in at http://localhost:3000/login: each account lands on its own page (admin → `/admin`, business → `/dashboard`,
 customer → `/account`). **My account** in the header goes to the same place.

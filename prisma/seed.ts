@@ -15,9 +15,9 @@ const TOS = TOS_VERSION;
 // they always work even after a password change, suspension or new Terms.
 const TEST_PASSWORD = "ChangeMe-123456";
 const TEST_LOGINS = [
-  { email: "admin@homeservices.local", name: "Ops Admin", role: "SUPER_ADMIN" as const },
-  { email: "customer@homeservices.local", name: "Casey Customer", role: "CUSTOMER" as const },
-  { email: "business@homeservices.local", name: "Blake Business", role: "TRADER" as const },
+  { email: "admin@gettradepros.local", name: "Ops Admin", role: "SUPER_ADMIN" as const },
+  { email: "customer@gettradepros.local", name: "Casey Customer", role: "CUSTOMER" as const },
+  { email: "business@gettradepros.local", name: "Blake Business", role: "TRADER" as const },
 ];
 
 // The test business login's own profile. Kept PENDING so it never shows in
@@ -63,6 +63,14 @@ async function main() {
   // Local-testing logins only. Never run this seed against production.
   const passwordHash = await hash(TEST_PASSWORD, { memoryCost: 19456, timeCost: 2, parallelism: 1 });
   for (const login of TEST_LOGINS) {
+    // Before the rebrand these were @homeservices.local. Move existing accounts
+    // to the new address so their data (and the admin's two-step sign-in) carry over.
+    const oldEmail = login.email.replace("@gettradepros.local", "@homeservices.local");
+    const [old, current] = await Promise.all([
+      db.user.findUnique({ where: { email: oldEmail }, select: { id: true } }),
+      db.user.findUnique({ where: { email: login.email }, select: { id: true } }),
+    ]);
+    if (old && !current) await db.user.update({ where: { id: old.id }, data: { email: login.email } });
     const usable = { passwordHash, status: "ACTIVE" as const, deletedAt: null, tosVersion: TOS, tosAcceptedAt: new Date() };
     await db.user.upsert({
       where: { email: login.email },
@@ -72,7 +80,7 @@ async function main() {
     });
   }
 
-  const owner = await db.user.findUniqueOrThrow({ where: { email: "business@homeservices.local" }, select: { id: true, trader: { select: { id: true } } } });
+  const owner = await db.user.findUniqueOrThrow({ where: { email: "business@gettradepros.local" }, select: { id: true, trader: { select: { id: true } } } });
   if (!owner.trader) {
     const handyman = await db.category.findUniqueOrThrow({ where: { slug: "handyman" }, select: { id: true } });
     await db.traderProfile.create({

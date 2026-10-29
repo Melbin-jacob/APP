@@ -1,5 +1,5 @@
 {
-  "name": "HomeServices Direct",
+  "name": "GetTradePros",
   "dockerComposeFile": ["../docker-compose.yml", "docker-compose.devcontainer.yml"],
   "service": "workspace",
   "runServices": ["workspace", "db", "redis", "mailpit"],

@@ -23,7 +23,7 @@ services:
       CRON_SECRET: local-test-cron-secret-change-me-0123456789
       EMAIL_TRANSPORT: smtp
       SMTP_URL: smtp://mailpit:1025
-      EMAIL_FROM: HomeServices Direct <no-reply@homeservices.test>
+      EMAIL_FROM: GetTradePros <no-reply@gettradepros.test>
       SEED_DEMO_DATA: "true"
       # The secrets above are public test values: allowed only because APP_URL is localhost.
       ALLOW_INSECURE_LOCAL_SECRETS: "true"

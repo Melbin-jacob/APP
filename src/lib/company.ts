@@ -4,9 +4,9 @@
 export const COMPANY = {
   name: process.env.LEGAL_ENTITY_NAME ?? "GetTradePros Inc.",
   address: process.env.LEGAL_ADDRESS ?? "[Registered mailing address — set LEGAL_ADDRESS]",
-  privacyEmail: process.env.PRIVACY_EMAIL ?? "privacy@homeservices.direct",
-  securityEmail: process.env.SECURITY_EMAIL ?? "security@homeservices.direct",
-  supportEmail: process.env.SUPPORT_EMAIL ?? "support@homeservices.direct",
+  privacyEmail: process.env.PRIVACY_EMAIL ?? "privacy@gettradepros.com",
+  securityEmail: process.env.SECURITY_EMAIL ?? "security@gettradepros.com",
+  supportEmail: process.env.SUPPORT_EMAIL ?? "support@gettradepros.com",
   // Quebec Law 25 / PIPEDA: the person accountable for personal information.
   privacyOfficer: process.env.PRIVACY_OFFICER ?? "Privacy Officer",
   jurisdiction: process.env.LEGAL_JURISDICTION ?? "[Governing law — set LEGAL_JURISDICTION]",

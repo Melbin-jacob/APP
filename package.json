@@ -1,8 +1,8 @@
 {
-  "name": "homeservices-direct",
+  "name": "gettradepros",
   "version": "0.1.0",
   "private": true,
-  "description": "HomeServices Direct — marketplace connecting local customers with independent home-service traders.",
+  "description": "GetTradePros — marketplace connecting local customers with independent home-service traders.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
