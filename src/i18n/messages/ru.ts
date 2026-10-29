@@ -51,6 +51,17 @@ const ru: Messages = {
     previous: "Назад",
     next: "Далее",
     page: "Страница {page} из {pages}",
+    sortBy: "Сортировка",
+    sort: {
+      relevance: "Рекомендуемые",
+      rating: "С высоким рейтингом",
+      reviews: "Больше отзывов",
+      distance: "Ближайшие",
+      priceLow: "Цена: по возрастанию",
+      priceHigh: "Цена: по убыванию",
+      newest: "Новые",
+      name: "Название (А–Я)",
+    },
   },
   categories: {
     popular: "Популярные категории",

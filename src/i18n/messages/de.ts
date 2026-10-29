@@ -51,6 +51,17 @@ const de: Messages = {
     previous: "Zurück",
     next: "Weiter",
     page: "Seite {page} von {pages}",
+    sortBy: "Sortieren nach",
+    sort: {
+      relevance: "Empfohlen",
+      rating: "Beste Bewertung",
+      reviews: "Meiste Bewertungen",
+      distance: "Nächstgelegen",
+      priceLow: "Preis: aufsteigend",
+      priceHigh: "Preis: absteigend",
+      newest: "Neueste",
+      name: "Name (A–Z)",
+    },
   },
   categories: {
     popular: "Beliebteste Kategorien",

@@ -51,6 +51,17 @@ const zh: Messages = {
     previous: "上一页",
     next: "下一页",
     page: "第 {page} 页，共 {pages} 页",
+    sortBy: "排序方式",
+    sort: {
+      relevance: "推荐",
+      rating: "评分最高",
+      reviews: "评价最多",
+      distance: "距离最近",
+      priceLow: "价格从低到高",
+      priceHigh: "价格从高到低",
+      newest: "最新",
+      name: "名称（A–Z）",
+    },
   },
   categories: {
     popular: "热门分类",

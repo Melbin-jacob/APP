@@ -5,6 +5,10 @@ import { type CountryCode, parsePostcode } from "@/lib/postcode";
 import { cached } from "@/lib/redis";
 import { lookupPostcode } from "./geo";
 
+/** Result orderings offered in the "Sort by" menu. "distance" needs a location. */
+export const SEARCH_SORTS = ["relevance", "rating", "reviews", "distance", "price_low", "price_high", "newest", "name"] as const;
+export type SearchSort = (typeof SEARCH_SORTS)[number];
+
 export const searchQuerySchema = z.object({
   q: z.string().trim().max(80).optional(),
   category: z.string().trim().max(60).regex(/^[a-z0-9-]*$/).optional(),
@@ -12,7 +16,7 @@ export const searchQuerySchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),
   lng: z.coerce.number().min(-180).max(180).optional(),
   radiusKm: z.coerce.number().int().min(1).max(200).default(25),
-  sort: z.enum(["relevance", "distance", "rating"]).default("relevance"),
+  sort: z.enum(SEARCH_SORTS).catch("relevance").default("relevance"),
   page: z.coerce.number().int().min(1).max(500).default(1),
   pageSize: z.coerce.number().int().min(1).max(48).default(12),
 });
@@ -112,13 +116,25 @@ export async function searchTraders(query: SearchQuery, country: CountryCode): P
   const whereSql = Prisma.join(where, " AND ");
   const distanceSql = geoPoint ? Prisma.sql`ST_Distance(t."location", ${geoPoint}) / 1000.0` : Prisma.sql`NULL::float`;
 
-  const orderSql =
-    query.sort === "distance" && geoPoint
-      ? Prisma.sql`"distanceKm" ASC NULLS LAST`
-      : query.sort === "rating" || !geoPoint
-        ? Prisma.sql`t."ratingAvg" DESC, t."ratingCount" DESC`
-        : // relevance: Bayesian-ish rating weighted against distance
-          Prisma.sql`(t."ratingAvg" * LEAST(t."ratingCount", 20) / 20.0) - (${distanceSql} / 10.0) DESC`;
+  // "Highest rated" uses a Bayesian average (as if every business also had 5
+  // reviews at 4.0), so one 5-star review doesn't outrank fifty 4.9s.
+  const bayesian = Prisma.sql`((t."ratingAvg" * t."ratingCount" + 4.0 * 5) / (t."ratingCount" + 5))`;
+  const orders: Record<SearchSort, Prisma.Sql> = {
+    // Best match: rating (trusted more as reviews grow) weighed against distance when there's a location.
+    relevance: geoPoint
+      ? Prisma.sql`(t."ratingAvg" * LEAST(t."ratingCount", 20) / 20.0) - (${distanceSql} / 10.0) DESC`
+      : Prisma.sql`${bayesian} DESC, t."ratingCount" DESC`,
+    rating: Prisma.sql`${bayesian} DESC, t."ratingCount" DESC`,
+    reviews: Prisma.sql`t."ratingCount" DESC, t."ratingAvg" DESC`,
+    distance: geoPoint ? Prisma.sql`"distanceKm" ASC NULLS LAST` : Prisma.sql`${bayesian} DESC`,
+    // Businesses without a listed rate go last either way.
+    price_low: Prisma.sql`t."hourlyRatePence" ASC NULLS LAST`,
+    price_high: Prisma.sql`t."hourlyRatePence" DESC NULLS LAST`,
+    newest: Prisma.sql`t."createdAt" DESC`,
+    name: Prisma.sql`lower(t."businessName") ASC`,
+  };
+  // Tie-break on id so paging never repeats or skips a business.
+  const orderSql = Prisma.sql`${orders[query.sort]}, t."id" ASC`;
 
   const offset = (query.page - 1) * query.pageSize;
 

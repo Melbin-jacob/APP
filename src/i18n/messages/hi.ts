@@ -51,6 +51,17 @@ const hi: Messages = {
     previous: "पिछला",
     next: "अगला",
     page: "पेज {page} / {pages}",
+    sortBy: "क्रमबद्ध करें",
+    sort: {
+      relevance: "अनुशंसित",
+      rating: "सर्वोच्च रेटिंग",
+      reviews: "सबसे अधिक समीक्षाएँ",
+      distance: "सबसे नज़दीक",
+      priceLow: "कीमत: कम से ज़्यादा",
+      priceHigh: "कीमत: ज़्यादा से कम",
+      newest: "नवीनतम",
+      name: "नाम (A–Z)",
+    },
   },
   categories: {
     popular: "सबसे लोकप्रिय श्रेणियाँ",

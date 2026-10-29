@@ -51,6 +51,17 @@ const ko: Messages = {
     previous: "이전",
     next: "다음",
     page: "{pages}페이지 중 {page}페이지",
+    sortBy: "정렬",
+    sort: {
+      relevance: "추천순",
+      rating: "평점 높은순",
+      reviews: "리뷰 많은순",
+      distance: "가까운순",
+      priceLow: "가격 낮은순",
+      priceHigh: "가격 높은순",
+      newest: "최신순",
+      name: "이름순(A–Z)",
+    },
   },
   categories: {
     popular: "인기 카테고리",

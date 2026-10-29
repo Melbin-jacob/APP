@@ -51,6 +51,17 @@ const en = {
     previous: "Previous",
     next: "Next",
     page: "Page {page} of {pages}",
+    sortBy: "Sort by",
+    sort: {
+      relevance: "Recommended",
+      rating: "Highest rated",
+      reviews: "Most reviews",
+      distance: "Nearest",
+      priceLow: "Price: low to high",
+      priceHigh: "Price: high to low",
+      newest: "Newest",
+      name: "Name (A–Z)",
+    },
   },
   categories: {
     popular: "Most Popular Categories",

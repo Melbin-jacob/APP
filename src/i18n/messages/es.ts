@@ -51,6 +51,17 @@ const es: Messages = {
     previous: "Anterior",
     next: "Siguiente",
     page: "Página {page} de {pages}",
+    sortBy: "Ordenar por",
+    sort: {
+      relevance: "Recomendados",
+      rating: "Mejor valorados",
+      reviews: "Más reseñas",
+      distance: "Más cercanos",
+      priceLow: "Precio: menor a mayor",
+      priceHigh: "Precio: mayor a menor",
+      newest: "Más recientes",
+      name: "Nombre (A–Z)",
+    },
   },
   categories: {
     popular: "Categorías más populares",

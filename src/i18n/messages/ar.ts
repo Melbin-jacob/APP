@@ -51,6 +51,17 @@ const ar: Messages = {
     previous: "السابق",
     next: "التالي",
     page: "الصفحة {page} من {pages}",
+    sortBy: "الترتيب حسب",
+    sort: {
+      relevance: "المقترحة",
+      rating: "الأعلى تقييمًا",
+      reviews: "الأكثر مراجعات",
+      distance: "الأقرب",
+      priceLow: "السعر: من الأقل إلى الأعلى",
+      priceHigh: "السعر: من الأعلى إلى الأقل",
+      newest: "الأحدث",
+      name: "الاسم (أ–ي)",
+    },
   },
   categories: {
     popular: "الفئات الأكثر رواجًا",

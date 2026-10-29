@@ -4,6 +4,7 @@ import { FeedAd } from "@/components/ads/AdBanner";
 import { withFeedAd } from "@/components/ads/withFeedAd";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SearchBar } from "@/components/search/SearchBar";
+import { SortSelect } from "@/components/search/SortSelect";
 import { TraderCard } from "@/components/traders/TraderCard";
 import { db } from "@/lib/db";
 import { getI18n } from "@/i18n/server";
@@ -30,10 +31,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     <SiteShell>
       <div className="py-8">
         <SearchBar initial={{ q: query.q, location: query.location }} />
-        <p className="mt-6 text-sm text-ink-500" aria-live="polite">
-          {t(total === 1 ? "search.resultsOne" : "search.resultsOther", { count: total })}
-          {query.location && <> · {t("search.near", { place: query.location })}</>}
-        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-ink-500" aria-live="polite">
+            {t(total === 1 ? "search.resultsOne" : "search.resultsOther", { count: total })}
+            {query.location && <> · {t("search.near", { place: query.location })}</>}
+          </p>
+          {total > 1 && <SortSelect value={query.sort} hasLocation={!!query.location || query.lat != null} />}
+        </div>
         {total === 0 && <p className="mt-6 rounded-md bg-white p-6 text-center text-sm text-ink-500 shadow-card">{t("search.noResults")}</p>}
         <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {withFeedAd(items.map((trader) => <TraderCard key={trader.id} trader={trader} />), <FeedAd banners={banners} label={t("common.advertisement")} />)}

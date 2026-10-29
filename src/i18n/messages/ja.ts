@@ -51,6 +51,17 @@ const ja: Messages = {
     previous: "前へ",
     next: "次へ",
     page: "{pages} ページ中 {page} ページ",
+    sortBy: "並べ替え",
+    sort: {
+      relevance: "おすすめ順",
+      rating: "評価の高い順",
+      reviews: "レビューの多い順",
+      distance: "近い順",
+      priceLow: "料金の安い順",
+      priceHigh: "料金の高い順",
+      newest: "新着順",
+      name: "名前順（A–Z）",
+    },
   },
   categories: {
     popular: "人気のカテゴリー",
