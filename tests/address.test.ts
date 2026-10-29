@@ -24,6 +24,22 @@ describe("address suggestions", () => {
     const url = new URL(String(fetch.mock.calls[0]![0]));
     expect(url.searchParams.get("q")).toBe("222 bridge");
     expect(url.searchParams.get("lat")).toBe("42.3");
+    expect(url.searchParams.get("bbox")).toBe("-84.30,41.40,-81.70,43.20"); // ~100 km around the business
+  });
+
+  it("falls back to a country-wide search when nearby results are all in another country", async () => {
+    const us = { properties: { countrycode: "US", type: "house", housenumber: "222", street: "Bridge Ave", city: "Detroit", postcode: "48209" } };
+    const fetch = vi.fn(async (url: string) => {
+      const bbox = new URL(url).searchParams.get("bbox");
+      const features = bbox === "-141.1,41.6,-52.6,83.2"
+        ? [feature({ type: "house", housenumber: "222", street: "Bridge Avenue", city: "Windsor", postcode: "N9B 2M2" })]
+        : [us];
+      return new Response(JSON.stringify({ features }), { status: 200 });
+    });
+    vi.stubGlobal("fetch", fetch);
+    const out = await suggestAddresses("222 bridge ave", "CA", { latitude: 42.3, longitude: -83 });
+    expect(out.map((s) => s.label)).toEqual(["222 Bridge Avenue, Windsor, Ontario N9B 2M2"]);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it("asks for nothing under 3 characters and never throws when the provider fails", async () => {

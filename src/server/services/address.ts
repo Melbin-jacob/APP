@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { type CountryCode, parsePostcode } from "@/lib/postcode";
 import { cached } from "@/lib/redis";
+import { logEvent } from "@/server/log";
 
 // Street-address suggestions for address fields ("type a few letters, pick
 // your address"). Looked up server-side so visitors' browsers never talk to a
@@ -42,14 +43,27 @@ type PhotonFeature = {
   };
 };
 
-async function photon(q: string, country: string, near: Near): Promise<AddressSuggestion[]> {
-  const params = new URLSearchParams({ q, limit: "10", lang: "en" });
+// Photon searches the whole world and location only nudges the ranking, so a
+// common street name ("Bridge Ave") can fill the list with other countries'
+// matches. Restrict each search to a box: around the business first (~100 km),
+// then the whole country.
+const COUNTRY_BOX: Record<string, string> = {
+  CA: "-141.1,41.6,-52.6,83.2",
+  US: "-179.2,18.9,-66.9,71.4",
+  GB: "-8.7,49.8,1.8,60.9",
+};
+const boxAround = ({ latitude: lat, longitude: lon }: { latitude: number; longitude: number }) =>
+  [lon - 1.3, lat - 0.9, lon + 1.3, lat + 0.9].map((n) => n.toFixed(2)).join(",");
+
+async function photonSearch(q: string, country: string, near: Near, bbox: string | undefined): Promise<AddressSuggestion[]> {
+  const params = new URLSearchParams({ q, limit: "15", lang: "en" });
   params.append("layer", "house");
   params.append("layer", "street");
+  if (bbox) params.set("bbox", bbox);
   if (near) { params.set("lat", String(near.latitude)); params.set("lon", String(near.longitude)); }
   const data = (await getJson(`${PHOTON}/api/?${params}`)) as { features?: PhotonFeature[] };
-  return (data.features ?? [])
-    .map((f) => f.properties)
+  const all = (data.features ?? []).map((f) => f.properties);
+  const kept = all
     .filter((p) => p.countrycode?.toUpperCase() === country)
     .map((p) => {
       const s = {
@@ -60,6 +74,16 @@ async function photon(q: string, country: string, near: Near): Promise<AddressSu
       };
       return { ...s, label: label(s) };
     });
+  logEvent("address.lookup", { provider: "photon", scope: bbox === COUNTRY_BOX[country] ? "country" : bbox ? "near" : "world", found: all.length, kept: kept.length });
+  return kept;
+}
+
+async function photon(q: string, country: string, near: Near): Promise<AddressSuggestion[]> {
+  if (near) {
+    const local = await photonSearch(q, country, near, boxAround(near));
+    if (local.length > 0) return local;
+  }
+  return photonSearch(q, country, near, COUNTRY_BOX[country]);
 }
 
 type GeoapifyResult = { housenumber?: string; street?: string; city?: string; postcode?: string; state_code?: string; state?: string };
@@ -82,9 +106,9 @@ export async function suggestAddresses(rawQuery: string, country: string, near: 
   // Round the bias point so nearby visitors share cache entries; hash the
   // query so typed addresses don't sit in Redis key names.
   const where = near ? `${near.latitude.toFixed(1)},${near.longitude.toFixed(1)}` : "-";
-  const cacheKey = `addr:${key ? "g" : "p"}:${country}:${where}:${createHash("sha256").update(q.toLowerCase()).digest("base64url")}`;
+  const cacheKey = `addr2:${key ? "g" : "p"}:${country}:${where}:${createHash("sha256").update(q.toLowerCase()).digest("base64url")}`;
   try {
-    const found = await cached(cacheKey, 60 * 60 * 24, () => (key ? geoapify(q, country, near, key) : photon(q, country, near)));
+    const found = await cached(cacheKey, 60 * 60 * 24, () => (key ? geoapify(q, country, near, key) : photon(q, country, near)), (found) => found.length > 0);
     const seen = new Set<string>();
     return found
       // Street-level results often carry only part of a postcode ("N9B"); fill only complete ones.
@@ -92,7 +116,7 @@ export async function suggestAddresses(rawQuery: string, country: string, near: 
       .filter((s) => s.addressLine && !seen.has(s.label) && seen.add(s.label))
       .slice(0, 6);
   } catch (err) {
-    console.warn("[address] lookup failed", err instanceof Error ? err.message : err);
+    logEvent("address.lookup_failed", { error: err instanceof Error ? err.message : String(err) }, "warn");
     return [];
   }
 }

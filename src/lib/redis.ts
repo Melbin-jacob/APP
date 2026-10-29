@@ -22,8 +22,11 @@ redis.on("error", (err) => {
 
 if (process.env.NODE_ENV !== "production") globalForRedis.redis = redis;
 
-/** Read-through cache. Falls back to the loader if Redis is unavailable. */
-export async function cached<T>(key: string, ttlSeconds: number, load: () => Promise<T>): Promise<T> {
+/**
+ * Read-through cache. Falls back to the loader if Redis is unavailable.
+ * `shouldCache` can skip storing some values (e.g. empty results worth retrying).
+ */
+export async function cached<T>(key: string, ttlSeconds: number, load: () => Promise<T>, shouldCache?: (value: T) => boolean): Promise<T> {
   try {
     const hit = await redis.get(key);
     if (hit) return JSON.parse(hit) as T;
@@ -31,6 +34,7 @@ export async function cached<T>(key: string, ttlSeconds: number, load: () => Pro
     return load();
   }
   const value = await load();
+  if (shouldCache && !shouldCache(value)) return value;
   redis.set(key, JSON.stringify(value), "EX", ttlSeconds).catch(() => {});
   return value;
 }
