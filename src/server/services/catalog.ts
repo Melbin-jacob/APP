@@ -45,7 +45,7 @@ export function getPublicTrader(slug: string) {
       select: {
         id: true, slug: true, businessName: true, bio: true, hourlyRatePence: true, currency: true, country: true,
         website: true, userId: true, phone: true,
-        logoUrl: true, coverImageUrl: true, addressLine: true, city: true, postcode: true,
+        logoUrl: true, coverImageUrl: true, addressLine: true, city: true, postcode: true, latitude: true, longitude: true,
         serviceRadiusKm: true, operatingHours: true, verifiedAt: true, ratingAvg: true, ratingCount: true,
         createdAt: true,
         categories: { select: { isPrimary: true, category: { select: { name: true, slug: true, icon: true } } } },

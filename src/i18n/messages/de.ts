@@ -441,6 +441,7 @@ const de: Messages = {
     phone: "Telefonnummer",
     email: "E-Mail (optional, für eine Kopie Ihrer Anfrage)",
     address: "Straße und Hausnummer",
+    addressHint: "Beginnen Sie zu tippen und wählen Sie Ihre Adresse aus der Liste.",
     city: "Ort",
     job: "Zum Auftrag",
     description: "Beschreiben Sie das Problem",

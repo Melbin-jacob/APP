@@ -441,6 +441,7 @@ const pt: Messages = {
     phone: "Telefone",
     email: "E-mail (opcional, para receber uma cópia)",
     address: "Endereço",
+    addressHint: "Comece a digitar e escolha seu endereço na lista.",
     city: "Cidade",
     job: "Sobre o serviço",
     description: "Descreva o problema",

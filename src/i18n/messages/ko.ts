@@ -441,6 +441,7 @@ const ko: Messages = {
     phone: "전화번호",
     email: "이메일(선택, 요청 사본 수신용)",
     address: "주소",
+    addressHint: "입력을 시작한 뒤 목록에서 주소를 선택하세요.",
     city: "도시",
     job: "작업 내용",
     description: "문제를 설명해 주세요",

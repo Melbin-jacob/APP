@@ -39,6 +39,7 @@ export default async function QuotePage({ params }: Props) {
             businessName={trader.businessName}
             claimed={trader.claimed}
             country={isSupportedCountry(trader.country) ? trader.country : "US"}
+            near={trader.latitude != null && trader.longitude != null ? { latitude: Math.round(trader.latitude * 10) / 10, longitude: Math.round(trader.longitude * 10) / 10 } : null}
             defaults={{
               name: me?.name ?? "", email: me?.email ?? "", phone: me?.phone ?? "",
               addressLine: me?.addressLine ?? "", city: me?.city ?? "", postcode: me?.postcode ?? "",

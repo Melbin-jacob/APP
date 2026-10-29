@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState, type FormEvent, type ReactNode } from "react";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
+import { AddressAutocomplete } from "@/components/forms/AddressAutocomplete";
 import { api, ClientApiError } from "@/lib/api-client";
 import { CONTACT_TIMES, PHONE_PATTERN, QUOTE_LIMITS as L, type ContactTime } from "@/lib/quotes";
 
@@ -13,9 +14,11 @@ type Props = {
   claimed: boolean;
   country: "US" | "CA" | "GB";
   defaults: { name: string; email: string; phone: string; addressLine: string; city: string; postcode: string };
+  /** Roughly where the business is, so address suggestions start nearby. */
+  near?: { latitude: number; longitude: number } | null;
 };
 
-export function QuoteForm({ slug, businessName, claimed, country, defaults }: Props) {
+export function QuoteForm({ slug, businessName, claimed, country, defaults, near }: Props) {
   const { t } = usePrefs();
   const label = t(`register.postalLabels.${country}`);
   const [f, setF] = useState({
@@ -80,8 +83,11 @@ export function QuoteForm({ slug, businessName, claimed, country, defaults }: Pr
           <Field id="q-email" label={t("quote.email")} className="sm:col-span-2">
             <input id="q-email" type="email" maxLength={254} value={f.email} onChange={set("email")} className="input" autoComplete="email" dir="ltr" />
           </Field>
-          <Field id="q-address" label={t("quote.address")} className="sm:col-span-2">
-            <input id="q-address" required minLength={3} maxLength={L.address} value={f.addressLine} onChange={set("addressLine")} className="input" autoComplete="street-address" />
+          <Field id="q-address" label={t("quote.address")} hint={t("quote.addressHint")} className="sm:col-span-2">
+            <AddressAutocomplete id="q-address" required minLength={3} maxLength={L.address} value={f.addressLine} className="input"
+              country={country} near={near}
+              onChange={(v) => { setF((x) => ({ ...x, addressLine: v })); m.reset(); }}
+              onSelect={(a) => { setF((x) => ({ ...x, addressLine: a.addressLine, city: a.city || x.city, postcode: a.postcode || x.postcode })); m.reset(); }} />
           </Field>
           <Field id="q-city" label={t("quote.city")}>
             <input id="q-city" required minLength={2} maxLength={L.city} value={f.city} onChange={set("city")} className="input" autoComplete="address-level2" />

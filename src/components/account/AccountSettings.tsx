@@ -5,6 +5,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import { AddressAutocomplete } from "@/components/forms/AddressAutocomplete";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
 import { StarRating } from "@/components/ui/StarRating";
 import { api, ClientApiError } from "@/lib/api-client";
@@ -18,7 +19,7 @@ export function SignOutButton({ className = "btn-ghost" }: { className?: string 
 type ProfileData = { name: string; email: string; marketingOptIn: boolean; phone: string; addressLine: string; city: string; postcode: string };
 
 export function ProfileForm({ initial }: { initial: ProfileData }) {
-  const { t } = usePrefs();
+  const { t, country } = usePrefs();
   const router = useRouter();
   const [name, setName] = useState(initial.name);
   const [marketing, setMarketing] = useState(initial.marketingOptIn);
@@ -60,7 +61,13 @@ export function ProfileForm({ initial }: { initial: ProfileData }) {
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="acc-address" className="label">{t("quote.address")}</label>
-          <input id="acc-address" maxLength={200} value={contact.addressLine} onChange={setField("addressLine")} className="input" autoComplete="street-address" />
+          <AddressAutocomplete id="acc-address" maxLength={200} value={contact.addressLine} className="input" country={country}
+            onChange={(v) => setField("addressLine")({ target: { value: v } })}
+            onSelect={(a) => {
+              setField("addressLine")({ target: { value: a.addressLine } });
+              if (a.city) setField("city")({ target: { value: a.city } });
+              if (a.postcode) setField("postcode")({ target: { value: a.postcode } });
+            }} />
         </div>
         <div>
           <label htmlFor="acc-city" className="label">{t("quote.city")}</label>

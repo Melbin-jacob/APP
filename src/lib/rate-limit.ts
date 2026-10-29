@@ -14,6 +14,7 @@ export const RATE_LIMITS = {
   newsletter: { limit: 5, windowSeconds: 60 * 60 },
   search: { limit: 120, windowSeconds: 60 },
   geoLookup: { limit: 30, windowSeconds: 60 },
+  addressSuggest: { limit: 60, windowSeconds: 60 }, // per IP; one lookup per pause in typing
   callClick: { limit: 30, windowSeconds: 60 * 60 },
   quoteRequest: { limit: 5, windowSeconds: 60 * 60 }, // per IP
   contact: { limit: 5, windowSeconds: 60 * 60 }, // per IP
@@ -74,7 +75,7 @@ export async function rateLimit(
     };
   } catch {
     // Fail closed for auth-sensitive policies, open for read paths.
-    const failOpen = policy === "search" || policy === "callClick" || policy === "geoLookup";
+    const failOpen = policy === "search" || policy === "callClick" || policy === "geoLookup" || policy === "addressSuggest";
     return { ok: failOpen, remaining: 0, retryAfterSeconds: failOpen ? 0 : 60 };
   }
 }

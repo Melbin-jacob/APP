@@ -441,6 +441,7 @@ const ja: Messages = {
     phone: "電話番号",
     email: "メールアドレス（任意。依頼内容の控えをお送りします）",
     address: "住所",
+    addressHint: "入力を始めると候補が表示されます。一覧から住所を選んでください。",
     city: "市区町村",
     job: "作業内容",
     description: "お困りの内容",

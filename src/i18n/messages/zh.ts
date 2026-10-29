@@ -441,6 +441,7 @@ const zh: Messages = {
     phone: "电话号码",
     email: "电子邮箱（可选，用于接收请求副本）",
     address: "街道地址",
+    addressHint: "开始输入，然后从列表中选择您的地址。",
     city: "城市",
     job: "工作内容",
     description: "描述问题",

@@ -441,6 +441,7 @@ const en = {
     phone: "Phone number",
     email: "Email (optional, for a copy of your request)",
     address: "Street address",
+    addressHint: "Start typing and pick your address from the list.",
     city: "City or town",
     job: "About the job",
     description: "Describe the issue",

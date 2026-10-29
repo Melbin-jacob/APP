@@ -66,7 +66,9 @@ export default function PrivacyPage() {
         <li><strong>The business you ask for a quote:</strong> the details you enter in its quote form, only with your consent and only
           for that request. Businesses may not use them for marketing.</li>
         <li><strong>Service providers</strong> under contract, only to run the service: cloud hosting and databases, email delivery, and a
-          postal-code lookup service (which receives only a business postal code). They may not use the data for their own purposes.</li>
+          postal-code lookup service (which receives only a business postal code), and an address-suggestion service based on
+          OpenStreetMap (which receives the partial street address you type, from our server, never linked to your name or account).
+          They may not use the data for their own purposes.</li>
         <li><strong>Advertising partners:</strong> only if you accept advertising cookies. See <Link href="/legal/privacy-choices">Do Not Sell or Share</Link>.</li>
         <li><strong>Authorities:</strong> when required by law, or to protect people’s safety or our rights.</li>
       </ul>
