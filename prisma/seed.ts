@@ -104,17 +104,30 @@ async function main() {
   const LIST = { name: "list your business", targetUrl: "/register?type=trader" };
   const QUOTES = { name: "get free quotes", targetUrl: "/search" };
   const HOUSE_ADS = [
-    { slot: "LEFT" as const, ads: [{ ...LIST, imageUrl: "/images/ads/house-list-business.svg" }], width: 160, height: 600 },
-    { slot: "RIGHT" as const, ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes.svg" }], width: 160, height: 600 },
+    { slot: "LEFT" as const, ads: [{ ...LIST, imageUrl: "/images/promo/list-business-tall.svg" }], width: 160, height: 600 },
+    { slot: "RIGHT" as const, ads: [{ ...QUOTES, imageUrl: "/images/promo/get-quotes-tall.svg" }], width: 160, height: 600 },
     {
       slot: "LEADERBOARD" as const, width: 728, height: 90,
-      ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes-728x90.svg" }, { ...LIST, imageUrl: "/images/ads/house-list-business-728x90.svg" }],
+      ads: [{ ...QUOTES, imageUrl: "/images/promo/get-quotes-wide.svg" }, { ...LIST, imageUrl: "/images/promo/list-business-wide.svg" }],
     },
     {
       slot: "MOBILE" as const, width: 320, height: 100,
-      ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes-320x100.svg" }, { ...LIST, imageUrl: "/images/ads/house-list-business-320x100.svg" }],
+      ads: [{ ...QUOTES, imageUrl: "/images/promo/get-quotes-compact.svg" }, { ...LIST, imageUrl: "/images/promo/list-business-compact.svg" }],
     },
   ];
+  // House-ad images used to live under /images/ads/ with sizes in their names
+  // ("-728x90.svg"), which ad blockers hide even on our own site. Repoint
+  // existing banners at the renamed files.
+  const MOVED: Record<string, string> = {
+    "/images/ads/house-list-business.svg": "/images/promo/list-business-tall.svg",
+    "/images/ads/house-get-quotes.svg": "/images/promo/get-quotes-tall.svg",
+    "/images/ads/house-get-quotes-728x90.svg": "/images/promo/get-quotes-wide.svg",
+    "/images/ads/house-list-business-728x90.svg": "/images/promo/list-business-wide.svg",
+    "/images/ads/house-get-quotes-320x100.svg": "/images/promo/get-quotes-compact.svg",
+    "/images/ads/house-list-business-320x100.svg": "/images/promo/list-business-compact.svg",
+  };
+  for (const [from, to] of Object.entries(MOVED)) await db.banner.updateMany({ where: { imageUrl: from }, data: { imageUrl: to } });
+
   for (const { slot, ads, width, height } of HOUSE_ADS) {
     if (await db.banner.count({ where: { slot } })) continue;
     for (const ad of ads) {
