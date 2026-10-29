@@ -76,7 +76,8 @@ export function AddressAutocomplete({ id, value, onChange, onSelect, country, ne
           if (!open || items.length === 0) return;
           if (e.key === "ArrowDown") { e.preventDefault(); setActive((i) => (i + 1) % items.length); }
           else if (e.key === "ArrowUp") { e.preventDefault(); setActive((i) => (i <= 0 ? items.length - 1 : i - 1)); }
-          else if (e.key === "Enter" && active >= 0) { e.preventDefault(); pick(items[active]!); }
+          // Enter picks the highlighted (or first) address instead of submitting the form.
+          else if (e.key === "Enter") { e.preventDefault(); pick(items[Math.max(active, 0)]!); }
           else if (e.key === "Escape") { setOpen(false); }
         }}
       />
