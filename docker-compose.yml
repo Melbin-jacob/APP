@@ -27,6 +27,12 @@ services:
       SEED_DEMO_DATA: "true"
       # The secrets above are public test values: allowed only because APP_URL is localhost.
       ALLOW_INSECURE_LOCAL_SECRETS: "true"
+      # Docker Desktop often can't route IPv6; without this, calls to outside
+      # services (address suggestions, postal-code lookup) can hang until timeout.
+      NODE_OPTIONS: --dns-result-order=ipv4first
+      # Optional: free key from geoapify.com for reliable address suggestions.
+      # Put GEOAPIFY_API_KEY=... in a .env file next to this one.
+      GEOAPIFY_API_KEY: ${GEOAPIFY_API_KEY:-}
 
   db:
     image: postgis/postgis:16-3.4

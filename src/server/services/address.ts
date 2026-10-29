@@ -27,7 +27,7 @@ export type AddressSuggestion = {
 type Near = { latitude: number; longitude: number } | null;
 
 async function getJson(url: string): Promise<unknown> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(4000), headers: { Accept: "application/json", "User-Agent": "GetTradePros address lookup" } });
+  const res = await fetch(url, { signal: AbortSignal.timeout(6000), headers: { Accept: "application/json", "User-Agent": "GetTradePros address lookup" } });
   if (!res.ok) throw new Error(`address provider ${res.status}`);
   return res.json();
 }
