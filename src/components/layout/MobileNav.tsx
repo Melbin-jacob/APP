@@ -7,7 +7,7 @@ import { SignOutButton } from "@/components/account/AccountSettings";
 export function MobileNav({ items, cta, menuLabel, signOut }: { items: { href: string; label: string }[]; cta?: string; menuLabel: string; signOut?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         className="rounded p-2 text-ink-700"

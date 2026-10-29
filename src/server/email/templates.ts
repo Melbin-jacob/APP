@@ -245,3 +245,27 @@ export function claimReceivedEmail(input: { businessName: string; claimant: stri
   );
   return { subject, html, text: `${input.claimant} (${input.jobTitle}, ${input.email}, ${input.phone}) claims ${input.businessName}. Verify, then review: ${input.adminUrl}` };
 }
+
+const CONTACT_TOPIC_LABELS: Record<string, string> = {
+  general: "General question", customer: "Help finding or hiring a pro", business: "Business listing",
+  account: "Account or signing in", privacy: "Privacy or personal data", advertising: "Advertising and partnerships", other: "Something else",
+};
+
+export function contactMessageEmail(input: { name: string; email: string; phone: string | null; topic: string; message: string }) {
+  const topic = CONTACT_TOPIC_LABELS[input.topic] ?? input.topic;
+  const subject = `Contact form: ${topic} (${input.name})`;
+  const html = layout(
+    subject,
+    `<p style="font-size:15px;line-height:1.5;margin:0 0 12px"><strong>${esc(input.name)}</strong> sent a message through the contact page.</p>
+     <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.6;margin:0 0 16px">
+       <tr><td style="color:#7b8794;padding-right:12px">Topic</td><td>${esc(topic)}</td></tr>
+       <tr><td style="color:#7b8794;padding-right:12px">Email</td><td>${esc(input.email)}</td></tr>
+       <tr><td style="color:#7b8794;padding-right:12px">Phone</td><td>${esc(input.phone ?? "not given")}</td></tr>
+     </table>
+     <div style="border:1px solid #e4e7eb;border-radius:6px;padding:12px;font-size:14px;line-height:1.5;white-space:pre-wrap">${esc(input.message)}</div>
+     <p style="font-size:13px;color:#7b8794;margin:16px 0 0">Reply to this email to answer ${esc(input.name)} directly.</p>`,
+    senderLine(),
+  );
+  const text = `${input.name} sent a message through the contact page.\nTopic: ${topic}\nEmail: ${input.email}\nPhone: ${input.phone ?? "not given"}\n\n${input.message}\n\nReply to this email to answer them directly.`;
+  return { subject, html, text };
+}

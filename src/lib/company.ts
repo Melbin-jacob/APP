@@ -7,7 +7,13 @@ export const COMPANY = {
   privacyEmail: process.env.PRIVACY_EMAIL ?? "privacy@gettradepros.com",
   securityEmail: process.env.SECURITY_EMAIL ?? "security@gettradepros.com",
   supportEmail: process.env.SUPPORT_EMAIL ?? "support@gettradepros.com",
+  // Contact page. Left as placeholders until set; the page shows "Coming soon".
+  phone: process.env.CONTACT_PHONE ?? "[Phone — set CONTACT_PHONE]",
+  hours: process.env.CONTACT_HOURS ?? "[Office hours — set CONTACT_HOURS]",
   // Quebec Law 25 / PIPEDA: the person accountable for personal information.
   privacyOfficer: process.env.PRIVACY_OFFICER ?? "Privacy Officer",
   jurisdiction: process.env.LEGAL_JURISDICTION ?? "[Governing law — set LEGAL_JURISDICTION]",
 };
+
+/** True for a value still at its "[… — set X]" placeholder. */
+export const isPlaceholder = (value: string) => value.startsWith("[");

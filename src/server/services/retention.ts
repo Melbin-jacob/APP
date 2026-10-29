@@ -10,6 +10,7 @@ export const RETENTION_DAYS = {
   decidedClaims: 730, // listing claims, 24 months after the decision
   // Claim proof documents (registration, photo ID) are deleted the moment the
   // claim is decided; this sweep only catches any left behind.
+  contactMessages: 730, // support mailbox: delete contact-form emails 24 months after answering (manual; policy only)
   consentRecords: 730, // proof of cookie consent (the cookie itself lasts 6 months)
   closedIncidents: 1095, // breach register: PIPEDA requires 24 months; we keep 36
   auditLogs: 730, // 24 months of security / admin audit trail

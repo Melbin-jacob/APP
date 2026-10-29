@@ -7,6 +7,8 @@ export type OutgoingEmail = {
   subject: string;
   html: string;
   text: string;
+  /** Where replies go (e.g. the visitor who used the contact form). */
+  replyTo?: string;
   /** SES configuration-set / SendGrid category for delivery analytics. */
   tag?: string;
   /** Non-essential mail must carry a one-click unsubscribe (RFC 8058, Gmail/Yahoo sender rules). */
@@ -38,6 +40,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: str
       new SendEmailCommand({
         FromEmailAddress: EMAIL_FROM,
         Destination: { ToAddresses: [email.to] },
+        ReplyToAddresses: email.replyTo ? [email.replyTo] : undefined,
         Content: {
           Simple: {
             Subject: { Data: email.subject, Charset: "UTF-8" },
@@ -52,7 +55,7 @@ export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: str
   }
 
   smtp ??= nodemailer.createTransport(SMTP_URL);
-  const { to, subject, html, text } = email;
-  const info = await smtp.sendMail({ from: EMAIL_FROM, to, subject, html, text, headers: listHeaders(email) });
+  const { to, subject, html, text, replyTo } = email;
+  const info = await smtp.sendMail({ from: EMAIL_FROM, to, replyTo, subject, html, text, headers: listHeaders(email) });
   return { messageId: info.messageId };
 }

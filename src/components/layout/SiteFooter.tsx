@@ -39,6 +39,7 @@ export async function SiteFooter() {
             <li><Link href="/search" className={link}>{t("nav.services")}</Link></li>
             <li><Link href="/register?type=trader" className={link}>{t("nav.listBusiness")}</Link></li>
             <li><Link href="/account" className={link}>{t("footer.yourData")}</Link></li>
+            <li><Link href="/contact" className={link}>{t("nav.contact")}</Link></li>
           </ul>
         </nav>
 

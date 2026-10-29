@@ -32,6 +32,7 @@ export async function SiteHeader() {
     { href: "/", label: t("nav.home") },
     { href: "/categories", label: t("nav.categories") },
     { href: "/search", label: t("nav.services") },
+    { href: "/contact", label: t("nav.contact") },
     user ? { href: accountHref, label: t("nav.myAccount") } : { href: "/login", label: t("nav.loginRegister") },
   ];
 
@@ -39,7 +40,7 @@ export async function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-ink-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Logo />
-        <nav aria-label="Main" className="hidden items-center gap-7 md:flex">
+        <nav aria-label="Main" className="hidden items-center gap-5 whitespace-nowrap lg:flex xl:gap-7">
           {nav.map((n) => (
             <Link key={n.href} href={n.href} className="text-sm font-medium text-ink-700 hover:text-brand-600">
               {n.label}
