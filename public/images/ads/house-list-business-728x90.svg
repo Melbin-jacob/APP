@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="728" height="90" viewBox="0 0 728 90">
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#3b4636"/><stop offset="1" stop-color="#55634e"/></linearGradient></defs>
+  <rect width="728" height="90" rx="8" fill="url(#bg)"/>
+  <circle cx="48" cy="45" r="29" fill="#fff" fill-opacity=".14"/>
+  <g transform="translate(24 21)" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 22 24 4l20 18v22H4z"/><path d="M18 44V30h12v14"/>
+  </g>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#fff">
+    <text x="94" y="30" font-size="11" font-weight="700" letter-spacing="1.5" fill-opacity=".8">FOR BUSINESSES</text>
+    <text x="94" y="56" font-size="22" font-weight="700">List your business <tspan fill="#c9e3b8">free</tspan></text>
+    <text x="94" y="75" font-size="12" fill-opacity=".9">Reach local homeowners looking for your trade · Free listing · Quote requests · Reviews</text>
+  </g>
+  <rect x="592" y="25" width="116" height="40" rx="20" fill="#4caf2f"/>
+  <text x="650" y="50" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#fff" text-anchor="middle">Get started</text>
+</svg>

@@ -5,6 +5,13 @@ import { AdSlot } from "./AdSlot";
  * Sticky skyscraper column flanking the main container. Only shown at xl+
  * where there's room for 160px (or 300px at 2xl) beside the 1152px content.
  */
+/** Where the rails appear: xl for 160-wide banners, 2xl if any is 300 wide; null with no rails. */
+export function railBreakpoint(...rails: (PublicBanner | undefined)[]): "xl" | "2xl" | null {
+  const shown = rails.filter((r): r is PublicBanner => !!r);
+  if (shown.length === 0) return null;
+  return shown.some((r) => r.width > 160) ? "2xl" : "xl";
+}
+
 export function AdRail({ banner, side, label }: { banner?: PublicBanner; side: "left" | "right"; label: string }) {
   if (!banner) return null;
   const visibility = banner.width > 160 ? "hidden 2xl:block" : "hidden xl:block";

@@ -25,7 +25,7 @@ export const PATCH = route<Ctx>(async (req, { params }) => {
   if (!(await db.banner.findUnique({ where: { id }, select: { id: true } }))) throw notFound("Banner");
   await db.banner.update({ where: { id }, data: input });
   await audit({ actorId: admin.id, action: "banner.update", entityType: "Banner", entityId: id, ipHash: ipHash(req), metadata: input });
-  await invalidate("banners:active");
+  await invalidate("banners:active", "banners:active-ids");
   return NextResponse.json({ ok: true });
 });
 
@@ -36,6 +36,6 @@ export const DELETE = route<Ctx>(async (req, { params }) => {
   const { id } = await params;
   await db.banner.delete({ where: { id } }).catch(() => { throw notFound("Banner"); });
   await audit({ actorId: admin.id, action: "banner.delete", entityType: "Banner", entityId: id, ipHash: ipHash(req) });
-  await invalidate("banners:active");
+  await invalidate("banners:active", "banners:active-ids");
   return NextResponse.json({ ok: true });
 });

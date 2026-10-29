@@ -401,8 +401,10 @@ model ReviewReport {
 // ─── Ads, settings, ops ──────────────────────────────────────────────────────
 
 enum BannerSlot {
-  LEFT
+  LEFT // skyscraper rails beside the content, wide desktops (160 or 300 wide)
   RIGHT
+  LEADERBOARD // 728x90 across the top of the page on tablets and laptops (no room for rails)
+  MOBILE // 320x100 (or 320x50) across the top of the page on phones
 }
 
 enum BannerKind {

@@ -6,9 +6,18 @@ import { api, ClientApiError } from "@/lib/api-client";
 import { Badge, PageTitle } from "./ui";
 
 type Banner = {
-  id: string; name: string; slot: "LEFT" | "RIGHT"; kind: "IMAGE" | "SCRIPT"; imageUrl: string | null; targetUrl: string | null;
+  id: string; name: string; slot: Slot; kind: "IMAGE" | "SCRIPT"; imageUrl: string | null; targetUrl: string | null;
   width: number; height: number; weight: number; isActive: boolean; startsAt: string | null; endsAt: string | null;
   stats: { impressions: number; clicks: number; ctr: number };
+};
+
+type Slot = "LEFT" | "RIGHT" | "LEADERBOARD" | "MOBILE";
+// Where each slot shows, and the sizes it takes (the API enforces these).
+const SLOTS: Record<Slot, { label: string; sizes: [number, number][] }> = {
+  LEFT: { label: "Left rail (wide desktops)", sizes: [[160, 600], [300, 600], [300, 250]] },
+  RIGHT: { label: "Right rail (wide desktops)", sizes: [[160, 600], [300, 600], [300, 250]] },
+  LEADERBOARD: { label: "Top banner (tablets & laptops)", sizes: [[728, 90]] },
+  MOBILE: { label: "Top banner (phones)", sizes: [[320, 100], [320, 50]] },
 };
 
 function GlobalSwitch() {
@@ -23,13 +32,16 @@ function GlobalSwitch() {
   return (
     <section className="card mb-6 flex items-center justify-between gap-4 p-5">
       <div>
-        <h2 className="font-semibold">Side banners — site-wide</h2>
-        <p className="text-sm text-ink-500">Instantly shows or hides the left &amp; right skyscraper slots on every public page.</p>
+        <h2 className="font-semibold">Ad banners — site-wide</h2>
+        <p className="text-sm text-ink-500">
+          Instantly shows or hides every banner on every public page: the left &amp; right rails on wide desktops, and the
+          top banner on laptops, tablets and phones.
+        </p>
       </div>
       <button
         role="switch"
         aria-checked={enabled}
-        aria-label="Toggle side banners"
+        aria-label="Toggle ad banners"
         disabled={settings.isLoading || toggle.isPending}
         onClick={() => toggle.mutate(!enabled)}
         className={`relative h-8 w-14 shrink-0 rounded-full transition ${enabled ? "bg-brand-500" : "bg-ink-200"}`}
@@ -42,6 +54,8 @@ function GlobalSwitch() {
 
 function NewBannerForm({ onDone }: { onDone: () => void }) {
   const [kind, setKind] = useState<"IMAGE" | "SCRIPT">("IMAGE");
+  const [slot, setSlot] = useState<Slot>("LEFT");
+  const [size, setSize] = useState("160x600");
   const create = useMutation({
     mutationFn: (body: object) => api("/api/admin/banners", { method: "POST", json: body }),
     onSuccess: onDone,
@@ -50,8 +64,9 @@ function NewBannerForm({ onDone }: { onDone: () => void }) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
     const s = (k: string) => (String(f.get(k) ?? "").trim() || undefined);
+    const [width, height] = size.split("x").map(Number);
     create.mutate({
-      name: s("name"), slot: s("slot"), kind, width: Number(s("width")), height: Number(s("height") ?? 600),
+      name: s("name"), slot, kind, width, height,
       weight: Number(s("weight") ?? 1), imageUrl: s("imageUrl"), targetUrl: s("targetUrl"), scriptHtml: s("scriptHtml"),
       startsAt: s("startsAt"), endsAt: s("endsAt"),
     });
@@ -60,12 +75,16 @@ function NewBannerForm({ onDone }: { onDone: () => void }) {
     <form onSubmit={submit} className="card mb-6 grid gap-3 p-5 sm:grid-cols-4">
       <h2 className="font-semibold sm:col-span-4">New banner</h2>
       <input name="name" required placeholder="Name" className="input sm:col-span-2" />
-      <select name="slot" className="input"><option>LEFT</option><option>RIGHT</option></select>
+      <select value={slot} aria-label="Where it shows" className="input"
+        onChange={(e) => { const v = e.target.value as Slot; setSlot(v); setSize(SLOTS[v].sizes[0]!.join("x")); }}>
+        {(Object.keys(SLOTS) as Slot[]).map((k) => <option key={k} value={k}>{SLOTS[k].label}</option>)}
+      </select>
       <select value={kind} onChange={(e) => setKind(e.target.value as "IMAGE" | "SCRIPT")} className="input">
         <option value="IMAGE">Image + link</option><option value="SCRIPT">Script tag (AdSense…)</option>
       </select>
-      <select name="width" className="input"><option value="160">160 px wide</option><option value="300">300 px wide</option></select>
-      <input name="height" type="number" defaultValue={600} min={250} max={1050} className="input" aria-label="Height" />
+      <select value={size} onChange={(e) => setSize(e.target.value)} aria-label="Size" className="input">
+        {SLOTS[slot].sizes.map(([w, h]) => <option key={`${w}x${h}`} value={`${w}x${h}`}>{w} × {h} px</option>)}
+      </select>
       <input name="weight" type="number" defaultValue={1} min={1} max={100} className="input" aria-label="Rotation weight" />
       <span />
       {kind === "IMAGE" ? (
@@ -116,11 +135,11 @@ export function AdminBannersClient() {
                 <td className="p-3">
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {b.imageUrl ? <img src={b.imageUrl} alt="" className="h-12 w-8 rounded object-cover" /> : <span className="grid h-12 w-8 place-items-center rounded bg-ink-100 text-[10px]">JS</span>}
+                    {b.imageUrl ? <img src={b.imageUrl} alt="" className="h-12 w-20 rounded object-contain" /> : <span className="grid h-12 w-20 place-items-center rounded bg-ink-100 text-[10px]">JS</span>}
                     <span>{b.name}<span className="block max-w-[16rem] truncate text-xs text-ink-500">{b.targetUrl ?? "script tag"}</span></span>
                   </div>
                 </td>
-                <td>{b.slot}</td>
+                <td>{SLOTS[b.slot]?.label ?? b.slot}</td>
                 <td>{b.width}×{b.height}</td>
                 <td>{b.stats.impressions.toLocaleString()}</td>
                 <td>{b.stats.clicks.toLocaleString()}</td>

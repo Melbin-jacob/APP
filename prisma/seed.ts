@@ -98,15 +98,27 @@ async function main() {
     });
   }
 
-  // Our own promos for the side rails, so they're never empty. Only added to a
-  // side with no banners at all: banners an admin created, paused or deleted win.
+  // Our own promos, so no slot is ever empty. Only added to a slot with no
+  // banners at all: banners an admin created, paused or deleted win. The top
+  // banner slots rotate both messages.
+  const LIST = { name: "list your business", targetUrl: "/register?type=trader" };
+  const QUOTES = { name: "get free quotes", targetUrl: "/search" };
   const HOUSE_ADS = [
-    { slot: "LEFT" as const, name: "House ad: list your business", imageUrl: "/images/ads/house-list-business.svg", targetUrl: "/register?type=trader" },
-    { slot: "RIGHT" as const, name: "House ad: get free quotes", imageUrl: "/images/ads/house-get-quotes.svg", targetUrl: "/search" },
+    { slot: "LEFT" as const, ads: [{ ...LIST, imageUrl: "/images/ads/house-list-business.svg" }], width: 160, height: 600 },
+    { slot: "RIGHT" as const, ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes.svg" }], width: 160, height: 600 },
+    {
+      slot: "LEADERBOARD" as const, width: 728, height: 90,
+      ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes-728x90.svg" }, { ...LIST, imageUrl: "/images/ads/house-list-business-728x90.svg" }],
+    },
+    {
+      slot: "MOBILE" as const, width: 320, height: 100,
+      ads: [{ ...QUOTES, imageUrl: "/images/ads/house-get-quotes-320x100.svg" }, { ...LIST, imageUrl: "/images/ads/house-list-business-320x100.svg" }],
+    },
   ];
-  for (const ad of HOUSE_ADS) {
-    if (!(await db.banner.count({ where: { slot: ad.slot } }))) {
-      await db.banner.create({ data: { ...ad, kind: "IMAGE", width: 160, height: 600, weight: 1, isActive: true } });
+  for (const { slot, ads, width, height } of HOUSE_ADS) {
+    if (await db.banner.count({ where: { slot } })) continue;
+    for (const ad of ads) {
+      await db.banner.create({ data: { ...ad, name: `House ad: ${ad.name}`, slot, kind: "IMAGE", width, height, weight: 1, isActive: true } });
     }
   }
 

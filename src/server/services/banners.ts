@@ -20,12 +20,14 @@ function pickWeighted<T extends { weight: number }>(items: T[]): T | undefined {
   return items[0];
 }
 
+export const BANNER_SLOTS = ["LEFT", "RIGHT", "LEADERBOARD", "MOBILE"] as const;
+
 /**
- * One banner per side, or nothing when the global kill switch is off.
+ * One banner per slot, or nothing when the global kill switch is off.
  * The switch is checked on every render so an admin toggle takes effect
  * site-wide within the settings cache TTL (seconds).
  */
-export async function getSideBanners(): Promise<Partial<Record<BannerSlot, PublicBanner>>> {
+export async function getBanners(): Promise<Partial<Record<BannerSlot, PublicBanner>>> {
   if (!(await getSetting("ads.sideBanners.enabled"))) return {};
 
   const now = new Date();
@@ -43,7 +45,7 @@ export async function getSideBanners(): Promise<Partial<Record<BannerSlot, Publi
   );
 
   const result: Partial<Record<BannerSlot, PublicBanner>> = {};
-  for (const slot of ["LEFT", "RIGHT"] as const) {
+  for (const slot of BANNER_SLOTS) {
     const chosen = pickWeighted(active.filter((b) => b.slot === slot));
     if (chosen) {
       result[slot] = {
@@ -51,10 +53,20 @@ export async function getSideBanners(): Promise<Partial<Record<BannerSlot, Publi
         scriptHtml: chosen.scriptHtml, width: chosen.width, height: chosen.height, name: chosen.name,
         internal: !!chosen.targetUrl?.startsWith("/"),
       };
-      redis.hincrby(`banner:stats:${today()}`, `${chosen.id}:i`, 1).catch(() => {});
     }
   }
   return result;
+}
+
+/**
+ * Counts an impression. Called from the browser once the banner is actually
+ * on screen: every slot is rendered, but CSS hides those that don't fit the
+ * device (side rails on phones, the top banner on wide desktops).
+ */
+export async function recordBannerImpression(id: string) {
+  const active = await cached("banners:active-ids", 60, async () => (await db.banner.findMany({ where: { isActive: true }, select: { id: true } })).map((b) => b.id));
+  if (!active.includes(id)) return;
+  await redis.hincrby(`banner:stats:${today()}`, `${id}:i`, 1).catch(() => {});
 }
 
 export async function recordBannerClick(id: string): Promise<string | null> {
