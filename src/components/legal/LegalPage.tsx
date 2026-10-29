@@ -14,6 +14,7 @@ export const LEGAL_DOCS = [
   { href: "/legal/disclaimer", title: "Legal Disclaimer" },
   { href: "/legal/accessibility", title: "Accessibility Statement" },
   { href: "/legal/security", title: "Security & Vulnerability Disclosure" },
+  { href: "/legal/copyright", title: "Copyright & DMCA Policy" },
 ] as const;
 
 /**

@@ -45,3 +45,10 @@ runs. Tick them off before go-live.
 - [ ] Every staff account has two-step sign-in (enforced) and a password manager.
 - [ ] Fill in the roles table in INCIDENT_RESPONSE.md; run a tabletop exercise.
 - [ ] Privacy lawyer review of notification duties; register with the OPC/CAI where required.
+
+## Legal settings before launch
+See `docs/compliance/LAUNCH_COMPLIANCE.md`.
+- [ ] `LEGAL_ENTITY_NAME`, `LEGAL_ADDRESS` (shown in every email; the app refuses to start without the address), `LEGAL_JURISDICTION`.
+- [ ] DMCA designated agent registered at https://dmca.copyright.gov; `DMCA_AGENT_NAME`, `COPYRIGHT_EMAIL`, `DMCA_AGENT_ADDRESS` set to match. Renew every 3 years.
+- [ ] Mailboxes exist and are monitored: support@, privacy@, security@, copyright@.
+- [ ] Before any paid plan: automatic-renewal disclosures and online cancellation (see LAUNCH_COMPLIANCE.md #5).

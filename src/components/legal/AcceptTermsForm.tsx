@@ -4,28 +4,48 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { usePrefs } from "@/components/providers/PreferencesProvider";
-import { api } from "@/lib/api-client";
+import { BirthDateFields } from "@/components/auth/BirthDateFields";
+import { api, ClientApiError } from "@/lib/api-client";
 import { LIABILITY_DISCLAIMER } from "@/lib/legal";
 
-export function AcceptTermsForm({ version, next }: { version: string; next: string }) {
+/** `askAge`: the account never confirmed its age (Google / email-link sign-up). */
+export function AcceptTermsForm({ version, next, askAge = false }: { version: string; next: string; askAge?: boolean }) {
   const { t, locale } = usePrefs();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [birth, setBirth] = useState({ month: "", year: "" });
+  const [tooYoung, setTooYoung] = useState(false);
+  const ageMissing = askAge && (!birth.month || !birth.year);
 
   const accept = async () => {
     setBusy(true);
     setError(false);
     try {
-      await api("/api/me/accept-terms", { method: "POST", json: { acceptTerms: true, version } });
+      await api("/api/me/accept-terms", {
+        method: "POST",
+        json: { acceptTerms: true, version, ...(askAge ? { birthMonth: Number(birth.month), birthYear: Number(birth.year) } : {}) },
+      });
       router.push(next);
       router.refresh();
-    } catch {
-      setError(true);
+    } catch (err) {
+      // Under-age: the account has been deleted on the server and signed out.
+      if (err instanceof ClientApiError && err.code === "too_young") setTooYoung(true);
+      else setError(true);
       setBusy(false);
     }
   };
+
+  if (tooYoung) {
+    return (
+      <div className="card space-y-3 p-8 text-center" role="status">
+        <h1 className="text-xl font-bold">{t("age.tooYoungTitle")}</h1>
+        <p className="text-sm text-ink-700">{t("age.accountRemoved")}</p>
+        <Link href="/" className="btn-ghost inline-flex">{t("age.backHome")}</Link>
+      </div>
+    );
+  }
 
   return (
     <div className="card space-y-4 p-8">
@@ -40,6 +60,7 @@ export function AcceptTermsForm({ version, next }: { version: string; next: stri
           </>
         )}
       </div>
+      {askAge && <BirthDateFields value={birth} onChange={setBirth} />}
       <label className="flex items-start gap-2 text-sm">
         <input type="checkbox" className="mt-1" checked={checked} onChange={(e) => setChecked(e.target.checked)} />
         <span>
@@ -50,7 +71,7 @@ export function AcceptTermsForm({ version, next }: { version: string; next: stri
         </span>
       </label>
       {error && <p role="alert" className="text-sm text-rose-600">{t("common.somethingWrong")}</p>}
-      <button type="button" className="btn-primary w-full" disabled={!checked || busy} onClick={accept}>{t("acceptTerms.continue")}</button>
+      <button type="button" className="btn-primary w-full" disabled={!checked || busy || ageMissing} onClick={accept}>{t("acceptTerms.continue")}</button>
       <p className="text-center text-xs text-ink-500"><Link href="/account" className="underline">{t("acceptTerms.manageData")}</Link></p>
     </div>
   );

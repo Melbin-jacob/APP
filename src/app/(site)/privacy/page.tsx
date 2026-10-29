@@ -48,7 +48,15 @@ export default function PrivacyPage() {
       <p>
         The only sensitive personal information we collect is the photo ID you upload when claiming a business listing. We use it
         solely to confirm that you represent the business, never to infer anything about you. It is encrypted, only our verification
-        team can open it, and it is deleted as soon as your claim has been approved or rejected. The service is not directed to children under 16.
+        team can open it, and it is deleted as soon as your claim has been approved or rejected.
+      </p>
+
+      <h3>Children</h3>
+      <p>
+        GetTradePros is for adults: you must be 18 or older to create an account, and we ask every new account for a month and year of
+        birth (which we check but don’t keep). The service is not directed to children, and we don’t knowingly collect personal
+        information from children under 13. If we learn that we have, we delete it. If you think a child has given us information,
+        email <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>.
       </p>
 
       <h2>3. Legal bases and consent</h2>

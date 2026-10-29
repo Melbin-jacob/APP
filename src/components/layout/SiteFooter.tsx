@@ -22,6 +22,7 @@ export async function SiteFooter() {
     { href: "/legal/disclaimer", label: t("footer.disclaimer") },
     { href: "/legal/accessibility", label: t("footer.accessibility") },
     { href: "/legal/security", label: t("footer.security") },
+    { href: "/legal/copyright", label: t("footer.copyright") },
   ];
 
   return (

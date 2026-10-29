@@ -13,6 +13,12 @@ export type OutgoingEmail = {
   tag?: string;
   /** Non-essential mail must carry a one-click unsubscribe (RFC 8058, Gmail/Yahoo sender rules). */
   unsubscribe?: { url: string; oneClickUrl: string };
+  /**
+   * Marketing or promotional mail (newsletters, launch announcements, review
+   * requests). CAN-SPAM and CASL require a working unsubscribe in every such
+   * message, so sending one without `unsubscribe` is refused.
+   */
+  commercial?: boolean;
 };
 
 function listHeaders(email: OutgoingEmail): Record<string, string> {
@@ -27,6 +33,9 @@ let ses: SESv2Client | undefined;
 let smtp: Transporter | undefined;
 
 export async function sendEmail(email: OutgoingEmail): Promise<{ messageId?: string }> {
+  if (email.commercial && !email.unsubscribe) {
+    throw new Error(`Refusing to send commercial email "${email.subject}" without an unsubscribe link (CAN-SPAM / CASL)`);
+  }
   const { EMAIL_TRANSPORT, EMAIL_FROM, AWS_REGION, SMTP_URL } = env();
 
   if (EMAIL_TRANSPORT === "console") {

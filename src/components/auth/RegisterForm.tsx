@@ -8,6 +8,7 @@ import { api, ClientApiError } from "@/lib/api-client";
 import { LIABILITY_DISCLAIMER } from "@/lib/legal";
 import { COUNTRIES, type CountryCode, SUPPORTED_COUNTRIES, isSupportedCountry } from "@/lib/postcode";
 import type { MessageKey } from "@/i18n";
+import { BirthDateFields } from "./BirthDateFields";
 import { PostcodeLookup, type VerifiedLocation } from "./PostcodeLookup";
 
 type Category = { id: string; slug: string; name: string };
@@ -36,6 +37,7 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<null | { status?: string }>(null);
+  const [tooYoung, setTooYoung] = useState(false);
   // Businesses must enter a postal code that resolves to a real place before
   // the rest of their details can be filled in or submitted.
   const [location, setLocation] = useState<VerifiedLocation | null>(null);
@@ -67,6 +69,7 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
       if (!PHONE.test(str("phone"))) e.phone = "register.errors.phone";
       if (!str("categoryId")) e.categoryId = "register.errors.category";
     }
+    if (!str("birthMonth") || !str("birthYear")) e.birthYear = "age.missing";
     if (f.get("acceptTerms") !== "on") e.acceptTerms = "register.errors.terms";
     return Object.fromEntries(Object.entries(e).map(([k, key]) => [k, t(key)]));
   };
@@ -90,6 +93,8 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
       password: str("password"),
       acceptTerms: true,
       marketingOptIn: f.get("marketingOptIn") === "on",
+      birthMonth: Number(str("birthMonth")),
+      birthYear: Number(str("birthYear")),
     };
     if (type === "trader") {
       if (!location) return;
@@ -113,6 +118,8 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
     } catch (err) {
       if (!(err instanceof ClientApiError)) {
         setFormError(t("common.somethingWrong"));
+      } else if (err.code === "too_young") {
+        setTooYoung(true);
       } else if (err.code === "email_taken") {
         setErrors({ email: t("register.errors.emailTaken") });
         setFormError(t("register.errors.fix"));
@@ -129,6 +136,17 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
       setBusy(false);
     }
   };
+
+  if (tooYoung) {
+    // No account was created and nothing was kept.
+    return (
+      <div className="card p-8 text-center" role="status">
+        <h1 className="text-xl font-bold">{t("age.tooYoungTitle")}</h1>
+        <p className="mt-2 text-sm text-ink-500">{t("age.tooYoung")}</p>
+        <Link href="/" className="btn-ghost mt-6">{t("age.backHome")}</Link>
+      </div>
+    );
+  }
 
   if (done) {
     return (
@@ -167,6 +185,7 @@ export function RegisterForm({ initialType, categories, next }: { initialType: "
         <Field id="password" label={t("register.password")} error={errors.password}>
           <input id="password" name="password" type="password" required minLength={12} className="input" autoComplete="new-password" />
         </Field>
+        <BirthDateFields error={errors.birthYear || errors.birthMonth} />
       </div>
 
       {type === "trader" && (

@@ -71,7 +71,7 @@ async function main() {
       db.user.findUnique({ where: { email: login.email }, select: { id: true } }),
     ]);
     if (old && !current) await db.user.update({ where: { id: old.id }, data: { email: login.email } });
-    const usable = { passwordHash, status: "ACTIVE" as const, deletedAt: null, tosVersion: TOS, tosAcceptedAt: new Date() };
+    const usable = { passwordHash, status: "ACTIVE" as const, deletedAt: null, tosVersion: TOS, tosAcceptedAt: new Date(), ageConfirmedAt: new Date() };
     await db.user.upsert({
       where: { email: login.email },
       create: { ...login, ...usable, emailVerified: new Date() },

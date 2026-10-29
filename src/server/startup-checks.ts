@@ -39,6 +39,13 @@ export function productionConfigProblems(env: Env): { errors: string[]; warnings
   if (appUrl && appUrl.protocol !== "https:") errors.push("APP_URL must use https:// in production");
   if (env.REQUIRE_ADMIN_MFA === "false") errors.push("REQUIRE_ADMIN_MFA=false is not allowed in production");
   if (env.EMAIL_TRANSPORT === "console") errors.push("EMAIL_TRANSPORT=console is not allowed in production");
+  // CAN-SPAM (US) and CASL (Canada): every commercial email must carry a valid postal address.
+  if (!env.LEGAL_ADDRESS?.trim()) errors.push("LEGAL_ADDRESS is not set: emails must show the company's mailing address (CAN-SPAM / CASL)");
+  if (!env.LEGAL_ENTITY_NAME?.trim()) warnings.push("LEGAL_ENTITY_NAME is not set: legal pages and emails show the placeholder company name");
+  // DMCA safe harbour needs a designated agent registered with the U.S. Copyright Office and named on the site.
+  if (!env.DMCA_AGENT_NAME?.trim()) {
+    warnings.push("DMCA_AGENT_NAME is not set: register a designated agent at https://dmca.copyright.gov and set DMCA_AGENT_NAME (and COPYRIGHT_EMAIL)");
+  }
 
   try {
     const db = new URL(env.DATABASE_URL ?? "");

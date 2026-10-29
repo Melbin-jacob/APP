@@ -135,7 +135,7 @@ export function AdminBannersClient() {
                 <td className="p-3">
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {b.imageUrl ? <img src={b.imageUrl} alt="" className="h-12 w-20 rounded object-contain" /> : <span className="grid h-12 w-20 place-items-center rounded bg-ink-100 text-[10px]">JS</span>}
+                    {b.imageUrl ? <img src={/^https?:\/\//.test(b.imageUrl) ? `/api/banners/${b.id}/image` : b.imageUrl} alt="" className="h-12 w-20 rounded object-contain" /> : <span className="grid h-12 w-20 place-items-center rounded bg-ink-100 text-[10px]">JS</span>}
                     <span>{b.name}<span className="block max-w-[16rem] truncate text-xs text-ink-500">{b.targetUrl ?? "script tag"}</span></span>
                   </div>
                 </td>

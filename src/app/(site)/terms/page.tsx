@@ -44,6 +44,7 @@ export default function TermsPage() {
 
       <h2>6. Content and licence</h2>
       <p>You keep ownership of content you post and give us a non-exclusive, worldwide, royalty-free licence to host, display and translate it to operate and promote the service. You can remove it by deleting it or your account.</p>
+      <p>Only post logos, photos and text you own or have permission to use. We remove material when we receive a valid copyright notice, as described in our <Link href="/legal/copyright">Copyright &amp; DMCA Policy</Link>, and close the accounts of repeat infringers.</p>
 
       <h2>7. Third-party advertising and links</h2>
       <p>Ads and links to other sites are provided by third parties; we don’t endorse them and aren’t responsible for their content or practices.</p>
@@ -52,7 +53,7 @@ export default function TermsPage() {
       <p>To the extent permitted by law, the service is provided “as is”, and we are not liable for indirect or consequential losses or for anything arising from work agreed between customers and businesses. Nothing in these terms excludes rights you have under consumer-protection laws that cannot be waived, including in Quebec.</p>
 
       <h2>9. Suspension and termination</h2>
-      <p>You can close your account at any time. We may suspend or remove accounts or listings that breach these terms, with notice where appropriate.</p>
+      <p>You can close your account at any time. We may suspend or remove accounts or listings that breach these terms, with notice where appropriate, including the accounts of repeat copyright infringers.</p>
 
       <h2>10. Changes</h2>
       <p>If we change these terms materially, we will tell you and ask you to accept the new version before you continue using your account.</p>

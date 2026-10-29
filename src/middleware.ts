@@ -13,7 +13,9 @@ function csp(nonce: string, https: boolean) {
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? " 'unsafe-eval'" : ""}`,
     `style-src 'self' 'unsafe-inline'`,
-    `img-src 'self' data: https:`,
+    // Our own domain only: images from other sites would send visitors' IP
+    // addresses to those hosts (outside images are copied or proxied instead).
+    `img-src 'self' data: blob:`,
     `font-src 'self' data:`,
     `connect-src 'self'`,
     `frame-src 'self'`,

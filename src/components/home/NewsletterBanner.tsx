@@ -6,7 +6,9 @@ import { useT } from "@/components/providers/PreferencesProvider";
 import { Icon } from "@/components/ui/Icon";
 import { api, ClientApiError } from "@/lib/api-client";
 
-const BG = "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1600&q=60";
+// Served from our own domain: a third-party image here would send every
+// visitor's IP address to that host before they've agreed to anything.
+const BG = "/images/hero/neighbourhood.svg";
 
 export function NewsletterBanner() {
   const t = useT();

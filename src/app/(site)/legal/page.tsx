@@ -13,6 +13,7 @@ const SUMMARIES: Record<string, string> = {
   "/legal/disclaimer": "The limits of our responsibility for work arranged through the directory.",
   "/legal/accessibility": "Our accessibility commitment and how to report a barrier.",
   "/legal/security": "How we protect the platform and how to report a security vulnerability.",
+  "/legal/copyright": "How to report copyright infringement, send a counter-notice, and our repeat-infringer policy.",
 };
 
 export default function LegalCentre() {
@@ -39,6 +40,9 @@ export default function LegalCentre() {
           <tr><td>Privacy (Canada)</td><td>PIPEDA; Quebec Law 25</td><td>Consent before non-essential cookies, designated privacy officer, retention limits, access and correction rights, breach response</td></tr>
           <tr><td>Privacy (visitors from the EU/UK)</td><td>GDPR / UK GDPR</td><td>Lawful bases, data minimisation, export and erasure, storage limitation</td></tr>
           <tr><td>Email</td><td>CAN-SPAM (US), CASL (Canada)</td><td>Double opt-in for newsletters, one-click unsubscribe on non-essential email, sender identity and mailing address in every message</td></tr>
+          <tr><td>Children</td><td>COPPA (US)</td><td>Accounts are for adults (18+); a neutral date-of-birth check at sign-up; under-age sign-ups are refused and nothing is kept</td></tr>
+          <tr><td>Copyright</td><td>DMCA § 512 (US); Copyright Act (Canada)</td><td>Designated agent, notice-and-takedown, counter-notices and a repeat-infringer policy: see our <Link href="/legal/copyright">Copyright &amp; DMCA Policy</Link></td></tr>
+          <tr><td>Third-party requests</td><td>Court rulings on embedded third-party resources (e.g. LG München, 2022)</td><td>Fonts, images and scripts are served from our own domain; advertising code loads only after consent, in a sandbox</td></tr>
           <tr><td>Accessibility</td><td>ADA (US), AODA (Ontario), WCAG 2.1 AA</td><td>Accessibility statement and barrier reporting; ongoing conformance work</td></tr>
           <tr><td>Security</td><td>OWASP Top 10, OWASP ASVS (guidance)</td><td>See our <Link href="/legal/security">Security page</Link></td></tr>
         </tbody>
@@ -48,6 +52,7 @@ export default function LegalCentre() {
       <ul>
         <li>Privacy questions and requests: <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a> ({COMPANY.privacyOfficer})</li>
         <li>Security reports: <a href={`mailto:${COMPANY.securityEmail}`}>{COMPANY.securityEmail}</a></li>
+        <li>Copyright notices: <a href={`mailto:${COMPANY.dmcaAgent.email}`}>{COMPANY.dmcaAgent.email}</a> (<Link href="/legal/copyright">how to send one</Link>)</li>
         <li>General support: <a href={`mailto:${COMPANY.supportEmail}`}>{COMPANY.supportEmail}</a></li>
         <li>Mail: {COMPANY.name}, {COMPANY.address}</li>
       </ul>

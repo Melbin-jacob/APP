@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { birthInput } from "@/lib/age";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/crypto";
 import { TOS_VERSION } from "@/lib/legal";
@@ -23,6 +24,7 @@ const base = z.object({
   name: z.string().trim().min(1).max(80),
   acceptTerms: z.literal(true, { message: "You must accept the Terms of Service" }),
   marketingOptIn: z.boolean().default(false),
+  ...birthInput,
 });
 
 export const customerRegistrationInput = base;
@@ -59,6 +61,7 @@ export async function registerCustomer(input: z.infer<typeof customerRegistratio
       role: "CUSTOMER",
       tosVersion: TOS_VERSION,
       tosAcceptedAt: new Date(),
+      ageConfirmedAt: new Date(),
       marketingOptIn: input.marketingOptIn,
     },
   });
@@ -102,6 +105,7 @@ export async function registerTrader(input: z.infer<typeof traderRegistrationInp
         role: "TRADER",
         tosVersion: TOS_VERSION,
         tosAcceptedAt: new Date(),
+        ageConfirmedAt: new Date(),
         marketingOptIn: input.marketingOptIn,
         trader: {
           create: {

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { CredentialActions, TraderStatusActions } from "@/components/admin/TraderReviewActions";
+import { CredentialActions, RemoveLogoButton, TraderStatusActions } from "@/components/admin/TraderReviewActions";
 import { Badge, statusTone } from "@/components/admin/ui";
 import { BusinessAvatar } from "@/components/traders/BusinessAvatar";
 import { db } from "@/lib/db";
@@ -68,7 +68,10 @@ export default async function AdminTraderPage({ params }: { params: Promise<{ id
 
       <header className="card flex flex-wrap items-center justify-between gap-4 p-5">
         <div className="flex items-center gap-4">
-          <BusinessAvatar name={t.businessName} logoUrl={t.logoUrl} className="h-16 w-16 rounded-lg" textClassName="text-xl" />
+          <div className="flex flex-col items-center gap-1">
+            <BusinessAvatar name={t.businessName} logoUrl={t.logoUrl} className="h-16 w-16 rounded-lg" textClassName="text-xl" />
+            {t.logoUrl && <RemoveLogoButton id={t.id} />}
+          </div>
           <div>
             <h1 className="text-xl font-bold">{t.businessName} <Badge tone={statusTone(t.status)}>{t.status}</Badge></h1>
             <p className="text-sm text-ink-500">

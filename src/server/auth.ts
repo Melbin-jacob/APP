@@ -169,6 +169,8 @@ export const authOptions: NextAuthOptions = {
 
 type Principal = {
   id: string; email: string; role: Role; status: UserStatus; tosVersion: string | null;
+  /** Confirmed old enough for an account (see lib/age). */
+  ageConfirmed: boolean;
   mfaEnabled: boolean;
   /** Epoch seconds of the sign-in behind this session. */
   authTime: number;
@@ -190,7 +192,7 @@ export async function getPrincipal(): Promise<Principal | null> {
   const user = await cached(`principal:${session.user.id}`, 60, () =>
     db.user.findUnique({
       where: { id: session.user.id },
-      select: { id: true, email: true, role: true, status: true, tosVersion: true, sessionVersion: true, mfaEnabledAt: true },
+      select: { id: true, email: true, role: true, status: true, tosVersion: true, ageConfirmedAt: true, sessionVersion: true, mfaEnabledAt: true },
     }),
   );
   if (!user || user.status !== "ACTIVE") return null;
@@ -200,7 +202,7 @@ export async function getPrincipal(): Promise<Principal | null> {
   if (isStaff(user.role) && Date.now() / 1000 - (session.authTime ?? 0) > ADMIN_SESSION_SECONDS) return null;
   return {
     id: user.id, email: user.email, role: user.role, status: user.status, tosVersion: user.tosVersion,
-    mfaEnabled: !!user.mfaEnabledAt, authTime: session.authTime ?? 0,
+    ageConfirmed: !!user.ageConfirmedAt, mfaEnabled: !!user.mfaEnabledAt, authTime: session.authTime ?? 0,
   };
 }
 
@@ -214,14 +216,17 @@ export async function requireUser(): Promise<Principal> {
   return user;
 }
 
-/** True when the user hasn't accepted the current Terms (OAuth / magic-link sign-ups, or Terms changed since). */
-export const needsTerms = (user: Pick<Principal, "tosVersion">) => user.tosVersion !== TOS_VERSION;
+/**
+ * True when the user hasn't accepted the current Terms or confirmed their age
+ * (OAuth / magic-link sign-ups, or Terms changed since).
+ */
+export const needsTerms = (user: Pick<Principal, "tosVersion" | "ageConfirmed">) => user.tosVersion !== TOS_VERSION || !user.ageConfirmed;
 
 /**
  * Page guard: send users who haven't accepted the current Terms to accept them
  * first. Not applied to the account page, so export and deletion always work.
  */
-export function requireCurrentTerms(user: Pick<Principal, "tosVersion">, next: string) {
+export function requireCurrentTerms(user: Pick<Principal, "tosVersion" | "ageConfirmed">, next: string) {
   if (needsTerms(user)) redirect(`/legal/accept-terms?next=${encodeURIComponent(next)}`);
 }
 

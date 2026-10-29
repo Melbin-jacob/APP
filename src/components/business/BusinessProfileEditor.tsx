@@ -159,8 +159,8 @@ function DetailsSection({ data }: { data: EditorData }) {
           serviceRadiusKm: Number(f.serviceRadiusKm),
           coverImageUrl: f.coverImageUrl.trim() || null,
         },
-      }),
-    onSuccess: () => router.refresh(),
+      }) as Promise<{ coverImageUrl: string | null }>,
+    onSuccess: (r) => { setF((v) => ({ ...v, coverImageUrl: r.coverImageUrl ?? "" })); router.refresh(); },
   });
   return (
     <Section title={t("business.details")}>
@@ -491,7 +491,9 @@ function GallerySection({ data }: { data: EditorData }) {
   const [caption, setCaption] = useState("");
   const m = useMutation({
     mutationFn: (next: { url: string; caption: string }[]) =>
-      api("/api/trader/me", { method: "PATCH", json: { gallery: next.map((g) => ({ url: g.url, caption: g.caption || undefined })) } }).then(() => next),
+      // The server answers with its own copies of linked photos.
+      api<{ gallery: { url: string; caption: string | null }[] }>("/api/trader/me", { method: "PATCH", json: { gallery: next.map((g) => ({ url: g.url, caption: g.caption || undefined })) } })
+        .then((r) => r.gallery.map((g) => ({ url: g.url, caption: g.caption ?? "" }))),
     onSuccess: (next) => { setItems(next); setUrl(""); setCaption(""); },
   });
   return (
@@ -500,7 +502,7 @@ function GallerySection({ data }: { data: EditorData }) {
         <ul className="grid grid-cols-3 gap-2">
           {items.map((g, i) => (
             <li key={`${g.url}-${i}`} className="group relative">
-              {/* eslint-disable-next-line @next/next/no-img-element -- business-supplied hosts vary */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- our own stored copy (/api/media/…) */}
               <img src={g.url} alt={g.caption} className="aspect-square w-full rounded-md bg-ink-200 object-cover" />
               <button type="button" className="absolute end-1 top-1 rounded-full bg-white/90 px-2 text-xs text-rose-700 shadow"
                 aria-label={`${t("business.remove")} ${g.caption || i + 1}`} disabled={m.isPending}

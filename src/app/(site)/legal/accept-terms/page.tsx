@@ -19,7 +19,7 @@ export default async function AcceptTermsPage({ searchParams }: { searchParams: 
   return (
     <SiteShell>
       <div className="mx-auto max-w-2xl py-12">
-        <AcceptTermsForm version={TOS_VERSION} next={next} />
+        <AcceptTermsForm version={TOS_VERSION} next={next} askAge={!user.ageConfirmed} />
       </div>
     </SiteShell>
   );

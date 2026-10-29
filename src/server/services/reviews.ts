@@ -97,7 +97,7 @@ export async function createReviewRequest(
     unsubscribeUrl: unsubscribe.url,
   });
   try {
-    await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request", unsubscribe });
+    await sendEmail({ to: input.customerEmail, ...mail, tag: "review_request", unsubscribe, commercial: true });
   } catch (err) {
     // Revoke so the cooldown check above doesn't block a retry for 30 days.
     await db.reviewRequest.update({ where: { id: request.id }, data: { status: "REVOKED" } });

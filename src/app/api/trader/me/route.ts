@@ -5,6 +5,7 @@ import { plainText, safeUrl } from "@/lib/sanitize";
 import { requireRole } from "@/server/auth";
 import { audit } from "@/server/audit";
 import { badRequest, notFound, parseJson, route } from "@/server/http";
+import { ownImageUrl, pruneTraderMedia } from "@/server/services/media";
 import { invalidateTrader } from "@/server/services/traders";
 
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
@@ -52,7 +53,12 @@ export const PATCH = route(async (req) => {
   const input = await parseJson(req, patch);
   if (!Object.keys(input).length) throw badRequest("Nothing to update");
   const profile = await myProfile(user.id);
-  const { gallery, ...fields } = input;
+  const { gallery: galleryInput, ...fields } = input;
+  // Images linked from other sites are copied to our own storage first, so
+  // visitors never load anything from a third-party host.
+  if (fields.logoUrl) fields.logoUrl = await ownImageUrl(profile.id, fields.logoUrl, "logo");
+  if (fields.coverImageUrl) fields.coverImageUrl = await ownImageUrl(profile.id, fields.coverImageUrl, "cover");
+  const gallery = galleryInput && await Promise.all(galleryInput.map(async (g) => ({ ...g, url: await ownImageUrl(profile.id, g.url, "gallery") })));
 
   await db.$transaction(async (tx) => {
     await tx.traderProfile.update({
@@ -73,6 +79,11 @@ export const PATCH = route(async (req) => {
     }
     await audit({ actorId: user.id, action: "trader.update_profile", entityType: "TraderProfile", entityId: profile.id, metadata: { fields: Object.keys(input) } }, tx);
   });
+  await pruneTraderMedia(profile.id);
   await invalidateTrader(profile.slug);
-  return NextResponse.json({ ok: true });
+  const saved = await db.traderProfile.findUniqueOrThrow({
+    where: { id: profile.id },
+    select: { logoUrl: true, coverImageUrl: true, gallery: { orderBy: { sortOrder: "asc" }, select: { url: true, caption: true } } },
+  });
+  return NextResponse.json({ ok: true, ...saved });
 });

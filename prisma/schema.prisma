@@ -46,6 +46,8 @@ model User {
   status           UserStatus @default(ACTIVE)
   tosVersion       String? // version of the Terms the user explicitly accepted
   tosAcceptedAt    DateTime?
+  // When the user confirmed being old enough for an account (birth date itself is never stored).
+  ageConfirmedAt DateTime?
   marketingOptIn   Boolean    @default(false)
   // Optional contact details the customer keeps on file; used to prefill quote requests.
   phone            String?

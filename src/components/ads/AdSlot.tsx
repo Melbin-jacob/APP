@@ -20,7 +20,7 @@ function Creative({ banner }: { banner: PublicBanner }) {
       <a href={`/api/banners/${banner.id}/click`} rel="sponsored noopener noreferrer" target={banner.internal ? undefined : "_blank"} className="block max-w-full overflow-hidden rounded-md shadow-card"
         style={{ width: banner.width, aspectRatio: `${banner.width} / ${banner.height}` }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- arbitrary advertiser hosts */}
-        <img src={banner.imageUrl} alt={banner.name} width={banner.width} height={banner.height} className="h-full w-full object-cover" loading="lazy" />
+        <img src={/^https?:\/\//.test(banner.imageUrl) ? `/api/banners/${banner.id}/image` : banner.imageUrl} alt={banner.name} width={banner.width} height={banner.height} className="h-full w-full object-cover" loading="lazy" />
       </a>
     );
   }

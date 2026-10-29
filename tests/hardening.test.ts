@@ -72,6 +72,7 @@ describe("production startup checks", () => {
     NEXTAUTH_SECRET: "q8Zr3vT1pLx9WmB2nK7cY4dF6gH0jS5aE", REVIEW_TOKEN_PEPPER: "Vb6Nm2Qw8Er4Ty0Ui7Op3As5Df1Gh9JkL",
     CRON_SECRET: "Zx3Cv5Bn7Mq9Wp1Ol2Ik4Uj6Yh8Tg0RfE", MFA_ENCRYPTION_KEY: Buffer.alloc(32, 7).toString("base64"),
     DATABASE_URL: "postgresql://app:S0me-Strong-Pass@db.internal:5432/hsd?sslmode=require", EMAIL_TRANSPORT: "ses",
+    LEGAL_ADDRESS: "350 City Hall Square W, Windsor, ON N9A 6S1, Canada",
   };
   it("passes a sound configuration", () => expect(productionConfigProblems(good).errors).toEqual([]));
   it("ignores development", () => expect(productionConfigProblems({ NODE_ENV: "development" }).errors).toEqual([]));
@@ -84,7 +85,12 @@ describe("production startup checks", () => {
     ["default DB password", { DATABASE_URL: "postgresql://postgres:postgres@db:5432/hsd" }],
     ["admin MFA off", { REQUIRE_ADMIN_MFA: "false" }],
     ["console email", { EMAIL_TRANSPORT: "console" }],
+    ["no mailing address for emails", { LEGAL_ADDRESS: undefined }],
   ])("refuses %s", (_label, patch) => expect(productionConfigProblems({ ...good, ...patch }).errors.length).toBeGreaterThan(0));
+  it("warns until a DMCA agent is named", () => {
+    expect(productionConfigProblems(good).warnings.some((w) => w.includes("DMCA_AGENT_NAME"))).toBe(true);
+    expect(productionConfigProblems({ ...good, DMCA_AGENT_NAME: "Jane Doe" }).warnings.some((w) => w.includes("DMCA"))).toBe(false);
+  });
   it("allows the local Docker stack only on localhost", () => {
     const local = { NODE_ENV: "production", ALLOW_INSECURE_LOCAL_SECRETS: "true", NEXTAUTH_SECRET: "local-test-secret-change-me" };
     expect(productionConfigProblems({ ...local, APP_URL: "http://localhost:3000" }).errors).toEqual([]);

@@ -51,3 +51,24 @@ export function CredentialActions({ id }: { id: string }) {
     </span>
   );
 }
+
+/** Takes a business's logo down (copyright notice, offensive image…). Reason goes to the audit log. */
+export function RemoveLogoButton({ id }: { id: string }) {
+  const router = useRouter();
+  const m = useMutation({
+    mutationFn: (reason: string) => api(`/api/admin/traders/${id}/logo`, { method: "DELETE", json: { reason } }),
+    onSuccess: () => router.refresh(),
+  });
+  return (
+    <span className="inline-flex items-center gap-2">
+      <button type="button" className="text-xs text-rose-700 underline" disabled={m.isPending}
+        onClick={() => {
+          const reason = window.prompt("Why is the logo being removed? (e.g. DMCA notice received 2026-10-29; kept in the audit log)");
+          if (reason?.trim()) m.mutate(reason.trim());
+        }}>
+        Remove logo
+      </button>
+      {m.error && <span role="alert" className="text-xs text-rose-600">{errorText(m.error)}</span>}
+    </span>
+  );
+}
