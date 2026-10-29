@@ -31,8 +31,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-56 shrink-0 border-r border-ink-200 bg-white p-4 md:block">
-        <Logo />
+      <aside className="hidden w-64 shrink-0 border-r border-ink-200 bg-white p-4 md:block">
+        <Logo compact />
         <p className="mt-6 text-[10px] font-semibold uppercase tracking-widest text-ink-500">Ops console</p>
         <nav className="mt-2 space-y-1" aria-label="Admin">
           {nav.map((n) => (

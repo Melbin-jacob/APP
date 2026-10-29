@@ -4,17 +4,21 @@ import { getI18n } from "@/i18n/server";
 import { getPrincipal } from "@/server/auth";
 import { MobileNav } from "./MobileNav";
 
-export async function Logo() {
+/** Brand lockup. `compact` is for narrow spots (the ops console sidebar): a
+ *  smaller wordmark, and the tagline wraps instead of being cut off. */
+export async function Logo({ compact = false }: { compact?: boolean }) {
   const { t } = await getI18n();
   return (
     <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={t("brand.home")}>
       {/* eslint-disable-next-line @next/next/no-img-element -- static SVG mark */}
       <img src="/brand/gettradepros-mark.svg" alt="" width={44} height={43} className="h-10 w-10 shrink-0 sm:h-11 sm:w-11" />
       <span className="min-w-0 leading-tight">
-        <span className="block font-brand text-lg font-bold uppercase tracking-[0.08em] text-[#0B2545]" dir="ltr">
+        <span className={`block whitespace-nowrap font-brand font-bold uppercase tracking-[0.08em] text-[#0B2545] ${compact ? "text-base" : "text-lg"}`} dir="ltr">
           GetTradePros
         </span>
-        <span className="block truncate font-brand text-[8px] font-medium uppercase tracking-[0.04em] sm:tracking-[0.12em] text-[#0B2545]/80 sm:text-[9.5px]">{t("brand.tagline")}</span>
+        <span className={`block font-brand font-medium uppercase text-[#0B2545]/80 ${compact
+          ? "mt-0.5 text-[8.5px] leading-snug tracking-[0.1em]"
+          : "truncate text-[8px] tracking-[0.04em] sm:text-[9.5px] sm:tracking-[0.12em]"}`}>{t("brand.tagline")}</span>
       </span>
     </Link>
   );
