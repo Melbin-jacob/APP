@@ -17,6 +17,8 @@ export const RATE_LIMITS = {
   addressSuggest: { limit: 60, windowSeconds: 60 }, // per IP; one lookup per pause in typing
   callClick: { limit: 30, windowSeconds: 60 * 60 },
   quoteRequest: { limit: 5, windowSeconds: 60 * 60 }, // per IP
+  chat: { limit: 20, windowSeconds: 60 }, // per IP: a fast typist, not a script
+  chatDaily: { limit: 300, windowSeconds: 60 * 60 * 24 }, // per IP: caps AI spend from one source
   contact: { limit: 5, windowSeconds: 60 * 60 }, // per IP
   listingClaim: { limit: 5, windowSeconds: 60 * 60 * 24 }, // per user
   upload: { limit: 20, windowSeconds: 60 * 60 }, // per user

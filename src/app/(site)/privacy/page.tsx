@@ -35,6 +35,7 @@ export default function PrivacyPage() {
             <tr><td>Business location (derived from the postal code)</td><td>Postal-code lookup</td><td>Show listings to nearby customers</td><td>Geolocation (approximate)</td></tr>
             <tr><td>Customer email and name entered by a business to request a review</td><td>The business</td><td>Send one review invitation</td><td>Identifiers</td></tr>
             <tr><td>Quote requests: your name, phone, address, optional email, the job description and when to contact you</td><td>You</td><td>Pass your request to the business you chose (or, if it hasn’t joined yet, have our team pass it on by phone)</td><td>Identifiers; commercial information</td></tr>
+            <tr><td>Chat assistant: what you type in “Ask GetTradePros”</td><td>You</td><td>Understand what you need and find matching businesses. Messages are sent from our server to our AI provider to write a reply; the conversation stays in your browser tab and isn’t stored on our servers</td><td>Any information you choose to include (please don’t include personal details)</td></tr>
             <tr><td>Contact form: your name, email, optional phone number, topic and message</td><td>You</td><td>Answer your question or request</td><td>Identifiers; any information you choose to include</td></tr>
             <tr><td>Listing claims: name, role, phone and notes from someone claiming a business, plus a company registration document and a government photo ID</td><td>You</td><td>Verify that you own or represent the business before giving you control of its listing</td><td>Identifiers; professional information; government identification (sensitive)</td></tr>
             <tr><td>Reviews, ratings and reports</td><td>You</td><td>Publish reviews; moderate abuse</td><td>Commercial information</td></tr>
@@ -74,7 +75,7 @@ export default function PrivacyPage() {
         <li><strong>The business you ask for a quote:</strong> the details you enter in its quote form, only with your consent and only
           for that request. Businesses may not use them for marketing.</li>
         <li><strong>Service providers</strong> under contract, only to run the service: cloud hosting and databases, email delivery, and a
-          postal-code lookup service (which receives only a business postal code), and an address-suggestion service based on
+          postal-code lookup service (which receives only a business postal code), an AI provider (Anthropic) that writes the chat assistant’s replies (it receives the chat messages, not your name or account, and may not use them to train its models), and an address-suggestion service based on
           OpenStreetMap (which receives the partial street address you type, from our server, never linked to your name or account).
           They may not use the data for their own purposes.</li>
         <li><strong>Advertising partners:</strong> only if you accept advertising cookies. See <Link href="/legal/privacy-choices">Do Not Sell or Share</Link>.</li>

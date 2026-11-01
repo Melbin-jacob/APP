@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AdBanner } from "@/components/ads/AdBanner";
 import { AdRail, railBreakpoint } from "@/components/ads/AdRail";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { PreferencesBar } from "@/components/prefs/PreferencesBar";
 import { getI18n } from "@/i18n/server";
 import { getBanners } from "@/server/services/banners";
@@ -43,6 +44,7 @@ export async function SiteShell({ children, fullBleed }: { children: ReactNode; 
         <AdRail side="right" banner={banners.RIGHT} label={t("common.advertisement")} />
       </div>
       <SiteFooter />
+      <ChatWidget />
     </div>
   );
 }
