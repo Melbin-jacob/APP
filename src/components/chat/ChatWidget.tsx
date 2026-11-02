@@ -22,7 +22,7 @@ const save = (turns: Turn[]) => {
   try { sessionStorage.setItem(STORE, JSON.stringify(turns.slice(-20))); } catch { /* not available */ }
 };
 
-/** "Ask GetTradePros": a floating assistant that finds pros from the directory. */
+/** "Get help": a floating assistant that finds pros from the directory. */
 export function ChatWidget() {
   const { t } = usePrefs();
   const [open, setOpen] = useState(false);

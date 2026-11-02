@@ -523,8 +523,8 @@ const pt: Messages = {
     alreadyClaimed: "Este perfil já é gerenciado pela empresa. Se isso estiver errado, escreva para {email}.",
   },
   chat: {
-    open: "Pergunte ao GetTradePros",
-    title: "Encontre um profissional local",
+    open: "Obter ajuda",
+    title: "Obter ajuda",
     subtitle: "Costuma responder em segundos",
     greeting: "Olá! Diga o que precisa e onde, e eu encontro profissionais perto de você.",
     example1: "A torneira da cozinha está vazando",

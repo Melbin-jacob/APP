@@ -523,8 +523,8 @@ const en = {
     alreadyClaimed: "This listing is already managed by its business. If that's wrong, contact {email}.",
   },
   chat: {
-    open: "Ask GetTradePros",
-    title: "Find a local pro",
+    open: "Get help",
+    title: "Get help",
     subtitle: "Usually replies in seconds",
     greeting: "Hi! Tell me what you need done and where, and I'll find local pros for you.",
     example1: "My kitchen tap is leaking",

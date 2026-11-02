@@ -523,8 +523,8 @@ const de: Messages = {
     alreadyClaimed: "Dieser Eintrag wird bereits vom Betrieb verwaltet. Falls das nicht stimmt, wenden Sie sich an {email}.",
   },
   chat: {
-    open: "GetTradePros fragen",
-    title: "Einen Profi vor Ort finden",
+    open: "Hilfe erhalten",
+    title: "Hilfe erhalten",
     subtitle: "Antwortet meist in Sekunden",
     greeting: "Hallo! Sagen Sie mir, was zu tun ist und wo, und ich finde Profis in Ihrer Nähe.",
     example1: "Mein Küchenwasserhahn tropft",

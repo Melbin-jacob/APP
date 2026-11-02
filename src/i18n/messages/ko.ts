@@ -523,8 +523,8 @@ const ko: Messages = {
     alreadyClaimed: "이 업체 정보는 이미 업체에서 관리하고 있습니다. 잘못된 경우 {email}로 문의하세요.",
   },
   chat: {
-    open: "GetTradePros에 물어보기",
-    title: "가까운 전문가 찾기",
+    open: "도움 받기",
+    title: "도움 받기",
     subtitle: "보통 몇 초 안에 답변합니다",
     greeting: "안녕하세요! 어떤 작업이 필요하고 어디인지 알려 주시면 가까운 전문가를 찾아 드릴게요.",
     example1: "주방 수도꼭지에서 물이 새요",

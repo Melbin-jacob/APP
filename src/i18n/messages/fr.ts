@@ -523,8 +523,8 @@ const fr: Messages = {
     alreadyClaimed: "Cette fiche est déjà gérée par l'entreprise. En cas d'erreur, contactez {email}.",
   },
   chat: {
-    open: "Demandez à GetTradePros",
-    title: "Trouver un pro près de chez vous",
+    open: "Obtenir de l'aide",
+    title: "Obtenir de l'aide",
     subtitle: "Répond généralement en quelques secondes",
     greeting: "Bonjour! Dites-moi ce dont vous avez besoin et où, et je trouverai des pros près de chez vous.",
     example1: "Mon robinet de cuisine fuit",

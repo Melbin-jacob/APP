@@ -8,7 +8,7 @@ import { logEvent } from "@/server/log";
 import { searchQuerySchema, searchTraders, type TraderCard } from "../search";
 import { readIntent } from "./intent";
 
-// "Ask GetTradePros" chat assistant. Claude understands the request, asks a
+// "Get help" chat assistant. Claude understands the request, asks a
 // short question when the trade or place is unclear, and searches the
 // directory with a tool, so it can only recommend businesses that exist.
 // Without an API key, or if the AI service fails or is slow, a keyword

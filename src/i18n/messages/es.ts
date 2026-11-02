@@ -523,8 +523,8 @@ const es: Messages = {
     alreadyClaimed: "Esta ficha ya la gestiona su negocio. Si es un error, escribe a {email}.",
   },
   chat: {
-    open: "Pregunta a GetTradePros",
-    title: "Encuentra un profesional local",
+    open: "Obtener ayuda",
+    title: "Obtener ayuda",
     subtitle: "Suele responder en segundos",
     greeting: "¡Hola! Cuéntame qué necesitas y dónde, y te buscaré profesionales cercanos.",
     example1: "Gotea el grifo de mi cocina",

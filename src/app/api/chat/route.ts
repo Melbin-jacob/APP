@@ -4,7 +4,7 @@ import { chat, chatInput } from "@/server/services/chat";
 import { getVisitor } from "@/server/visitor";
 
 // POST /api/chat { messages } → { reply, results, suggestions } for the
-// "Ask GetTradePros" assistant. Nothing is stored.
+// "Get help" assistant. Nothing is stored.
 export const POST = route(async (req) => {
   const ip = ipHash(req);
   await enforceRateLimit("chat", ip);

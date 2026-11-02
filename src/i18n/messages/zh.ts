@@ -523,8 +523,8 @@ const zh: Messages = {
     alreadyClaimed: "此页面已由企业本身管理。如有错误，请联系 {email}。",
   },
   chat: {
-    open: "问问 GetTradePros",
-    title: "寻找附近的专业人员",
+    open: "获取帮助",
+    title: "获取帮助",
     subtitle: "通常几秒内回复",
     greeting: "您好！告诉我需要做什么、在哪里，我来帮您找附近的专业人员。",
     example1: "厨房水龙头漏水",

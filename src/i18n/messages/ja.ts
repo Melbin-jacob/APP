@@ -523,8 +523,8 @@ const ja: Messages = {
     alreadyClaimed: "この掲載はすでに事業者が管理しています。誤りがある場合は {email} までご連絡ください。",
   },
   chat: {
-    open: "GetTradeProsに質問",
-    title: "近くの専門業者を探す",
+    open: "ヘルプ",
+    title: "ヘルプ",
     subtitle: "通常は数秒で返信します",
     greeting: "こんにちは！どんな作業が必要で、場所はどこか教えてください。近くの業者をお探しします。",
     example1: "キッチンの蛇口が水漏れしています",
