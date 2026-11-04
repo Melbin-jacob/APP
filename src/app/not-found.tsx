@@ -8,7 +8,7 @@ export default async function NotFound() {
     <SiteShell>
       <div className="grid place-items-center py-24 text-center">
         <div>
-          <p className="text-6xl font-black text-brand-500">404</p>
+          <p className="text-6xl font-black text-brand-600">404</p>
           <h1 className="mt-2 text-xl font-bold">{t("notFound.title")}</h1>
           <Link href="/" className="btn-primary mt-6">{t("notFound.back")}</Link>
         </div>

@@ -23,7 +23,7 @@ export function QuoteRequests() {
   return (
     <section className="card p-6" aria-labelledby="quotes-heading">
       <h2 id="quotes-heading" className="mb-1 font-semibold">
-        {t("dashboard.quotes")} {open > 0 && <span className="ms-1 rounded-full bg-accent-500 px-2 py-0.5 text-xs text-white">{open}</span>}
+        {t("dashboard.quotes")} {open > 0 && <span className="ms-1 rounded-full bg-accent-500 px-2 py-0.5 text-xs text-[#0B2545]">{open}</span>}
       </h2>
       <p className="mb-4 text-sm text-ink-500">{t("dashboard.quotesHint")}</p>
       {q.data?.length === 0 && <p className="py-4 text-center text-sm text-ink-500">{t("dashboard.noQuotes")}</p>}

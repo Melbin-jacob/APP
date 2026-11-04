@@ -9,7 +9,7 @@ import { MobileNav } from "./MobileNav";
 export async function Logo({ compact = false }: { compact?: boolean }) {
   const { t } = await getI18n();
   return (
-    <Link href="/" className="flex min-w-0 items-center gap-2.5" aria-label={t("brand.home")}>
+    <Link href="/" className="flex min-w-0 items-center gap-2.5">
       {/* eslint-disable-next-line @next/next/no-img-element -- static SVG mark */}
       <img src="/brand/gettradepros-mark.svg" alt="" width={44} height={43} className="h-10 w-10 shrink-0 sm:h-11 sm:w-11" />
       <span className="min-w-0 leading-tight">

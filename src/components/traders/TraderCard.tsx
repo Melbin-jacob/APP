@@ -45,9 +45,10 @@ export function TraderCard({ trader }: { trader: TraderCardData }) {
             <strong><Price minor={trader.hourlyRatePence} currency={trader.currency} label="card.perHour" /></strong>
           </p>
         )}
-        <div className="mt-auto flex w-full gap-2 pt-4">
-          {trader.canCall && <CallButton slug={trader.slug} className="btn-primary flex-1 whitespace-nowrap px-2 py-2 text-xs" />}
-          <Link href={`/traders/${trader.slug}/quote`} className="btn-ghost flex-1 whitespace-nowrap px-2 py-2 text-xs">{t("card.requestQuote")}</Link>
+        {/* Side by side when they fit, stacked on narrow cards (and in longer languages). */}
+        <div className="mt-auto flex w-full flex-wrap gap-2 pt-4">
+          {trader.canCall && <CallButton slug={trader.slug} className="btn-primary min-w-[7.5rem] flex-1 whitespace-nowrap px-2 py-2 text-xs" />}
+          <Link href={`/traders/${trader.slug}/quote`} className="btn-ghost min-w-[7.5rem] flex-1 whitespace-nowrap px-2 py-2 text-xs">{t("card.requestQuote")}</Link>
         </div>
       </div>
       <LegalDisclaimer variant="compact" />

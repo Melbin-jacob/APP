@@ -37,7 +37,8 @@ export function AdminAuditClient() {
         </p>
       )}
       <p className="mb-4 text-xs text-ink-500">Entries are append-only and hash-chained: the database refuses edits, and any change or removal shows up in the integrity check.</p>
-      <div className="card overflow-x-auto">
+      {/* Scrolls sideways on small screens: focusable so keyboard users can scroll it too. */}
+      <div className="card overflow-x-auto" tabIndex={0} role="region" aria-label="Audit log entries">
         <table className="w-full text-left text-xs">
           <thead className="bg-ink-100 uppercase text-ink-500">
             <tr><th className="p-2">When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Details</th></tr>

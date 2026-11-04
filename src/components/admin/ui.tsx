@@ -14,7 +14,7 @@ export function Stat({ label, value, tone, href }: { label: string; value: React
   const body = (
     <>
       <p className="text-xs uppercase tracking-wide text-ink-500">{label}</p>
-      <p className={`mt-1 text-2xl font-bold ${tone === "warn" ? "text-accent-600" : "text-ink-900"}`}>{value}</p>
+      <p className={`mt-1 text-2xl font-bold ${tone === "warn" ? "text-amber-700" : "text-ink-900"}`}>{value}</p>
     </>
   );
   if (!href) return <div className="card p-4">{body}</div>;
@@ -27,7 +27,7 @@ export function Stat({ label, value, tone, href }: { label: string; value: React
 }
 
 export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "good" | "bad" | "warn" | "neutral" }) {
-  const cls = { good: "bg-brand-50 text-brand-700", bad: "bg-rose-50 text-rose-700", warn: "bg-accent-400/20 text-accent-600", neutral: "bg-ink-100 text-ink-700" }[tone];
+  const cls = { good: "bg-brand-50 text-brand-700", bad: "bg-rose-50 text-rose-700", warn: "bg-amber-50 text-amber-800", neutral: "bg-ink-100 text-ink-700" }[tone];
   return <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${cls}`}>{children}</span>;
 }
 

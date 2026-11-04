@@ -46,7 +46,8 @@ export function AdminUsersClient({ initialRole }: { initialRole?: string }) {
         </div>
       }>Users</PageTitle>
       {update.error && <p className="mb-3 text-sm text-rose-600">{update.error instanceof ClientApiError ? update.error.message : "Failed"}</p>}
-      <div className="card overflow-x-auto">
+      {/* Scrolls sideways on small screens: focusable so keyboard users can scroll it too. */}
+      <div className="card overflow-x-auto" tabIndex={0} role="region" aria-label="Users">
         <table className="w-full text-left text-sm">
           <thead className="bg-ink-100 text-xs uppercase text-ink-500">
             <tr><th className="p-3">Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Last login</th><th /></tr>

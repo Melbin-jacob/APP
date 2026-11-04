@@ -39,17 +39,17 @@ export default async function ContactPage() {
           <aside className="space-y-4">
             <section className="card space-y-4 p-6">
               <h2 className="font-semibold">{t("contact.detailsTitle")}</h2>
-              <dl className="space-y-3 text-sm">
+              <ul className="space-y-3 text-sm">
                 {details.map((d) => (
-                  <div key={d.label} className="flex gap-3">
+                  <li key={d.label} className="flex gap-3">
                     <span aria-hidden="true">{d.icon}</span>
                     <div className="min-w-0">
-                      <dt className="text-xs font-medium uppercase tracking-wide text-ink-500">{d.label}</dt>
-                      <dd className="break-words text-ink-900">{d.body}</dd>
+                      <p className="text-xs font-medium uppercase tracking-wide text-ink-500">{d.label}</p>
+                      <p className="break-words text-ink-900">{d.body}</p>
                     </div>
-                  </div>
+                  </li>
                 ))}
-              </dl>
+              </ul>
             </section>
             <p className="rounded-md bg-sky-50 p-4 text-xs text-sky-900">{t("contact.directoryNote")}</p>
           </aside>

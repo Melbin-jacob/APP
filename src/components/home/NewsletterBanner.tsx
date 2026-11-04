@@ -44,7 +44,7 @@ export function NewsletterBanner() {
               placeholder={t("newsletter.placeholder")}
               className="flex-1 bg-transparent px-3 text-sm outline-none"
             />
-            <button type="submit" disabled={m.isPending} aria-label={t("newsletter.subscribe")} className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-white hover:bg-brand-600">
+            <button type="submit" disabled={m.isPending} aria-label={t("newsletter.subscribe")} className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 text-white hover:bg-brand-700">
               <Icon name="send" className="h-4 w-4" />
             </button>
           </form>

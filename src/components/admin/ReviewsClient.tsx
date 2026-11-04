@@ -41,7 +41,7 @@ export function AdminReviewsClient({ initialFilter }: { initialFilter?: string }
       <PageTitle actions={
         <div className="flex gap-1">
           {(Object.keys(FILTERS) as Filter[]).map((f) => (
-            <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1 text-xs ${filter === f ? "bg-brand-500 text-white" : "bg-white"}`}>{f}</button>
+            <button key={f} onClick={() => setFilter(f)} className={`rounded-full px-3 py-1 text-xs ${filter === f ? "bg-brand-600 text-white" : "bg-white"}`}>{f}</button>
           ))}
         </div>
       }>Review moderation</PageTitle>

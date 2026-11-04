@@ -124,7 +124,8 @@ export function AdminBannersClient() {
       </PageTitle>
       <GlobalSwitch />
       {creating && <NewBannerForm onDone={() => { setCreating(false); refresh(); }} />}
-      <div className="card overflow-x-auto">
+      {/* Scrolls sideways on small screens: focusable so keyboard users can scroll it too. */}
+      <div className="card overflow-x-auto" tabIndex={0} role="region" aria-label="Banners">
         <table className="w-full text-left text-sm">
           <thead className="bg-ink-100 text-xs uppercase text-ink-500">
             <tr><th className="p-3">Banner</th><th>Slot</th><th>Size</th><th>Impr. (30d)</th><th>Clicks</th><th>CTR</th><th>Status</th><th /></tr>
