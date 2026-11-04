@@ -11,8 +11,21 @@ import { getI18n } from "@/i18n/server";
 import { getBanners } from "@/server/services/banners";
 import { searchQuerySchema, searchTraders } from "@/server/services/search";
 
-export async function generateMetadata(): Promise<Metadata> {
-  return { title: (await getI18n()).t("search.title") };
+// A category's result page is worth indexing (e.g. "Plumbing"); keyword,
+// location, sorted and later pages are endless variations of it, so they're
+// kept out of search engines while their links are still followed.
+export async function generateMetadata({ searchParams }: { searchParams: Promise<Record<string, string>> }): Promise<Metadata> {
+  const raw = await searchParams;
+  const { t } = await getI18n();
+  const category = /^[a-z0-9-]{1,60}$/.test(raw.category ?? "") ? raw.category : undefined;
+  const categoryOnly = !!category && Object.keys(raw).every((k) => k === "category");
+  if (!categoryOnly) return { title: t("search.title"), robots: { index: false, follow: true } };
+  const name = t.maybe(`categories.names.${category}`, category!.replace(/-/g, " "));
+  return {
+    title: `${name} near you`,
+    description: `Find local ${name.toLowerCase()} businesses. Compare rates, read reviews and request free quotes on GetTradePros.`,
+    alternates: { canonical: `/search?category=${category}` },
+  };
 }
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<Record<string, string>> }) {

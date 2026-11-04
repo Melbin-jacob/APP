@@ -12,6 +12,7 @@ import { StarRating } from "@/components/ui/StarRating";
 import { COMPANY } from "@/lib/company";
 import { countryName, formatDate } from "@/lib/format";
 import { getI18n } from "@/i18n/server";
+import { absoluteUrl, jsonLd, openingHoursSpec, schemaTypeFor } from "@/lib/seo";
 import { getPublicTrader } from "@/server/services/catalog";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -21,7 +22,58 @@ type Hours = Partial<Record<(typeof DAYS)[number], { open: string; close: string
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const trader = await getPublicTrader((await params).slug);
-  return trader ? { title: `${trader.businessName} · ${trader.city}`, description: trader.bio?.slice(0, 155) } : {};
+  if (!trader) return {};
+  const trade = (trader.categories.find((c) => c.isPrimary) ?? trader.categories[0])?.category.name;
+  const title = `${trader.businessName} · ${[trade, trader.city].filter(Boolean).join(" in ")}`;
+  const rating = trader.ratingCount > 0 ? ` Rated ${trader.ratingAvg.toFixed(1)}/5 from ${trader.ratingCount} reviews.` : "";
+  const description = (trader.bio?.trim() || `${trader.businessName}${trade ? `, ${trade.toLowerCase()}` : ""} in ${trader.city}. See rates and opening hours, read reviews and request a free quote on GetTradePros.${rating}`).slice(0, 160);
+  const url = `/traders/${trader.slug}`;
+  // The preview image comes from opengraph-image.tsx next to this page.
+  return {
+    title, description,
+    alternates: { canonical: url },
+    openGraph: { type: "website", url, title, description, siteName: "GetTradePros" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
+
+/** schema.org data for Google's local business results. Only facts shown on the page. */
+function businessJsonLd(trader: NonNullable<Awaited<ReturnType<typeof getPublicTrader>>>) {
+  const primary = (trader.categories.find((c) => c.isPrimary) ?? trader.categories[0])?.category;
+  const url = absoluteUrl(`/traders/${trader.slug}`);
+  const hoursSpec = openingHoursSpec((trader.operatingHours ?? {}) as Parameters<typeof openingHoursSpec>[0]);
+  return {
+    "@context": "https://schema.org",
+    "@type": schemaTypeFor(primary?.slug),
+    "@id": url,
+    name: trader.businessName,
+    url,
+    ...(trader.logoUrl ? { image: absoluteUrl(trader.logoUrl), logo: absoluteUrl(trader.logoUrl) } : {}),
+    ...(trader.bio ? { description: trader.bio.slice(0, 500) } : {}),
+    address: {
+      "@type": "PostalAddress",
+      ...(trader.addressLine ? { streetAddress: trader.addressLine } : {}),
+      addressLocality: trader.city,
+      ...(trader.postcode ? { postalCode: trader.postcode } : {}),
+      addressCountry: trader.country,
+    },
+    ...(trader.latitude != null && trader.longitude != null ? { geo: { "@type": "GeoCoordinates", latitude: trader.latitude, longitude: trader.longitude } } : {}),
+    ...(trader.website ? { sameAs: [trader.website] } : {}),
+    ...(primary ? { knowsAbout: trader.categories.map((c) => c.category.name) } : {}),
+    ...(hoursSpec.length ? { openingHoursSpecification: hoursSpec } : {}),
+    ...(trader.ratingCount > 0
+      ? {
+          aggregateRating: { "@type": "AggregateRating", ratingValue: Number(trader.ratingAvg.toFixed(1)), reviewCount: trader.ratingCount, bestRating: 5, worstRating: 1 },
+          review: trader.reviews.slice(0, 5).map((r) => ({
+            "@type": "Review",
+            author: { "@type": "Person", name: r.authorName },
+            datePublished: new Date(r.createdAt).toISOString().slice(0, 10),
+            reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+            ...(r.comment ? { reviewBody: r.comment } : {}),
+          })),
+        }
+      : {}),
+  };
 }
 
 // Reachable by direct link from any country (e.g. a shared URL); listings and
@@ -35,6 +87,8 @@ export default async function TraderProfilePage({ params }: Props) {
 
   return (
     <SiteShell>
+      {/* eslint-disable-next-line react/no-danger -- JSON-LD, with "<" escaped by jsonLd() */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(businessJsonLd(trader)) }} />
       <article className="py-8">
         {trader.country !== visitor.country && (
           <p className="mb-4 rounded-md bg-sky-50 px-4 py-2 text-sm text-sky-800" role="note">

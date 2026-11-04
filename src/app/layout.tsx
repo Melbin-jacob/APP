@@ -23,6 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(process.env.APP_URL ?? "http://localhost:3000"),
     title: { default: t("meta.title"), template: "%s · GetTradePros" },
     description: t("meta.description"),
+    applicationName: "GetTradePros",
+    // Preview images come from the opengraph-image files (site default + one per business).
+    openGraph: { type: "website", siteName: "GetTradePros", title: t("meta.title"), description: t("meta.description") },
+    twitter: { card: "summary_large_image", title: t("meta.title"), description: t("meta.description") },
   };
 }
 
