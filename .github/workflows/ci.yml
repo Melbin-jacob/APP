@@ -82,3 +82,56 @@ jobs:
       - name: App log on failure
         if: failure()
         run: cat app.log || true
+
+  e2e:
+    name: End-to-end tests (search, quote, claim, review, sign-in, accessibility)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: checks
+    services:
+      db:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: homeservices
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -h 127.0.0.1 -U postgres -d homeservices"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      # Throwaway CI-only values; production refuses anything like them (src/server/startup-checks.ts).
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/homeservices?schema=public
+      REDIS_URL: redis://localhost:6379
+      APP_URL: http://localhost:3000
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: ci-only-secret-0123456789abcdef0123456789
+      REVIEW_TOKEN_PEPPER: ci-only-pepper-0123456789abcdef0123456789
+      CRON_SECRET: ci-only-cron-0123456789abcdef0123456789ab
+      EMAIL_FROM: CI <ci@example.com>
+      ALLOW_INSECURE_LOCAL_SECRETS: "true"
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx prisma migrate deploy
+      - run: npx tsx prisma/seed.ts
+      - run: npm run build
+      # Starts the app and a test inbox itself (playwright.config.ts).
+      - run: npm run e2e
+      - name: Test report and traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

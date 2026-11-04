@@ -10,3 +10,7 @@ next-env.d.ts
 
 # Local Redis snapshots
 dump.rdb
+e2e/.mail/
+e2e/.state.json
+test-results/
+playwright-report/

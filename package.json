@@ -2,7 +2,7 @@
   "name": "gettradepros",
   "version": "0.1.0",
   "private": true,
-  "description": "GetTradePros — marketplace connecting local customers with independent home-service traders.",
+  "description": "GetTradePros \u2014 marketplace connecting local customers with independent home-service traders.",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -16,7 +16,8 @@
     "db:studio": "prisma studio",
     "smoke": "node scripts/smoke.mjs",
     "db:import-directory": "tsx prisma/import-directory.ts",
-    "mfa:reset": "tsx scripts/reset-mfa.ts"
+    "mfa:reset": "tsx scripts/reset-mfa.ts",
+    "e2e": "playwright test"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -41,7 +42,9 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@eslint/eslintrc": "^3.3.7",
+    "@playwright/test": "1.56.1",
     "@types/node": "^26.6.5",
     "@types/nodemailer": "^8.0.2",
     "@types/qrcode": "^1.5.6",
