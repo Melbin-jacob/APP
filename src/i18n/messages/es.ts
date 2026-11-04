@@ -522,6 +522,12 @@ const es: Messages = {
     staff: "Las cuentas del personal no pueden reclamar fichas.",
     alreadyClaimed: "Esta ficha ya la gestiona su negocio. Si es un error, escribe a {email}.",
   },
+  errorPage: {
+    title: "Algo salió mal",
+    body: "Lo sentimos, esta página no se cargó bien. Ya hemos sido avisados. Inténtalo de nuevo.",
+    retry: "Reintentar",
+    home: "Inicio",
+  },
   chat: {
     open: "Obtener ayuda",
     title: "Obtener ayuda",

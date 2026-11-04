@@ -522,6 +522,12 @@ const pt: Messages = {
     staff: "Contas da equipe não podem reivindicar perfis.",
     alreadyClaimed: "Este perfil já é gerenciado pela empresa. Se isso estiver errado, escreva para {email}.",
   },
+  errorPage: {
+    title: "Algo deu errado",
+    body: "Desculpe, esta página não carregou direito. Já fomos avisados. Tente novamente.",
+    retry: "Tentar novamente",
+    home: "Página inicial",
+  },
   chat: {
     open: "Obter ajuda",
     title: "Obter ajuda",

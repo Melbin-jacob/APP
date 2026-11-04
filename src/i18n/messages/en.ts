@@ -522,6 +522,12 @@ const en = {
     staff: "Staff accounts can't claim listings.",
     alreadyClaimed: "This listing is already managed by its business. If that's wrong, contact {email}.",
   },
+  errorPage: {
+    title: "Something went wrong",
+    body: "Sorry, this page didn't load properly. We've been notified. Please try again.",
+    retry: "Try again",
+    home: "Home page",
+  },
   chat: {
     open: "Get help",
     title: "Get help",

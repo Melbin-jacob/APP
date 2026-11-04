@@ -522,6 +522,12 @@ const zh: Messages = {
     staff: "员工账户不能认领企业页面。",
     alreadyClaimed: "此页面已由企业本身管理。如有错误，请联系 {email}。",
   },
+  errorPage: {
+    title: "出了点问题",
+    body: "抱歉，此页面未能正常加载。我们已收到通知，请重试。",
+    retry: "重试",
+    home: "首页",
+  },
   chat: {
     open: "获取帮助",
     title: "获取帮助",

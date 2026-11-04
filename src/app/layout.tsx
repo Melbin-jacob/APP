@@ -7,6 +7,7 @@ import { Providers } from "@/components/providers/Providers";
 import { getI18n } from "@/i18n/server";
 import { getRates } from "@/server/services/fx";
 import "./globals.css";
+import { ErrorReporter } from "@/components/analytics/ErrorReporter";
 import { VisitTracker } from "@/components/analytics/VisitTracker";
 
 // Brand typeface for the GetTradePros wordmark (self-hosted, no Google request).
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             {children}
             <CookieConsent />
             <VisitTracker />
+            <ErrorReporter />
           </Providers>
         </PreferencesProvider>
       </body>

@@ -522,6 +522,12 @@ const it: Messages = {
     staff: "Gli account dello staff non possono rivendicare schede.",
     alreadyClaimed: "Questa scheda è già gestita dall'attività. Se è un errore, scrivi a {email}.",
   },
+  errorPage: {
+    title: "Qualcosa è andato storto",
+    body: "Spiacenti, la pagina non si è caricata correttamente. Siamo stati avvisati. Riprova.",
+    retry: "Riprova",
+    home: "Home",
+  },
   chat: {
     open: "Ottieni aiuto",
     title: "Ottieni aiuto",

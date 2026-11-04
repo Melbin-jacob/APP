@@ -10,3 +10,23 @@ export async function register() {
     process.exit(1);
   }
 }
+
+/**
+ * Errors while rendering pages, server components and actions (API routes
+ * report their own, in route()). Emailed by error-alerts without visitor data.
+ */
+export async function onRequestError(
+  err: unknown,
+  request: { path: string; method: string },
+  context: { routePath?: string; routeType?: string },
+) {
+  // Written as an if-block so the bundler leaves the Node-only import out of the edge build.
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    const { reportError } = await import("./server/error-alerts");
+    await reportError("page", err, {
+      path: context.routePath ?? request.path,
+      method: request.method,
+      digest: (err as { digest?: string } | null)?.digest,
+    });
+  }
+}

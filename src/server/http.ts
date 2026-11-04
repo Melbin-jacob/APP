@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { ZodError, type ZodType } from "zod";
 import { rateLimit, type RATE_LIMITS } from "@/lib/rate-limit";
 import { anonymise } from "@/lib/crypto";
+import { reportError } from "./error-alerts";
 
 export class ApiError extends Error {
   constructor(
@@ -116,7 +117,7 @@ export function route<C = unknown>(handler: Handler<C>, opts: { sameOrigin?: boo
           { status: 422 },
         );
       }
-      console.error("[api] unhandled", err);
+      await reportError("api", err, { path: req.nextUrl.pathname, method: req.method });
       return NextResponse.json({ error: { code: "internal", message: "Something went wrong" } }, { status: 500 });
     }
   };

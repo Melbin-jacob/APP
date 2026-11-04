@@ -522,6 +522,12 @@ const fr: Messages = {
     staff: "Les comptes de l'équipe ne peuvent pas revendiquer de fiche.",
     alreadyClaimed: "Cette fiche est déjà gérée par l'entreprise. En cas d'erreur, contactez {email}.",
   },
+  errorPage: {
+    title: "Une erreur s'est produite",
+    body: "Désolés, cette page ne s'est pas chargée correctement. Nous avons été avertis. Veuillez réessayer.",
+    retry: "Réessayer",
+    home: "Accueil",
+  },
   chat: {
     open: "Obtenir de l'aide",
     title: "Obtenir de l'aide",

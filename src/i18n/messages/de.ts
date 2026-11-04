@@ -522,6 +522,12 @@ const de: Messages = {
     staff: "Mitarbeiterkonten können keine Einträge beanspruchen.",
     alreadyClaimed: "Dieser Eintrag wird bereits vom Betrieb verwaltet. Falls das nicht stimmt, wenden Sie sich an {email}.",
   },
+  errorPage: {
+    title: "Etwas ist schiefgelaufen",
+    body: "Diese Seite wurde leider nicht richtig geladen. Wir wurden benachrichtigt. Bitte versuchen Sie es erneut.",
+    retry: "Erneut versuchen",
+    home: "Startseite",
+  },
   chat: {
     open: "Hilfe erhalten",
     title: "Hilfe erhalten",
